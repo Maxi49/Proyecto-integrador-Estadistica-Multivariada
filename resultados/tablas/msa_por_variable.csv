@@ -1,0 +1,13 @@
+"variable","msa"
+"log_dur",0.785571606795942
+"log_spkts",0.620578975275242
+"log_sbytes",0.664990662596039
+"log_dbytes",0.674776649301128
+"log_sinpkt",0.728847047609297
+"log_sjit",0.775102849441164
+"log_synack",0.87500426818635
+"log_ct_srv_src",0.769489184210472
+"log_ct_srv_dst",0.799549235359176
+"log_ct_src_ltm",0.879285886177193
+"log_ct_src_dport_ltm",0.795696166415703
+"log_ct_dst_sport_ltm",0.764068679043487

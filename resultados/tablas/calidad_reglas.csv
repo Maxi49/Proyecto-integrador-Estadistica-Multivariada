@@ -1,0 +1,16 @@
+"regla","incidencias"
+"Celdas numéricas negativas",0
+"Celdas numéricas no finitas (sin contar NA)",0
+"Conteos no enteros",0
+"sttl fuera de 0..255",0
+"dttl fuera de 0..255",0
+"swin fuera de 0..65535",0
+"dwin fuera de 0..65535",0
+"Conteos de ventana de 100 mayores que 100",0
+"dur = 0 con spkts > 1",0
+"sbytes < spkts",0
+"usa_http fuera de 0/1",0
+"is_sm_ips_ports fuera de 0/1",0
+"is_ftp_login fuera de 0/1",1
+"label fuera de normal/ataque",0
+"Inconsistencia label y attack_cat",0

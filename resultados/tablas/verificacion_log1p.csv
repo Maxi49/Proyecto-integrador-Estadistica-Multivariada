@@ -1,0 +1,15 @@
+"variable","error_maximo"
+"log_dur",8.88178419700125e-16
+"log_spkts",1.33226762955019e-15
+"log_dpkts",1.33226762955019e-15
+"log_sbytes",5.32907051820075e-15
+"log_dbytes",5.32907051820075e-15
+"log_rate",3.5527136788005e-15
+"log_sinpkt",5.32907051820075e-15
+"log_sjit",5.32907051820075e-15
+"log_synack",9.9855020085915e-17
+"log_ct_srv_src",1.33226762955019e-15
+"log_ct_srv_dst",1.33226762955019e-15
+"log_ct_src_ltm",1.33226762955019e-15
+"log_ct_src_dport_ltm",6.66133814775094e-16
+"log_ct_dst_sport_ltm",6.66133814775094e-16

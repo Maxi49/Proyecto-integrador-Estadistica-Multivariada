@@ -1,0 +1,2 @@
+"id","variable","valor","regla","decision"
+97597,"is_ftp_login","4","Discrepancia con la definición binaria del diccionario","Conservar el código original; no usar en X_num ni X_cat; revisar documentación de origen."

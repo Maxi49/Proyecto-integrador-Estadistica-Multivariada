@@ -1,0 +1,4 @@
+"variable","origen","unidad_original","corte_1","corte_2","criterio"
+"duracion_banda","dur","segundos",0.018541,0.709029333333333,"Terciles de la muestra, quantile tipo 7; intervalos cerrados a derecha"
+"bytes_origen_banda","sbytes","bytes",564,1580,"Terciles de la muestra, quantile tipo 7; intervalos cerrados a derecha"
+"respuesta_destino","dpkts","paquetes",0,,"Sin respuesta: dpkts = 0; con respuesta: dpkts > 0"

@@ -1,0 +1,69 @@
+"nombre","descripcion","unidad","tipo","rol_original","motivo_exclusion"
+"id","Identificador del registro dentro de su partición; no identifica equipos.","sin unidad","categórica","contexto","Identificador: excluir de distancias, correlaciones y modelos."
+"dur","Duración total del flujo.","segundos","numérica","X_num",
+"proto","Protocolo de transporte o de red registrado.","sin unidad","categórica","contexto","Usar la versión agrupada proto_g; la variable original (133 valores) no entra en el análisis."
+"service","Servicio identificado; '-' se recodifica como 'ninguno' (sin servicio identificado, no es un faltante).","sin unidad","categórica","contexto","Usar la versión agrupada service_g; la variable original no entra en el análisis."
+"state","Estado de conexión registrado.","sin unidad","categórica","contexto","Usar la versión agrupada state_g; la variable original no entra en el análisis."
+"spkts","Paquetes enviados del origen al destino.","paquetes","numérica","X_num",
+"dpkts","Paquetes enviados del destino al origen.","paquetes","numérica","excluida","Redundante con dbytes (r = 0,95 en log; VIF 50,5). Se excluye para que el determinante de la matriz de correlaciones supere 0,00001 (Etapa 2). Se conserva en la base para discretizar 'con/sin respuesta'."
+"sbytes","Bytes enviados del origen al destino.","bytes","numérica","X_num",
+"dbytes","Bytes enviados del destino al origen.","bytes","numérica","X_num",
+"rate","Tasa de paquetes del flujo.","paquetes/segundo","numérica","excluida","Derivada: rate = (spkts + dpkts - 1) / dur. Además r = -0,91 con sinpkt (VIF 14,3). Se excluye para que el determinante supere 0,00001 (Etapa 2)."
+"sttl","TTL del origen; se usa agrupado como categórica opcional.","código / valor TTL","categórica","contexto","Pocos valores: no entra en X_num; las derivadas TTL son opcionales y no se usan en logística."
+"dttl","TTL del destino; se reserva como contexto categórico.","código / valor TTL","categórica","contexto","Pocos valores: no entra en X_num; las derivadas TTL son opcionales y no se usan en logística."
+"sload","Carga del origen en bits por segundo.","bits/segundo","numérica","excluida","Se calcula a partir de bytes y duración: redundante con sbytes y dur."
+"dload","Carga del destino en bits por segundo.","bits/segundo","numérica","excluida","Se calcula a partir de bytes y duración: redundante con dbytes y dur."
+"sloss","Paquetes del origen perdidos o retransmitidos.","paquetes","numérica","excluida","Redundante con spkts (r = 0,92 en log); 29,2 % de ceros."
+"dloss","Paquetes del destino perdidos o retransmitidos.","paquetes","numérica","excluida","Redundante con dpkts (r = 0,92 en log); 29,8 % de ceros."
+"sinpkt","Tiempo entre paquetes del origen.","milisegundos","numérica","X_num",
+"dinpkt","Tiempo entre paquetes del destino.","milisegundos","numérica","excluida","Redundante con sinpkt (r = 0,84 en log); se priorizó un conjunto menor."
+"sjit","Jitter del origen.","milisegundos","numérica","X_num",
+"djit","Jitter del destino.","milisegundos","numérica","excluida","Redundante con sjit (r = 0,87 en log); se priorizó un conjunto menor."
+"swin","Ventana TCP anunciada por el origen.","bytes","numérica","excluida","Solo toma los valores 0 y 255 (70,8 % y 29,2 %): casi binaria, no continua."
+"stcpb","Número base de secuencia TCP del origen.","sin unidad","categórica","excluida","Número de secuencia TCP aleatorio por diseño; no mide comportamiento."
+"dtcpb","Número base de secuencia TCP del destino.","sin unidad","categórica","excluida","Número de secuencia TCP aleatorio por diseño; no mide comportamiento."
+"dwin","Ventana TCP anunciada por el destino.","bytes","numérica","excluida","Solo toma los valores 0 y 255 (70,4 % y 29,6 %): casi binaria, no continua."
+"tcprtt","Tiempo de establecimiento TCP: synack + ackdat (salvo redondeo decimal).","segundos","numérica","excluida","Es exactamente synack + ackdat: redundancia algebraica."
+"synack","Tiempo entre SYN y SYN_ACK.","segundos","numérica","X_num",
+"ackdat","Tiempo entre SYN_ACK y ACK.","segundos","numérica","excluida","Redundante con synack; se priorizó un conjunto menor."
+"smean","Tamaño medio de paquetes del origen.","bytes","numérica","excluida","Derivada de sbytes / spkts. Agregada a X_num tiene MSA = 0,15 y baja el KMO a 0,69."
+"dmean","Tamaño medio de paquetes del destino.","bytes","numérica","excluida","Derivada de dbytes / dpkts: casi combinación lineal de variables incluidas."
+"trans_depth","Profundidad de transacciones HTTP encadenadas.","transacciones","numérica","excluida","83,4 % de ceros; la información HTTP ya está en service. Solo se usa para construir usa_http."
+"response_body_len","Longitud sin comprimir del cuerpo de respuesta HTTP.","bytes","numérica","excluida","89,7 % de ceros; la información HTTP ya está en service."
+"ct_srv_src","Conexiones con igual servicio y origen en las últimas 100; conteo, no continua estricta.","conexiones (ventana de 100)","numérica","X_num",
+"ct_state_ttl","Código de combinación de estado y rango TTL; se agrupa como categórica opcional.","código / valor TTL","categórica","contexto","Pocos valores: no entra en X_num; las derivadas TTL son opcionales y no se usan en logística."
+"ct_dst_ltm","Conexiones con igual destino en las últimas 100.","conexiones (ventana de 100)","numérica","excluida","Conteo de contexto redundante con los ct_* incluidos."
+"ct_src_dport_ltm","Conexiones con igual origen y puerto destino en las últimas 100; conteo, no continua estricta.","conexiones (ventana de 100)","numérica","X_num",
+"ct_dst_sport_ltm","Conexiones con igual destino y puerto origen en las últimas 100; conteo, no continua estricta.","conexiones (ventana de 100)","numérica","X_num",
+"ct_dst_src_ltm","Conexiones con igual par origen-destino en las últimas 100.","conexiones (ventana de 100)","numérica","excluida","Conteo de contexto redundante con los ct_* incluidos (r = 0,77 con ct_srv_dst en log)."
+"is_ftp_login","Indicador nominal de autenticación FTP; se conservan los valores realmente observados.","sin unidad","categórica","excluida","Idéntica a ct_ftp_cmd en las 5.000 filas y con 98,5 % de ceros."
+"ct_ftp_cmd","Conteo de flujos con comandos FTP.","flujos FTP","numérica","excluida","Idéntica a is_ftp_login en las 5.000 filas y con 98,5 % de ceros."
+"ct_flw_http_mthd","Conteo de flujos con métodos HTTP.","flujos HTTP","numérica","excluida","83,4 % de ceros; la información HTTP ya está en service."
+"ct_src_ltm","Conexiones con igual origen en las últimas 100; conteo, no continua estricta.","conexiones (ventana de 100)","numérica","X_num",
+"ct_srv_dst","Conexiones con igual servicio y destino en las últimas 100; conteo, no continua estricta.","conexiones (ventana de 100)","numérica","X_num",
+"is_sm_ips_ports","1 cuando coinciden IP y puerto entre origen y destino; 0 en otro caso.","sin unidad","categórica","excluida","Indicador de contexto no incluido en X_num ni en las categóricas acordadas."
+"attack_cat","Clase original: Normal o uno de los nueve ataques; estratificación y contexto.","sin unidad","categórica","contexto","Usar la versión agrupada tipo_trafico; la variable original no entra en el análisis."
+"label","Respuesta binaria: 0 -> normal; 1 -> ataque; guardada como factor en ese orden.","sin unidad","categórica","respuesta",
+"n_atipicos","Número de variables X_num fuera de los límites 1,5 IQR en log; cortes del training deduplicado.","variables (0 a 14)","numérica","contexto","No es predictor acordado."
+"tipo_trafico","Normal / Exploits / Fuzzers / Reconnaissance / Otros ataques. 'Otros ataques' agrupa Generic, DoS, Analysis, Backdoor, Shellcode y Worms (cada una < 5 %).","sin unidad","categórica","X_cat",
+"proto_g","Protocolo agrupado: tcp / udp / otros.","sin unidad","categórica","X_cat",
+"service_g","Servicio agrupado: ninguno / http / dns / otros.","sin unidad","categórica","X_cat",
+"state_g","Estado agrupado: FIN / INT / CON_otros.","sin unidad","categórica","X_cat",
+"ttl_origen","TTL de origen: 254 / 31 / otros; opcional; excluida de logística.","sin unidad","categórica","contexto","Inclusión en el ACM a decidir en la Etapa 4. Separa casi perfecto normal/ataque por un artefacto del laboratorio: no usar como predictor en la logística."
+"perfil_estado_ttl","ct_state_ttl: 0 / 1 / 2_o_mas; opcional; excluida de logística.","sin unidad","categórica","contexto","Inclusión en el ACM a decidir en la Etapa 4. Separa casi perfecto normal/ataque por un artefacto del laboratorio: no usar como predictor en la logística."
+"repeticion_servicio","ct_srv_src: baja (1-2), media (3-10), alta (>10); suplementaria, posible redundancia ACP/ACM.","sin unidad","categórica","contexto","Inclusión en el ACM a decidir en la Etapa 4 (posible suplementaria: repite información de ct_srv_src)."
+"usa_http","1 si service es http o trans_depth > 0; 0 en otro caso; predictor adicional previsto.","sin unidad","categórica","contexto",
+"log_dur","log1p de dur; conserva ceros; unidad original: segundos.","escala log1p","numérica","X_num",
+"log_spkts","log1p de spkts; conserva ceros; unidad original: paquetes.","escala log1p","numérica","X_num",
+"log_dpkts","log1p de dpkts; conserva ceros; unidad original: paquetes.","escala log1p","numérica","excluida","Redundante con dbytes (r = 0,95 en log; VIF 50,5). Se excluye para que el determinante de la matriz de correlaciones supere 0,00001 (Etapa 2). Se conserva en la base para discretizar 'con/sin respuesta'."
+"log_sbytes","log1p de sbytes; conserva ceros; unidad original: bytes.","escala log1p","numérica","X_num",
+"log_dbytes","log1p de dbytes; conserva ceros; unidad original: bytes.","escala log1p","numérica","X_num",
+"log_rate","log1p de rate; conserva ceros; unidad original: paquetes/segundo.","escala log1p","numérica","excluida","Derivada: rate = (spkts + dpkts - 1) / dur. Además r = -0,91 con sinpkt (VIF 14,3). Se excluye para que el determinante supere 0,00001 (Etapa 2)."
+"log_sinpkt","log1p de sinpkt; conserva ceros; unidad original: milisegundos.","escala log1p","numérica","X_num",
+"log_sjit","log1p de sjit; conserva ceros; unidad original: milisegundos.","escala log1p","numérica","X_num",
+"log_synack","log1p de synack; conserva ceros; unidad original: segundos.","escala log1p","numérica","X_num",
+"log_ct_srv_src","log1p de ct_srv_src; conserva ceros; unidad original: conexiones (ventana de 100).","escala log1p","numérica","X_num",
+"log_ct_srv_dst","log1p de ct_srv_dst; conserva ceros; unidad original: conexiones (ventana de 100).","escala log1p","numérica","X_num",
+"log_ct_src_ltm","log1p de ct_src_ltm; conserva ceros; unidad original: conexiones (ventana de 100).","escala log1p","numérica","X_num",
+"log_ct_src_dport_ltm","log1p de ct_src_dport_ltm; conserva ceros; unidad original: conexiones (ventana de 100).","escala log1p","numérica","X_num",
+"log_ct_dst_sport_ltm","log1p de ct_dst_sport_ltm; conserva ceros; unidad original: conexiones (ventana de 100).","escala log1p","numérica","X_num",

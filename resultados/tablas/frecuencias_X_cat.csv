@@ -1,0 +1,24 @@
+"variable","categoria","frecuencia","porcentaje"
+"tipo_trafico","Exploits",921,18.42
+"tipo_trafico","Fuzzers",749,14.98
+"tipo_trafico","Normal",2408,48.16
+"tipo_trafico","Otros ataques",573,11.46
+"tipo_trafico","Reconnaissance",349,6.98
+"proto_g","otros",363,7.26
+"proto_g","tcp",3541,70.82
+"proto_g","udp",1096,21.92
+"service_g","dns",516,10.32
+"service_g","http",869,17.38
+"service_g","ninguno",3002,60.04
+"service_g","otros",613,12.26
+"state_g","CON_otros",620,12.4
+"state_g","FIN",3467,69.34
+"state_g","INT",913,18.26
+"respuesta_destino","con_respuesta",4055,81.1
+"respuesta_destino","sin_respuesta",945,18.9
+"duracion_banda","corta",1667,33.34
+"duracion_banda","larga",1667,33.34
+"duracion_banda","media",1666,33.32
+"bytes_origen_banda","altos",1630,32.6
+"bytes_origen_banda","bajos",1689,33.78
+"bytes_origen_banda","medios",1681,33.62
