@@ -1,9 +1,0 @@
-GUION PROPUESTO DE EXPOSICION - 18 MINUTOS
-0-4 min: Mateo. Pregunta, hipótesis, muestra, calidad y componentes principales.
-4-8 min: Ignacio. Factores, diagnóstico Heywood y comparación crítica ACP-AF.
-8-13 min: Maximiliano. Elección de k, comparación de métodos y perfiles de los seis grupos.
-13-18 min: Lisandro. ACS, ACM, cluster suplementario, hipótesis y limitaciones.
-Reservar hasta dos minutos adicionales para el cierre o preguntas, sin exceder 20 minutos.
-Puntos que deben poder explicar: por qué estandarizar; qué significa una unicidad negativa;
-por qué k=6 no es un óptimo indiscutible; por qué la inercia ajustada no es la cruda;
-por qué asociación y clusters no permiten afirmar probabilidades predictivas validadas.

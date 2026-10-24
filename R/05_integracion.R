@@ -1,4 +1,4 @@
-# ETAPAS 5 Y 6. Síntesis de resultados y preparación de la exposición.
+# ETAPA 6. Síntesis de resultados de las técnicas multivariadas.
 set.seed(42)
 base <- readRDS("resultados/base_con_clusters.rds")
 X <- readRDS("resultados/conjuntos_congelados.rds")$X_num
@@ -33,14 +33,4 @@ integracion <- data.frame(
     "Respuesta/protocolo/estado y oposición entre estados y tipos de servicio")
 )
 guardar(integracion, "integracion_tecnicas")
-writeLines(c("GUION PROPUESTO DE EXPOSICION - 18 MINUTOS",
-  "0-4 min: Mateo. Pregunta, hipótesis, muestra, calidad y componentes principales.",
-  "4-8 min: Ignacio. Factores, diagnóstico Heywood y comparación crítica ACP-AF.",
-  "8-13 min: Maximiliano. Elección de k, comparación de métodos y perfiles de los seis grupos.",
-  "13-18 min: Lisandro. ACS, ACM, cluster suplementario, hipótesis y limitaciones.",
-  "Reservar hasta dos minutos adicionales para el cierre o preguntas, sin exceder 20 minutos.",
-  "Puntos que deben poder explicar: por qué estandarizar; qué significa una unicidad negativa;",
-  "por qué k=6 no es un óptimo indiscutible; por qué la inercia ajustada no es la cruda;",
-  "por qué asociación y clusters no permiten afirmar probabilidades predictivas validadas."),
-  "resultados/guion_exposicion.txt", useBytes = TRUE)
 print(integracion)
