@@ -1,0 +1,24 @@
+EJECUTAR DESDE LA CARPETA PRINCIPAL DEL REPOSITORIO
+
+1. Una sola vez, en R:
+install.packages(c("readxl", "psych", "cluster", "ca", "FactoMineR"))
+
+2. Ejecutar los análisis completos en R:
+source("R/ejecutar_todo.R", encoding = "UTF-8")
+
+3. En la terminal de Python:
+python -m pip install -r requirements.txt
+python python/graficos_etapa0.py
+python python/graficos_parte2.py
+python python/verificar_resultados.py
+python python/crear_informe.py --salida "carpeta de entrega"
+
+4. Para exportar el Word a PDF con Microsoft Word instalado, en PowerShell:
+.\python\exportar_word.ps1 -Documento "ruta completa del Word generado"
+
+R/00_datos.R conserva el estilo del script Consultar Diccionario de Variables.R.
+La hoja muestra y n_atipicos originales no se modifican. Los clusters se guardan
+en otra base: resultados/base_con_clusters.rds.
+Minres produce un caso Heywood; se informa y se contrasta con ML acotado.
+Ese aviso es un resultado metodológico, no un error ocultado de la ejecución.
+La portada usa los integrantes y la docente indicados. Completar la fecha de entrega.

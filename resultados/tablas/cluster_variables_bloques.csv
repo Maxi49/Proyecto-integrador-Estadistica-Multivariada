@@ -1,0 +1,13 @@
+"variable","bloque"
+"log_dur",1
+"log_spkts",2
+"log_sbytes",2
+"log_dbytes",2
+"log_sinpkt",1
+"log_sjit",1
+"log_synack",1
+"log_ct_srv_src",3
+"log_ct_srv_dst",3
+"log_ct_src_ltm",3
+"log_ct_src_dport_ltm",3
+"log_ct_dst_sport_ltm",3

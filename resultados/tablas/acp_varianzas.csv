@@ -1,0 +1,13 @@
+"variable","varianza"
+"log_dur",0.383928877255597
+"log_spkts",1.30339492534982
+"log_sbytes",2.61578141428398
+"log_dbytes",11.8463126815065
+"log_sinpkt",4.80226889686878
+"log_sjit",13.6112647310253
+"log_synack",0.00179359196152236
+"log_ct_srv_src",0.527471429276964
+"log_ct_srv_dst",0.524741161227675
+"log_ct_src_ltm",0.408313943421239
+"log_ct_src_dport_ltm",0.216177860978849
+"log_ct_dst_sport_ltm",0.112307687641452

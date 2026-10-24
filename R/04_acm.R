@@ -1,9 +1,74 @@
-# PLANTILLA DE ETAPA POSTERIOR: ACS y ACM. No contiene resultados calculados.
-# Ejecutar desde la raíz del repositorio, después de completar la Etapa 0.
+# ETAPA 4. ACS, ACM y proyección suplementaria del cluster.
+library(ca)
+library(FactoMineR)
 set.seed(42)
-if (!file.exists("resultados/conjuntos_congelados.rds")) stop("Ejecutar primero R/00_datos.R.")
-base <- readRDS("resultados/base_limpia.rds")
+base <- readRDS("resultados/base_con_clusters.rds")
 conjuntos <- readRDS("resultados/conjuntos_congelados.rds")
-X_num <- conjuntos$X_num
 X_cat <- conjuntos$X_cat
-stop("Etapa ACS y ACM pendiente. Esta plantilla solo carga los datos comunes; no ejecuta la técnica.")
+guardar <- function(x, nombre) write.csv(x, paste0("resultados/tablas/", nombre, ".csv"),
+  row.names = FALSE, fileEncoding = "UTF-8")
+
+# Las siete variables activas ya incluyen tres numéricas discretizadas en Etapa 0.
+# Sus modalidades superan 5%; no se fusionan categorías adicionales.
+frecuencias <- read.csv("resultados/tablas/frecuencias_X_cat.csv")
+stopifnot(all(frecuencias$porcentaje >= 5), all(sapply(X_cat, is.factor)))
+
+# ACS: tipo de tráfico y estado agrupado, para estudiar la tercera hipótesis.
+tabla <- table(X_cat$tipo_trafico, X_cat$state_g)
+acs <- ca::ca(tabla, nd = 2)
+chi <- chisq.test(tabla, correct = FALSE)
+guardar(data.frame(tipo_trafico = rownames(tabla), unclass(tabla)), "acs_contingencia")
+guardar(data.frame(tipo_trafico = rownames(tabla), unclass(100 * prop.table(tabla, 1))), "acs_porcentajes_fila")
+guardar(data.frame(dimension = seq_along(acs$sv), autovalor = acs$sv^2,
+  porcentaje = 100 * acs$sv^2 / sum(acs$sv^2)), "acs_inercia")
+guardar(data.frame(chi2 = unname(chi$statistic), gl = unname(chi$parameter), p = chi$p.value,
+  cramer_v = sqrt(unname(chi$statistic) / (sum(tabla) * min(nrow(tabla) - 1, ncol(tabla) - 1))),
+  frecuencia_esperada_min = min(chi$expected)), "acs_asociacion")
+guardar(data.frame(categoria = rownames(tabla),
+  sweep(acs$rowcoord[, 1:2, drop = FALSE], 2, acs$sv[1:2], "*")), "acs_filas")
+guardar(data.frame(categoria = colnames(tabla),
+  sweep(acs$colcoord[, 1:2, drop = FALSE], 2, acs$sv[1:2], "*")), "acs_columnas")
+
+# Cluster es suplementario: no interviene en la construcción de los ejes.
+datos_acm <- data.frame(X_cat, cluster = base$cluster)
+Q <- ncol(X_cat)
+J <- sum(sapply(X_cat, nlevels))
+acm <- FactoMineR::MCA(datos_acm, quali.sup = ncol(datos_acm), ncp = J - Q, graph = FALSE)
+ajustado <- ca::mjca(X_cat, nd = NA, lambda = "adjusted")
+indicador <- ca::mjca(X_cat, nd = NA, lambda = "indicator")
+# ca 0.72 entrega valores singulares: al cuadrarlos se obtienen los autovalores.
+stopifnot(max(abs(indicador$sv^2 - acm$eig[, 1])) < 1e-8)
+autovalores <- data.frame(dimension = seq_len(nrow(acm$eig)), autovalor = acm$eig[, 1],
+  porcentaje_crudo = acm$eig[, 2], acumulado_crudo = acm$eig[, 3],
+  autovalor_ajustado = 0, porcentaje_ajustado = 0)
+n_aj <- length(ajustado$sv)
+autovalores$autovalor_ajustado[1:n_aj] <- ajustado$sv^2
+autovalores$porcentaje_ajustado[1:n_aj] <- 100 * ajustado$inertia.e
+autovalores$acumulado_ajustado <- cumsum(autovalores$porcentaje_ajustado)
+guardar(autovalores, "acm_autovalores")
+guardar(data.frame(Q = Q, J = J, inercia_cruda = J / Q - 1,
+  umbral = 1 / Q, ejes_sobre_umbral = sum(acm$eig[, 1] > 1 / Q),
+  inercia_total_ajustada = ajustado$inertia.t,
+  porcentaje_plano_ajustado = sum(autovalores$porcentaje_ajustado[1:2])), "acm_resumen")
+
+# Se conservan todos los resultados; el informe interpreta el plano de dos dimensiones.
+categorias <- ajustado$levelnames
+coord <- data.frame(categoria = categorias, acm$var$coord)
+contrib <- data.frame(categoria = categorias, acm$var$contrib)
+cos2 <- data.frame(categoria = categorias, acm$var$cos2)
+guardar(coord, "acm_categorias_coordenadas")
+guardar(contrib, "acm_categorias_contribuciones")
+guardar(cos2, "acm_categorias_cos2")
+guardar(data.frame(variable = rownames(acm$var$eta2), acm$var$eta2), "acm_eta2")
+guardar(data.frame(cluster = levels(base$cluster), acm$quali.sup$coord), "acm_cluster_suplementario")
+guardar(data.frame(cluster = levels(base$cluster), acm$quali.sup$cos2), "acm_cluster_cos2")
+guardar(data.frame(id = base$id, cluster = base$cluster, acm$ind$coord[, 1:2]), "acm_individuos")
+
+# Cruces para interpretar tres asociaciones con frecuencias observadas, sin causalidad.
+for (variable in c("respuesta_destino", "duracion_banda", "bytes_origen_banda")) {
+  t <- table(X_cat$tipo_trafico, X_cat[[variable]])
+  guardar(data.frame(tipo_trafico = rownames(t), unclass(100 * prop.table(t, 1))), paste0("acm_cruce_", variable))
+}
+saveRDS(list(acs = acs, acm = acm, ajustado = ajustado, dimensiones_interpretadas = 2), "resultados/correspondencias.rds")
+print(autovalores)
+print(acm$var$eta2[, 1:2])

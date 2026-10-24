@@ -152,7 +152,7 @@ print(msa)
 if (kmo$MSA < .6 || min(kmo$MSAi) < .5 || det(correlaciones) <= 1e-5)
   warning("Revisar el piloto; no se cambia X_num automáticamente.")
 
-# 6. Congelar X_cat: cuatro categorías existentes y propuesta de tres discretizaciones.
+# 6. Congelar X_cat: cuatro categorías existentes y tres discretizaciones.
 # Los terciles no usan la etiqueta de ataque para elegir los cortes.
 cortes_dur <- unname(quantile(base$dur, c(1/3, 2/3), type = 7))
 cortes_bytes <- unname(quantile(base$sbytes, c(1/3, 2/3), type = 7))
@@ -179,6 +179,6 @@ stopifnot(identical(base, base_original))
 saveRDS(base, "resultados/base_limpia.rds")
 saveRDS(list(X_num = X_num, X_cat = X_cat, id = base$id, semilla = 42,
   cortes_dur = cortes_dur, cortes_bytes = cortes_bytes,
-  estado_X_cat = "Propuesta para revisión grupal"), "resultados/conjuntos_congelados.rds")
+  estado_X_cat = "Congelado para los análisis de la Parte 2"), "resultados/conjuntos_congelados.rds")
 cat("Base y conjuntos guardados en resultados. Excel original conservado.\n")
 cat("Gráficos: ejecutar en Python el archivo python/graficos_etapa0.py.\n")
