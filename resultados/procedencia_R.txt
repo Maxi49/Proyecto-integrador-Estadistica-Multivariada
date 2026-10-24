@@ -1,4 +1,0 @@
-Fuente de trabajo: muestra_estratificada-simulado-de-ataques.xlsx
-MD5: e84c8d96cb0c7c8699c175eb69829e8e
-La procedencia anterior de la muestra se describe según CONTEXTO_PROYECTO.md; no se remuestrea.
-La base no se elimina, imputa ni altera en esta etapa.

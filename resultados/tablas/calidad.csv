@@ -1,0 +1,17 @@
+"control","cantidad"
+"Valores NA",0
+"Textos vacíos",0
+"Filas duplicadas",0
+"ID repetidos",0
+"Perfiles originales duplicados sin id",0
+"Celdas negativas",0
+"Celdas no finitas sin NA",0
+"Conteos no enteros",0
+"TTL fuera de 0 a 255",0
+"Ventana TCP fuera de 0 a 65535",0
+"dur = 0 con spkts > 1 (revisar precisión)",0
+"sbytes < spkts",0
+"Indicadores usa_http/is_sm_ips_ports fuera de 0/1",0
+"is_ftp_login fuera de 0/1",1
+"label fuera de normal/ataque",0
+"label y attack_cat inconsistentes",0

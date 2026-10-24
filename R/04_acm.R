@@ -1,9 +1,9 @@
 # PLANTILLA DE ETAPA POSTERIOR: ACS y ACM. No contiene resultados calculados.
 # Ejecutar desde la raíz del repositorio, después de completar la Etapa 0.
 set.seed(42)
-if (!file.exists("datos/conjuntos_congelados.rds")) stop("Ejecutar primero R/00_datos.R.")
-base <- readRDS("datos/base_limpia.rds")
-conjuntos <- readRDS("datos/conjuntos_congelados.rds")
+if (!file.exists("resultados/conjuntos_congelados.rds")) stop("Ejecutar primero R/00_datos.R.")
+base <- readRDS("resultados/base_limpia.rds")
+conjuntos <- readRDS("resultados/conjuntos_congelados.rds")
 X_num <- conjuntos$X_num
 X_cat <- conjuntos$X_cat
 stop("Etapa ACS y ACM pendiente. Esta plantilla solo carga los datos comunes; no ejecuta la técnica.")

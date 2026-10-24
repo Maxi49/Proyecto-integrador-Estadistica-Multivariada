@@ -1,2 +1,2 @@
-"n","p","determinante","kmo_global","msa_minima","bartlett_chi2","bartlett_gl","bartlett_p_calculado","bartlett_p_informe"
-5000,12,6.30243194453168e-05,0.748265858510909,0.620578975275242,48303.5294746096,66,0,"< 0,001"
+"determinante","kmo_global","msa_minima","bartlett_chi2","bartlett_gl","bartlett_p_calculado","bartlett_p_informe"
+6.30243194453168e-05,0.748265858510909,0.620578975275242,48303.5294746096,66,0,"< 0,001"

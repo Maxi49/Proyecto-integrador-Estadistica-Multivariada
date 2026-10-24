@@ -17,8 +17,8 @@
 "respuesta_destino","con_respuesta",4055,81.1
 "respuesta_destino","sin_respuesta",945,18.9
 "duracion_banda","corta",1667,33.34
-"duracion_banda","larga",1667,33.34
 "duracion_banda","media",1666,33.32
-"bytes_origen_banda","altos",1630,32.6
+"duracion_banda","larga",1667,33.34
 "bytes_origen_banda","bajos",1689,33.78
 "bytes_origen_banda","medios",1681,33.62
+"bytes_origen_banda","altos",1630,32.6
