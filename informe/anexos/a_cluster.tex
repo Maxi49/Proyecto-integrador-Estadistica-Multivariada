@@ -1,0 +1,65 @@
+\subsection{Análisis de conglomerados}
+\label{anexo:cluster}
+
+\begin{figure}[H]
+  \centering
+  \grafico[0.95\linewidth]{11_cluster_dendrograma.png}
+  \caption{Dendrograma Ward.D2 de los 5.000 flujos (últimos 15 nodos; entre paréntesis, flujos de cada nodo). La línea punteada indica el corte en seis grupos. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:a-dendro}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{Tabla cruzada entre el corte de Ward en seis grupos (filas) y los clusters de k-means (columnas); ARI = 0,813. Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-cruce-ward}
+  \begin{tablacompacta}
+  \begin{tabular}{@{}crrrrrr@{}}
+  \toprule
+  Ward $\backslash$ k-means & 1 & 2 & 3 & 4 & 5 & 6 \\
+  \midrule
+  1 & 56 & 0 & 4 & 37 & 1.126 & 72 \\
+  2 & 19 & 98 & 0 & 2.063 & 8 & 47 \\
+  3 & 3 & 0 & 0 & 1 & 0 & 142 \\
+  4 & 71 & 285 & 0 & 19 & 0 & 8 \\
+  5 & 749 & 22 & 0 & 11 & 1 & 8 \\
+  6 & 0 & 0 & 143 & 0 & 0 & 7 \\
+  \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{Tabla cruzada entre k-means sobre las variables estandarizadas (filas) y k-means sobre los puntajes de las tres componentes principales (columnas); ARI = 0,708. Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-cruce-acp}
+  \begin{tablacompacta}
+  \begin{tabular}{@{}crrrrrr@{}}
+  \toprule
+  Variables $\backslash$ ACP & 1 & 2 & 3 & 4 & 5 & 6 \\
+  \midrule
+  1 & 0 & 2 & 76 & 14 & 1 & 805 \\
+  2 & 0 & 0 & 326 & 21 & 58 & 0 \\
+  3 & 147 & 0 & 0 & 0 & 0 & 0 \\
+  4 & 0 & 9 & 28 & 515 & 1.578 & 1 \\
+  5 & 1 & 1.126 & 0 & 6 & 0 & 2 \\
+  6 & 95 & 42 & 0 & 71 & 0 & 76 \\
+  \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{Cruce entre los clusters y el tipo de tráfico (cantidad de flujos). Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-cluster-tipo}
+  \begin{tablacompacta}
+  \begin{tabular}{@{}lrrrrrr@{}}
+  \toprule
+  Tipo de tráfico & 1 & 2 & 3 & 4 & 5 & 6 \\
+  \midrule
+  Normal & 885 & 111 & 0 & 617 & 610 & 185 \\
+  Exploits & 5 & 179 & 1 & 659 & 73 & 4 \\
+  Fuzzers & 6 & 78 & 2 & 416 & 185 & 62 \\
+  Reconnaissance & 0 & 4 & 2 & 255 & 84 & 4 \\
+  Otros ataques & 2 & 33 & 142 & 184 & 183 & 29 \\
+  \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}

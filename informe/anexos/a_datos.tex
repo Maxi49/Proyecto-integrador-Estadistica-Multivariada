@@ -5,7 +5,7 @@
   \centering
   \caption{Controles de calidad sobre la muestra de 5.000 flujos (cantidad de casos que incumplen cada control).}\label{tab:a-calidad}
   \begin{tablacompacta}
-  \begin{tabular}{@{}lr@{\hspace{1.2cm}}lr@{}}
+  \begin{tabular}{@{}lr@{\hspace{0.8cm}}lr@{}}
   \toprule
   Control & Casos & Control & Casos \\
   \midrule
@@ -13,7 +13,7 @@
   Textos vacíos & 0 & Ventana TCP fuera de 0 a 65.535 & 0 \\
   Filas duplicadas & 0 & \texttt{dur} = 0 con \texttt{spkts} > 1 & 0 \\
   Identificadores repetidos & 0 & \texttt{sbytes} < \texttt{spkts} & 0 \\
-  Perfiles duplicados sin \texttt{id} & 0 & Indicadores fuera de 0/1 (\texttt{usa\_http}, \texttt{is\_sm\_ips\_ports}) & 0 \\
+  Perfiles duplicados sin \texttt{id} & 0 & Indicadores binarios fuera de 0/1 & 0 \\
   Celdas negativas & 0 & \texttt{is\_ftp\_login} fuera de 0/1 & 1 \\
   Celdas no finitas & 0 & \texttt{label} fuera de normal/ataque & 0 \\
   Conteos no enteros & 0 & \texttt{label} y \texttt{attack\_cat} inconsistentes & 0 \\

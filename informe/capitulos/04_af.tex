@@ -1,5 +1,64 @@
 \section{Análisis factorial}
 \label{sec:af}
 
-[Pendiente]
+Los supuestos se verificaron en el capítulo de Datos (Sección~\ref{sec:datos}): determinante $6{,}3\times10^{-5}$, Bartlett con $p<0{,}001$, KMO 0,748 y MSA mínimo 0,621, por lo que no se eliminó ninguna variable. El análisis paralelo \citep{horn1965} sugiere cuatro factores, pero el cuarto autovalor observado es 0,127 (simulado: 0,036) y supera al azar sobre todo porque con $n=5.000$ se detecta casi cualquier estructura (Figura~\ref{fig:af-paralelo}). El criterio de Kaiser sobre la matriz reducida da 4,93; 1,78; 1,44 y 0,43: tres factores, y el cuarto aporta solo 4,8~\% de la varianza común. Con cuatro, además, el bloque de repetición se parte en dos factores que correlacionan 0,62 (oblimin), síntoma de sobreextracción. Retenemos \textbf{tres factores}, igual que el ACP.
 
+\begin{figure}[H]
+  \centering
+  \grafico[0.92\linewidth]{09_af_paralelo.png}
+  \caption{Análisis paralelo sobre la matriz reducida: tres autovalores observados quedan muy por encima de la referencia aleatoria; el cuarto (0,127) apenas la supera, y es el corte que sugiere el análisis paralelo. Retenemos tres factores (Kaiser reducido). Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:af-paralelo}
+\end{figure}
+
+\textbf{Caso Heywood y estimador.} Con cuatro factores \texttt{log\_spkts} alcanza una comunalidad de 1,029 (minres); con tres ocurre lo mismo con minres (1,025), ejes principales (1,095) y máxima verosimilitud (0,995), sea cual sea la rotación. La causa es que \texttt{log\_spkts} se reproduce casi por completo con el factor Volumen ($r=0{,}86$ con \texttt{log\_sbytes}), que tiene solo tres indicadores. La única combinación sin solución impropia es \textbf{tres factores con GLS} (comunalidad máxima 0,897; Anexo A, Tabla~\ref{tab:a-af-diagnostico}), que además no obliga a quitar una variable de X\_num. Usamos GLS con rotación varimax; la comunalidad de 0,87 de \texttt{log\_spkts} debe leerse como ``casi toda su varianza es Volumen''.
+
+\textbf{Interpretación.} Según la Tabla~\ref{tab:af-patron}, cada variable carga en un único factor (mínimo 0,54) y la menor diferencia con la segunda carga es 0,29 (\texttt{log\_ct\_src\_ltm}), por encima de 0,20: no hay cargas cruzadas ambiguas. Nombramos \textbf{F1 Repetición de conexiones}, \textbf{F2 Temporización} y \textbf{F3 Volumen}, que coinciden con los bloques de H1 y explican 68,6~\% de la varianza total. La variable peor explicada es \texttt{log\_ct\_src\_ltm} (0,36). Guardamos los puntajes factoriales (\texttt{af\_puntajes.csv}); son estimaciones, no valores medidos.
+
+\begin{table}[H]
+  \centering
+  \caption{Matriz de patrón del AF (GLS, varimax; cargas $<0{,}40$ ocultas con ``--''), comunalidades ($h^2$) y unicidades ($u^2$). Fuente: elaboración propia con UNSW-NB15.}\label{tab:af-patron}
+  \begin{tablacompacta}
+  \begin{tabular}{@{}lrrrrr@{}}
+  \toprule
+  Variable & F1 Repetición & F2 Temporización & F3 Volumen & $h^2$ & $u^2$ \\
+  \midrule
+  \texttt{log\_ct\_src\_dport\_ltm} & 0,91 & -- & -- & 0,90 & 0,10 \\
+  \texttt{log\_ct\_srv\_src} & 0,77 & -- & -- & 0,68 & 0,32 \\
+  \texttt{log\_ct\_srv\_dst} & 0,76 & -- & -- & 0,69 & 0,31 \\
+  \texttt{log\_ct\_dst\_sport\_ltm} & 0,70 & -- & -- & 0,59 & 0,41 \\
+  \texttt{log\_ct\_src\_ltm} & 0,54 & -- & -- & 0,36 & 0,64 \\
+  \texttt{log\_sinpkt} & -- & 0,87 & -- & 0,83 & 0,17 \\
+  \texttt{log\_sjit} & -- & 0,81 & -- & 0,87 & 0,13 \\
+  \texttt{log\_synack} & -- & 0,70 & -- & 0,51 & 0,49 \\
+  \texttt{log\_dur} & -- & 0,68 & -- & 0,56 & 0,44 \\
+  \texttt{log\_spkts} & -- & -- & 0,91 & 0,87 & 0,13 \\
+  \texttt{log\_sbytes} & -- & -- & 0,81 & 0,70 & 0,30 \\
+  \texttt{log\_dbytes} & -- & -- & 0,79 & 0,70 & 0,30 \\
+  \midrule
+  \% de la varianza total & 25,1 & 22,4 & 21,1 & \multicolumn{2}{r}{Total 68,6} \\
+  \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+
+\textbf{Ajuste global.} Es flojo: RMSR 0,051, TLI 0,609 y RMSEA 0,239, y el ajuste exacto se rechaza ($\chi^2=9.452$, 33 g.l., $p<0{,}001$, esperable con $n=5.000$). Con cuatro factores mejora (RMSR 0,033; TLI 0,79) pero con solución impropia: es el costo de la parsimonia. Usamos el AF de forma descriptiva y no confirmatoria \citep{hair2019,revelle2024}.
+
+\begin{table}[H]
+  \centering
+  \caption{Comparación entre el ACP (Etapa 1) y el AF (Etapa 2) sobre las mismas 12 variables. Fuente: elaboración propia con UNSW-NB15.}\label{tab:acp-af}
+  \begin{tablacompacta}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+  \toprule
+   & ACP & AF (GLS, varimax) \\
+  \midrule
+  Varianza que usa & Total (diagonal de $R$ igual a 1) & Solo la común (la unicidad se separa) \\
+  Retenido & 3 componentes, 74,5~\% de la varianza total & 3 factores, 68,6~\% de la varianza total \\
+  Qué representan los ejes & Combinaciones lineales que resumen la varianza; ejes mixtos & Causas latentes de las correlaciones; bloques \\
+  Variables en cada eje & CP1: temporización y volumen (+0,54 a +0,82) frente a repetición ($-0{,}56$ a $-0{,}70$); CP2: volumen (+0,45 a +0,64) junto con repetición (+0,29 a +0,51); CP3: \texttt{sinpkt}, \texttt{synack} y \texttt{ct\_*\_port} (+0,41 a +0,59) frente a volumen ($-0{,}32$ a $-0{,}39$) & F1: las cinco \texttt{ct\_*}; F2: \texttt{dur}, \texttt{sinpkt}, \texttt{sjit}, \texttt{synack}; F3: \texttt{spkts}, \texttt{sbytes}, \texttt{dbytes} \\
+  Puntajes & Exactos & Estimados \\
+  \bottomrule
+  \end{tabularx}
+  \end{tablacompacta}
+\end{table}
+
+\textbf{ACP versus AF.} La Tabla~\ref{tab:acp-af} compara ambas técnicas. Para esta base y esta pregunta (qué bloques de variables se mueven juntos, H1) resulta más adecuado el \textbf{AF}: sus tres ejes son los tres bloques esperados, mientras que en el ACP cada componente combina tiempo, volumen y repetición y obliga a leer contrastes. El ACP conviene para resumir (74,5~\% frente a 68,6~\%), con puntajes exactos y sin soluciones impropias, por lo que lo usamos como predictor en la regresión logística. La ventaja del AF es de interpretación, no de ajuste. Respecto de H1, el AF recupera los tres bloques con cargas $\ge 0{,}54$ y coincide exactamente con el cluster de variables (Sección~\ref{sec:cluster}).

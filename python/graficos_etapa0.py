@@ -111,7 +111,7 @@ ax.set_xticks(range(12), labels, rotation=50, ha="right")
 ax.set_yticks(range(12), labels)
 for i in range(12):
     for j in range(12):
-        ax.text(j, i, f"{correlaciones.iloc[i, j]:.2f}", ha="center", va="center", fontsize=8, color="#283C49")
+        ax.text(j, i, f"{correlaciones.iloc[i, j]:.2f}".replace(".", ","), ha="center", va="center", fontsize=8, color="#283C49")
 fig.colorbar(im, ax=ax, shrink=.75, label="Correlación de Pearson (r)")
 ax.set_title("Correlaciones entre las 12 variables de X_num", pad=16, fontsize=16)
 nota(fig, "5.000 flujos · todas las variables están en escala log(x + 1) · rango de color fijo: −1 a 1")
@@ -143,9 +143,9 @@ ax.barh(f.variable, f.msa, color=PASTEL[0], edgecolor=EDGE, linewidth=.5)
 ax.axvline(.5, color="#7C5363", linestyle="--", linewidth=1.2, label="Umbral MSA = 0,50")
 ax.set_xlim(0, 1)
 for i, row in enumerate(f.itertuples()):
-    ax.text(row.msa + .01, i, f"{row.msa:.3f}", va="center")
+    ax.text(row.msa + .01, i, f"{row.msa:.3f}".replace(".", ","), va="center")
 ax.set_xlabel("MSA por variable")
-ax.set_title(f"Adecuación por variable · KMO global = {piloto.kmo_global:.3f}", fontsize=15)
+ax.set_title(f"Adecuación por variable · KMO global = {piloto.kmo_global:.3f}".replace(".", ","), fontsize=15)
 ax.legend(loc="lower right")
 guardar(fig, "06_msa")
 

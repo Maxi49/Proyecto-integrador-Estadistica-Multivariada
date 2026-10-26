@@ -196,7 +196,7 @@ axs[0].set_xticks(range(12), ABR, rotation=55, ha="right", fontsize=11)
 axs[0].set_yticks(range(k), [f"C{i}" for i in range(1, k + 1)])
 axs[0].set_title("Medias z por cluster")
 for i in range(k):
-    for j in range(12): axs[0].text(j, i, f"{perfil.iloc[i,j]:.1f}", ha="center", va="center", fontsize=12)
+    for j in range(12): axs[0].text(j, i, f"{perfil.iloc[i,j]:.1f}".replace(".", ","), ha="center", va="center", fontsize=12)
 fig.colorbar(im, ax=axs[0], shrink=.65, label="z (colores saturan en ±3)")
 dendrogram(linkage_r("cluster_dendrograma_variables", 12), labels=ABR, orientation="right",
     ax=axs[1], link_color_func=lambda _: "#8EA9BE", leaf_font_size=9)
