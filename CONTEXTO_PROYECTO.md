@@ -38,8 +38,8 @@
 | Etapa 6 integración `R/05_integracion.R` | ✅ Hecho (sin cifras escritas a mano desde el 26/10) |
 | Regresión logística `R/06_logistica.R` | ✅ Hecha el 26/10 **[validar con el grupo]** |
 | Gráficos en Python (`python/`) | ✅ 18 figuras, coma decimal, `verificar_resultados.py` pasa |
-| Informe LaTeX (`informe/`) | ✅ Borrador completo de los 8 capítulos + Anexo A (complementos) + Anexo B (código). **Falta:** completar la portada (integrantes, facultad, carrera, fecha) y revisar la opinión del grupo (`% REVISAR GRUPO`) |
-| Exposición oral (≤ 20 min) | ✅ Guion en `docs/guion_exposicion.md` y presentación de diapositivas (borrador) **[ensayar]** |
+| Informe LaTeX (`informe/`) | ✅ 8 capítulos + Anexo A (complementos, diccionario, resumen numérico, tabla de integración) + Anexo B (código). 15 páginas sin anexos (portada, 2 de índices, cuerpo pp. 4–14, referencias p. 15). Revisado por un revisor independiente el 26/10 y corregido. **Falta:** completar la portada (integrantes, facultad, carrera, fecha) y revisar la opinión del grupo (`% REVISAR GRUPO`) |
+| Exposición oral (≤ 20 min) | ✅ Guion en `docs/guion_exposicion.md` (15 diapositivas, 18:45 min, 4 oradores, preguntas probables) y presentación de 15 diapositivas en Claude (artefacto privado «Exposición · UNSW-NB15 multivariado»; se descarga como PowerPoint o PDF y hay que compartirlo para que lo vea el resto del grupo). **[ensayar; completar nombres]** |
 | Todo el pipeline | ✅ `Rscript R/ejecutar_todo.R` + 3 scripts de Python corren de punta a punta en ~15 s y reproducen los resultados |
 
 ---
@@ -148,7 +148,7 @@ Volumen: `spkts`, `sbytes`, `dbytes` · Temporización: `dur`, `sinpkt`, `sjit`,
 - [ ] Revisar y reescribir con voz propia la opinión crítica (`% REVISAR GRUPO` en `informe/capitulos/08_integracion.tex` y en `docs/guion_exposicion.md`).
 - [ ] Repartir oradores y ensayar la exposición cronometrada (≤ 20 min).
 - [ ] Confirmar que la base corregida del 23/10 se reenvió a la profe.
-- [ ] Compilar el PDF final y controlar que no pase de 15 páginas sin anexos.
+- [ ] Después de completar la portada, recompilar el PDF y controlar que siga en 15 páginas sin anexos (hoy no hay margen: cualquier agregado al cuerpo debe compensarse moviendo material al Anexo A).
 - [ ] (Opcional) Discutir la propuesta de sensibilidad del AF: sin `log_spkts` no hay Heywood con ningún estimador (no se aplicó porque X_num está congelado).
 
 ---
