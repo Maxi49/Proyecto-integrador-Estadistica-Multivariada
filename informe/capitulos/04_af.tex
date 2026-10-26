@@ -1,7 +1,7 @@
 \section{Análisis factorial}
 \label{sec:af}
 
-Los supuestos se cumplen (sección~\ref{sec:datos}: KMO 0,748, MSA mínimo 0,621, Bartlett y determinante), por lo que no se eliminó ninguna variable. El análisis paralelo \citep{horn1965} sugiere cuatro factores, pero el cuarto autovalor observado es 0,127 (simulado: 0,036) y supera al azar sobre todo porque con $n=5.000$ se detecta casi cualquier estructura; los tres primeros quedan muy por encima (Anexo A, Figura~\ref{fig:af-paralelo}). El criterio de Kaiser sobre la matriz reducida da 4,93; 1,78; 1,44 y 0,43: tres factores, y el cuarto aporta solo 4,8~\% de la varianza común. Con cuatro, además, el bloque de repetición se parte en dos factores que correlacionan 0,62 (oblimin), síntoma de sobreextracción. Retenemos \textbf{tres factores}, igual que el ACP.
+Los supuestos se cumplen (sección~\ref{sec:datos}: KMO 0,748, MSA mínimo 0,621, Bartlett y determinante), por lo que no se eliminó ninguna variable por MSA (\texttt{dpkts} y \texttt{rate} ya se habían excluido por el determinante, sección~\ref{sec:datos}). El análisis paralelo \citep{horn1965} sugiere cuatro factores, pero el cuarto autovalor observado es 0,127 (simulado: 0,036) y supera al azar sobre todo porque con $n=5.000$ se detecta casi cualquier estructura; los tres primeros quedan muy por encima (Anexo A, Figura~\ref{fig:af-paralelo}). El criterio de Kaiser sobre la matriz reducida da 4,93; 1,78; 1,44 y 0,43: tres factores, y el cuarto aporta solo 4,8~\% de la varianza común. Con cuatro, además, el bloque de repetición se parte en dos factores que correlacionan 0,62 (oblimin), síntoma de sobreextracción. Retenemos \textbf{tres factores}, igual que el ACP.
 
 
 \textbf{Caso Heywood y estimador.} Con cuatro factores \texttt{log\_spkts} alcanza una comunalidad de 1,029 (minres); con tres, también (minres 1,025; ejes principales 1,095; máxima verosimilitud 0,995), con cualquier rotación. La causa es que \texttt{log\_spkts} se reproduce casi por completo con el factor Volumen ($r=0{,}86$ con \texttt{log\_sbytes}), que tiene solo tres indicadores. La única combinación sin solución impropia es \textbf{tres factores con GLS} (comunalidad máxima 0,897; Anexo A, Tabla~\ref{tab:a-af-diagnostico}), que además no obliga a quitar una variable de X\_num. Usamos GLS con rotación varimax; la comunalidad de 0,87 de \texttt{log\_spkts} debe leerse como ``casi toda su varianza es Volumen''.
@@ -35,7 +35,7 @@ Los supuestos se cumplen (sección~\ref{sec:datos}: KMO 0,748, MSA mínimo 0,621
   \end{tablacompacta}
 \end{table}
 
-\textbf{Ajuste global.} Es flojo: RMSR 0,051, TLI 0,609 y RMSEA 0,239, y el ajuste exacto se rechaza ($\chi^2=9.452$, 33 g.l., $p<0{,}001$, esperable con $n=5.000$). Con cuatro factores mejora (RMSR 0,033; TLI 0,79) pero con solución impropia: es el costo de la parsimonia. Usamos el AF de forma descriptiva y no confirmatoria \citep{hair2019,revelle2024}.
+\textbf{Ajuste global.} Es flojo: RMSR 0,051, TLI 0,609 y RMSEA 0,239, y el ajuste exacto se rechaza ($\chi^2=9.452$, 33 g.l., $p<0{,}001$, esperable con $n=5.000$). Con cuatro factores y máxima verosimilitud mejora (RMSR 0,032; TLI 0,79; con GLS, 0,028 y 0,78) pero con solución impropia: es el costo de la parsimonia. Usamos el AF de forma descriptiva y no confirmatoria \citep{hair2019,revelle2024}.
 
 \begin{table}[htbp]
   \centering

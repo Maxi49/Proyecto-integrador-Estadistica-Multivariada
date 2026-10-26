@@ -2,13 +2,13 @@
 \label{sec:acm}
 
 \subsection{Construcción de X\_cat}
-X\_cat reúne siete variables (Tabla~\ref{tab:xcat}): cuatro categóricas existentes y tres discretizadas. Todas las categorías superan el 5\,\% (la menor, 6,98\,\%), por lo que no fusionamos ninguna. Para \texttt{dur} y \texttt{sbytes} usamos terciles (0,0185 s y 0,709 s; 564 y 1.580 bytes): ambas son muy asimétricas (\texttt{sbytes}: mediana 918 y media 16.918 bytes), y cortes de igual amplitud dejarían casi todos los flujos en una categoría; los terciles dan 33\,\% por categoría y no usan la etiqueta. \texttt{respuesta\_destino} separa los flujos con \texttt{dpkts} = 0 (``sin respuesta''), un corte natural.
+X\_cat reúne siete variables (Tabla~\ref{tab:xcat}): cuatro categóricas existentes y tres discretizadas. \texttt{tipo\_trafico} entra como variable activa, a diferencia del ACP, el AF y los conglomerados, porque la consigna pide asociaciones entre categóricas incluida la de contexto; por eso las asociaciones con el tipo de tráfico son descriptivas y en parte esperables. Todas las categorías superan el 5\,\% (la menor, 6,98\,\%), por lo que no fusionamos ninguna. Para \texttt{dur} y \texttt{sbytes} usamos terciles (0,0185 s y 0,709 s; 564 y 1.580 bytes): ambas son muy asimétricas (\texttt{sbytes}: mediana 918 y media 16.918 bytes), y cortes de igual amplitud dejarían casi todos los flujos en una categoría; los terciles dan 33\,\% por categoría y no usan la etiqueta. \texttt{respuesta\_destino} separa los flujos con \texttt{dpkts} = 0 (``sin respuesta''), un corte natural.
 
 \begin{table}[htbp]
   \centering
   \caption[Variables y categorías de X\_cat]{X\_cat: variables y categorías finales (\% de 5.000 flujos). Fuente: elaboración propia con UNSW-NB15.}\label{tab:xcat}
   \begin{tablacompacta}
-  \begin{tabular}{ll}
+  \begin{tabularx}{\linewidth}{@{}lX@{}}
     \toprule
     Variable & Categorías (\%) \\
     \midrule
@@ -20,7 +20,7 @@ X\_cat reúne siete variables (Tabla~\ref{tab:xcat}): cuatro categóricas existe
     \texttt{duracion\_banda} & corta 33,3 · media 33,3 · larga 33,3 \\
     \texttt{bytes\_origen\_banda} & bajos 33,8 · medios 33,6 · altos 32,6 \\
     \bottomrule
-  \end{tabular}
+  \end{tabularx}
   \end{tablacompacta}
 \end{table}
 
@@ -35,7 +35,7 @@ Elegimos \texttt{state\_g} por encarnar H3 y ser la más asociada al tipo de tr�
 \end{figure}
 
 \subsection{Análisis de correspondencias múltiples}
-Con $Q = 7$ y $J = 23$, la inercia total cruda es $J/Q - 1 = 2{,}286$ y el autovalor medio $1/Q = 0{,}143$ (seis lo superan: criterio poco exigente). Los porcentajes crudos son bajos (Dim 1: 27,4\,\%, autovalor 0,627; Dim 2: 14,0\,\%, 0,321; acumulado 41,4\,\%). \texttt{mjca} del paquete \texttt{ca} usa por defecto \texttt{lambda = \textquotedbl{}adjusted\textquotedbl{}}, la corrección de Greenacre \citep{greenacre2017}, que reportamos: inercia total ajustada 0,414, Dim 1 = 77,0\,\%, Dim 2 = 10,4\,\%, Dim 3 = 1,8\,\%; el plano suma 87,4\,\% de inercia ajustada, cifra optimista que debe leerse junto con el 41,4\,\% crudo. Retenemos \textbf{dos dimensiones}: el codo se marca tras la Dim 2 (Anexo A, Figura~\ref{fig:a-acm-inercia}) y la tercera aporta menos del 2\,\% ajustado. Coordenadas y contribuciones salen de \texttt{FactoMineR::MCA} \citep{husson2017}.
+Con $Q = 7$ y $J = 23$, la inercia total cruda es $J/Q - 1 = 2{,}286$ y el autovalor medio $1/Q = 0{,}143$ (seis lo superan: criterio poco exigente). Los porcentajes crudos son bajos (Dim 1: 27,4\,\%, autovalor 0,627; Dim 2: 14,0\,\%, 0,321; acumulado 41,4\,\%). \texttt{mjca} del paquete \texttt{ca} \citep{nenadic2007} usa por defecto \texttt{lambda = \textquotedbl{}adjusted\textquotedbl{}}, la corrección de Greenacre \citep{greenacre2017}, que reportamos: inercia total ajustada 0,414, Dim 1 = 77,0\,\%, Dim 2 = 10,4\,\%, Dim 3 = 1,8\,\%; el plano suma 87,4\,\% de inercia ajustada, cifra optimista que debe leerse junto con el 41,4\,\% crudo. Retenemos \textbf{dos dimensiones}: el codo se marca tras la Dim 2 (Anexo A, Figura~\ref{fig:a-acm-inercia}) y la tercera aporta menos del 2\,\% ajustado. Coordenadas y contribuciones salen de \texttt{FactoMineR::MCA} \citep{le2008,husson2017}.
 
 \begin{figure}[htbp]
   \centering

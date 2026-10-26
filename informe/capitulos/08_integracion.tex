@@ -3,20 +3,20 @@
 
 La Tabla~\ref{tab:a-integracion} (Anexo A) integra las técnicas, una fila por técnica. Veredictos:
 
-\begin{singlespace}
-\begin{itemize}\setlength{\itemsep}{0pt}\setlength{\topsep}{1pt}\setlength{\parsep}{0pt}
+\begin{itemize}\setlength{\itemsep}{0pt}\setlength{\topsep}{2pt}\setlength{\parsep}{0pt}
   \item \textbf{H1, confirmada.} El AF y el cluster de variables dan los mismos tres bloques (ARI = 1,000); el ACP también pide tres componentes, pero no los recupera como ejes puros (secciones~\ref{sec:acp} y~\ref{sec:af}).
   \item \textbf{H2, parcialmente confirmada.} El cluster 1 es casi todo normal y el 3 todo ataque, pero los otros cuatro mezclan ambos; además, el cluster 3 sí distingue un tipo (Generic), lo que contradice la segunda parte de la hipótesis (sección~\ref{sec:cluster}).
   \item \textbf{H3, parcialmente confirmada.} INT y sin respuesta se asocian con Otros ataques, pero Exploits es casi todo FIN con respuesta, y dns y http no son exclusivos de lo normal (sección~\ref{sec:acm}).
   \item \textbf{H4, confirmada.} El AUC de prueba (0,882) y el límite inferior de su IC superan 0,80; solo con las componentes (M1, 0,795) no se cumpliría (sección~\ref{sec:logistica}).
 \end{itemize}
-\end{singlespace}
 
 \textbf{Bloques y clusters.} Los clusters se ordenan sobre todo por CP1 ($\eta^2 = 0{,}86$; CP2 y CP3, 0,65) y por los factores (F2 Temporización 0,78, F3 Volumen 0,73, F1 Repetición 0,72): por ejemplo, el cluster 3 tiene F1 = $+3{,}78$ (repetición) y el 2, F2 = $+0{,}88$ (sesiones largas). Es en parte circular, pero el ACM, que no intervino, lo confirma: el cluster 3 es todo INT y sin respuesta y los clusters 1, 2 y 4 se superponen en TCP/FIN.
 
 \textbf{Sorpresas.} (i) La repetición alta no distingue ataques: el cluster 3 es todo ataque y el 6, un tercio. (ii) El cluster 3 aísla Generic. (iii) Todo flujo INT es sin respuesta (913 de 913) y casi todo sin respuesta es INT (913 de 945). (iv) El caso Heywood de \texttt{log\_spkts}. (v) Los OR categóricos son inestables entre particiones.
 
-\textbf{Limitaciones.} Los ataques son sintéticos y, sin duplicados, las proporciones no son prevalencias: la probabilidad logística es relativa a esta base (52~\% de ataques); excluimos TTL por artefacto; los \texttt{ct\_*} usan ventanas de 100 conexiones, así que los flujos no son independientes; con $n = 5.000$ Bartlett rechaza todo y pesa más el KMO; el ajuste global del AF es flojo; k = 6 empata en silhouette con k = 2, 4 y 5; los terciles del ACM son un criterio estadístico, no sustantivo; las categóricas son colineales en la logística; usamos una sola partición 70/30 (a futuro: testing set oficial, validación cruzada y regularización para estabilizar los OR); y los datos son observacionales: describimos asociaciones, no causas.
+\textbf{Limitaciones.} Los ataques son sintéticos y, sin duplicados, las proporciones no son prevalencias: la probabilidad logística es relativa a esta base (52~\% de ataques); excluimos TTL por artefacto; los \texttt{ct\_*} usan ventanas de 100 conexiones, así que los flujos no son independientes; con $n = 5.000$ Bartlett rechaza todo y pesa más el KMO; el ajuste global del AF es flojo; k = 6 empata en silhouette con k = 2, 4 y 5; los terciles del ACM son un criterio estadístico, no sustantivo; las categóricas son colineales en la logística; conservamos los atípicos (34,3~\% de los flujos tiene al menos uno), que pueden influir en las componentes y los factores; usamos una sola partición 70/30; y los datos son observacionales: describimos asociaciones, no causas.
+
+\textbf{Próximos pasos.} Procesar del mismo modo el testing set oficial, usar validación cruzada en lugar de una sola partición, regularizar o incluir interacciones para estabilizar los OR y recalibrar el umbral de clasificación según el costo de los errores.
 
 % REVISAR GRUPO: opinión propia
 \textbf{Conclusión.} Los flujos se organizan en tres patrones, volumen, temporización y repetición, que junto con el estado, el servicio y el protocolo permiten estimar la probabilidad de ataque (AUC 0,882 en prueba), aunque con 28,7~\% de los normales marcados como ataque. A nuestro juicio (valoración del grupo), lo más sólido es la estructura de variables, que tres técnicas recuperan, y lo más frágil, la lectura de los grupos y de los odds ratios aislados; el estado de la conexión parece aportar más que cualquier patrón numérico.
