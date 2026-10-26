@@ -48,7 +48,7 @@ V de Cramér: state_g 0,405 > service_g 0,320 > proto_g 0,302. `state_g` es la v
 
 ## 4. Número de clusters: k = 6
 
-- Silhouette k-means: k = 2: 0,328 · 3: 0,302 · 4: 0,327 · 5: 0,329 · **6: 0,333** · 7: 0,277 · 8: 0,284. Las diferencias entre k = 2 y 6 son < 0,006: son empates prácticos, y todas están por debajo de 0,5 (estructura de grupos débil). Lo que sí es claro es la caída en k = 7.
+- Silhouette k-means: k = 2: 0,328 · 3: 0,302 · 4: 0,327 · 5: 0,329 · **6: 0,333** · 7: 0,277 · 8: 0,284. Entre k = 2, 4, 5 y 6 las diferencias son < 0,007 (k = 3 queda más abajo, 0,302): son empates prácticos, y todas están por debajo de 0,5 (estructura de grupos débil). Lo que sí es claro es la caída en k = 7.
 - Codo (WSS k-means): las ganancias son 7.496 (2→3), 6.722 (3→4), 3.046 (4→5), 2.054 (5→6), 1.858 (6→7). **El codo más marcado está en k = 4**, no en 6.
 - Interpretabilidad de k = 6: cluster 1 (898) es 98,6 % Normal y 1,4 % ataque; cluster 3 (147 flujos, 2,9 %) es 100 % ataque, 88 % Generic, con `ct_dst_sport_ltm` +5,1 desvíos: es un grupo chico pero sustantivo (ráfagas repetidas), no un artefacto. ARI Ward vs k-means = 0,813. Con otras semillas k = 6 da tamaños casi iguales (141 a 2.140), es estable.
 - **Veredicto: defendible, no indefendible; no se cambió.** Se elige por silhouette máxima y se reconoce que k = 4 también es defendible (codo, silhouette 0,327). Debilidad a declarar: los clusters 2 y 6 tienen silhouette media baja (0,06 y 0,12) y 36 % y 27 % de sus flujos con silhouette negativa: están mal separados.

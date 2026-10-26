@@ -25,11 +25,11 @@ Agrupamos los 5.000 flujos con las 12 variables de X\_num estandarizadas, con di
 \begin{figure}[htbp]
   \centering
   \grafico[0.8\linewidth]{10_cluster_seleccion.png}
-  \caption[Codo y silhouette para elegir k]{Codo (izquierda) y silhouette promedio (derecha) para k = 2 a 8, con Ward y k-means. El silhouette de k-means es máximo en k = 6 (0,333), casi igual a k = 2 a 5, y cae en k = 7. Fuente: elaboración propia con UNSW-NB15.}
+  \caption[Codo y silhouette para elegir k]{Codo (izquierda) y silhouette promedio (derecha) para k = 2 a 8, con Ward y k-means. El silhouette de k-means es máximo en k = 6 (0,333), casi igual a k = 2, 4 y 5, y cae en k = 7. Fuente: elaboración propia con UNSW-NB15.}
   \label{fig:cl-seleccion}
 \end{figure}
 
-La elección de k = 6 es defendible pero no contundente. El silhouette de k-means es 0,328 (k = 2), 0,302 (3), 0,327 (4), 0,329 (5), 0,333 (6), 0,277 (7) y 0,284 (8): entre k = 2 y 6 los valores son un empate práctico (diferencias menores que 0,006) y todos están por debajo de 0,5, lo que indica una estructura débil \citep{kaufman1990}; lo claro es la caída en k = 7. El codo más marcado está en k = 4 (la suma de cuadrados baja 7.496, 6.722, 3.046, 2.054 y 1.858 al pasar de 2 a 3, \dots, 6 a 7). Elegimos k = 6 por el silhouette máximo y porque aparece un grupo pequeño y muy definido que k = 4 perdería; k = 4 también era razonable. Los clusters 2 y 6 están mal separados: su silhouette medio es 0,063 y 0,119, con 35,6~\% y 26,8~\% de flujos de silhouette negativo.
+La elección de k = 6 es defendible pero no contundente. El silhouette de k-means es 0,328 (k = 2), 0,302 (3), 0,327 (4), 0,329 (5), 0,333 (6), 0,277 (7) y 0,284 (8): k = 2, 4, 5 y 6 son un empate práctico (entre 0,327 y 0,333; diferencias menores que 0,007), k = 3 queda más abajo y todos están por debajo de 0,5, lo que indica una estructura débil \citep{kaufman1990}; lo claro es la caída en k = 7. El codo más marcado está en k = 4 (la suma de cuadrados baja 7.496, 6.722, 3.046, 2.054 y 1.858 al pasar de 2 a 3, \dots, 6 a 7). Elegimos k = 6 por el silhouette máximo y porque aparece un grupo pequeño y muy definido que k = 4 perdería; k = 4 también era razonable. Los clusters 2 y 6 están mal separados: su silhouette medio es 0,063 y 0,119, con 35,6~\% y 26,8~\% de flujos de silhouette negativo.
 
 \textbf{Jerárquico, k-means y preprocesamiento.} Ward con seis grupos y k-means coinciden bastante (ARI = 0,813; Anexo A, Tabla~\ref{tab:a-cruce-ward}); perfilamos k-means. Sobre los puntajes de las tres componentes el ARI baja a 0,708 (0,605 con Ward; Anexo A, Tabla~\ref{tab:a-cruce-acp}): los grupos cambian, aunque el de 147 flujos queda íntegro. Es esperable: las componentes descartan 25,5~\% de la varianza y, sin reescalar, la primera pesa más en la distancia y desplaza las fronteras entre grupos vecinos.
 
@@ -44,6 +44,6 @@ La elección de k = 6 es defendible pero no contundente. El silhouette de k-mean
   \label{fig:cl-perfiles}
 \end{figure}
 
-Hipotetizamos (sin poder contrastarlo) que el cluster 1 es transferencia legítima de datos; el 3, ráfagas automáticas de paquetes pequeños sin respuesta (130 de sus 147 flujos son Generic); el 5, consultas breves, y el 6, conexiones repetidas hacia un mismo servicio. Los clusters se guardaron en la base (\texttt{cluster}, \texttt{cluster\_ward}, \texttt{cluster\_acp}) para el ACM.
+Hipotetizamos (sin poder contrastarlo) que el cluster 1 es transferencia legítima de datos; el 3, ráfagas automáticas de paquetes pequeños sin respuesta (130 de sus 147 flujos son Generic); el 5, consultas breves, y el 6, conexiones repetidas hacia un mismo servicio. Los clusters se guardaron en la base para el ACM.
 
 \textbf{Vínculo con H2.} H2 se cumple en parte. Un cluster es casi puramente normal (el 1, 98,6~\%) y otro íntegramente de ataques (el 3), definidos por la forma de la conexión; los otros cuatro mezclan ambos (34,9 a 72,6~\% de ataques). Además, la parte de H2 sobre los tipos de ataque no se sostiene del todo: el cluster 3 aísla casi solo ataques Generic. Dada la silhouette baja, leemos los grupos como descripción útil y no como categorías naturales.

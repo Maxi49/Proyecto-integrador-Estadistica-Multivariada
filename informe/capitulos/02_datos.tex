@@ -1,9 +1,9 @@
 \section{Datos}
 \label{sec:datos}
 
-\textbf{Origen y muestra.} Trabajamos con UNSW-NB15 \citep{moustafa2015,moustafa2016}, de uso académico citando a sus autores, con R \citep{rcore2024} y los paquetes \texttt{psych} y \texttt{ca}. El tráfico normal es realista, pero los ataques son sintéticos. En las variables, \texttt{s} indica el origen y \texttt{d} el destino. Del archivo de entrenamiento (175.341 flujos) tomamos 5.000 flujos únicos, con muestreo estratificado proporcional por \texttt{attack\_cat}: 48,2~\% normales y 51,8~\% ataques (Exploits 18,4~\%, Fuzzers 15,0~\%, Reconnaissance 7,0~\%, otros 11,5~\%). Al no haber duplicados (eran el 38,6~\% del original, casi todos ataques automáticos) analizamos perfiles distintos, de modo que las proporciones no son prevalencias reales de una red.
+\textbf{Origen y muestra.} Trabajamos con UNSW-NB15 \citep{moustafa2015,moustafa2016}, de uso académico citando a sus autores, con R \citep{rcore2024} y los paquetes \texttt{psych} y \texttt{ca}. El tráfico normal es realista, pero los ataques son sintéticos. En las variables, \texttt{s} indica el origen y \texttt{d} el destino. Del archivo de entrenamiento (175.341 flujos) tomamos 5.000 flujos únicos, con muestreo estratificado proporcional por \texttt{attack\_cat}: 48,2~\% normales y 51,8~\% ataques (Exploits 18,4~\%, Fuzzers 15,0~\%, Reconnaissance 7,0~\%, otros 11,5~\%). Sin duplicados (eran el 38,6~\% del original, casi todos ataques automáticos), las proporciones no son prevalencias reales de una red.
 
-\textbf{Transformación.} Las variables son positivas, muy asimétricas y de rangos muy amplios. Aplicamos $\log(x+1)$, que conserva los ceros y baja la asimetría de \texttt{sbytes} de 33,3 a 1,0; persisten colas en \texttt{log\_dur} (2,8) (Anexo A, Figuras~\ref{fig:a-hist-crudos} y~\ref{fig:a-hist-log}).
+\textbf{Transformación.} Las variables son positivas, muy asimétricas y de rangos muy amplios. Aplicamos $\log(x+1)$, que conserva los ceros y baja la asimetría de \texttt{sbytes} de 33,3 a 1,0 (Anexo A, Figuras~\ref{fig:a-hist-crudos} y~\ref{fig:a-hist-log}).
 
 \textbf{Variables.} X\_num son las 12 variables de la Tabla~\ref{tab:xnum}, en escala logarítmica. X\_cat tiene siete variables: \texttt{tipo\_trafico}, \texttt{proto\_g}, \texttt{service\_g} y \texttt{state\_g} (con categorías agrupadas) y tres numéricas discretizadas, \texttt{respuesta\_destino}, \texttt{duracion\_banda} y \texttt{bytes\_origen\_banda}, cuyos cortes se justifican en la sección~\ref{sec:acm}; ninguna categoría baja del 5~\% (Anexo A, Figura~\ref{fig:a-frecuencias}). \texttt{tipo\_trafico}, \texttt{attack\_cat} y \texttt{label} no construyen componentes, factores ni clusters: solo colorean o se cruzan después.
 
@@ -32,7 +32,7 @@
   \end{tablacompacta}
 \end{table}
 
-\textbf{Calidad.} No hay faltantes, duplicados ni valores imposibles; la única incidencia es un flujo con \texttt{is\_ftp\_login} = 4 (código no binario), que conservamos porque esa variable no se usa (Anexo A, Tabla~\ref{tab:a-calidad}). No imputamos los ceros estructurales: \texttt{synack} 29,6~\%, \texttt{sjit} 25,9~\% y \texttt{dbytes} 18,9~\% (sin respuesta). Para los atípicos usamos el criterio de Tukey ($1{,}5\times$ RIC) sobre la escala logarítmica: 1.714 flujos (34,3~\%) tienen al menos una de las 12 variables fuera de los límites, sobre todo \texttt{log\_dbytes} (21,1~\%, de los cuales 945 son esos ceros; Anexo A, Tabla~\ref{tab:a-atipicos} y Figura~\ref{fig:a-boxplots}). Los conservamos todos: en ciberseguridad lo extremo puede ser el fenómeno de interés.
+\textbf{Calidad.} No hay faltantes, duplicados ni valores imposibles; la única incidencia es un flujo con \texttt{is\_ftp\_login} = 4 (código no binario), que conservamos porque esa variable no se usa (Anexo A, Tabla~\ref{tab:a-calidad}). No imputamos los ceros estructurales: \texttt{synack} 29,6~\%, \texttt{sjit} 25,9~\% y \texttt{dbytes} 18,9~\% (sin respuesta). Para los atípicos usamos el criterio de Tukey ($1{,}5\times$ RIC) sobre la escala logarítmica: 1.715 flujos (34,3~\%) tienen al menos una de las 12 variables fuera de los límites, sobre todo \texttt{log\_dbytes} (21,1~\%, de los cuales 945 son esos ceros; Anexo A, Tabla~\ref{tab:a-atipicos} y Figura~\ref{fig:a-boxplots}). Los conservamos todos: en ciberseguridad lo extremo puede ser el fenómeno de interés.
 
 \textbf{Descriptiva y supuestos.} La Figura~\ref{fig:correlaciones} muestra tres zonas: volumen (\texttt{spkts}--\texttt{sbytes} 0,86), temporización (\texttt{sinpkt}--\texttt{sjit} 0,85) y repetición (\texttt{ct\_srv\_src}--\texttt{ct\_srv\_dst} 0,85), esta última con correlaciones negativas con el resto ($-0,13$ a $-0,43$). \texttt{sjit} también se asocia con el volumen (0,46 a 0,55), así que los bloques no están aislados.
 
@@ -40,7 +40,7 @@ Los supuestos se cumplen (Anexo A, Figura~\ref{fig:a-msa}): determinante $6{,}3\
 
 \begin{figure}[htbp]
   \centering
-  \grafico[0.42\linewidth]{04_correlaciones.png}
+  \grafico[0.46\linewidth]{04_correlaciones.png}
   \caption[Correlaciones entre las 12 variables de X\_num]{Correlaciones de Pearson entre las 12 variables de X\_num. Se distinguen tres bloques; el de repetición se asocia de forma negativa con los otros dos. Fuente: elaboración propia con UNSW-NB15.}
   \label{fig:correlaciones}
 \end{figure}

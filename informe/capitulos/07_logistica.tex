@@ -24,15 +24,9 @@ M1 usa solo los puntajes (AIC 3.734,2; $R^2$ de McFadden 0,232; AUC en prueba 0,
   \end{tablacompacta}
 \end{table}
 
-\textbf{Desempeño en prueba.} Con umbral 0,5, M2 logra AUC = 0,882 (IC 95\,\% de DeLong con \texttt{pROC} \citep{robin2011}: 0,864 -- 0,900), exactitud 0,818, sensibilidad 0,915, especificidad 0,713 y precisión 0,775. Domina el falso positivo: 207 normales marcados como ataque (28,7\,\%) frente a 66 ataques no detectados (8,5\,\%; Figura~\ref{fig:log-roc}), un costo aceptable al detectar intrusiones.
+\textbf{Desempeño en prueba.} Con umbral 0,5, M2 logra AUC = 0,882 (IC 95\,\% de DeLong con \texttt{pROC} \citep{robin2011}: 0,864 -- 0,900), exactitud 0,818, sensibilidad 0,915, especificidad 0,713 y precisión 0,775. Domina el falso positivo: 207 normales marcados como ataque (28,7\,\%) frente a 66 ataques no detectados (8,5\,\%; Anexo A, Figura~\ref{fig:log-roc}), un costo aceptable al detectar intrusiones.
 
-\begin{figure}[htbp]
-  \centering
-  \grafico[0.5\linewidth]{17_logistica_roc_confusion.png}
-  \caption[Curva ROC y matriz de confusión de M2]{Curva ROC y matriz de confusión de M2 en la prueba (umbral 0,5). Fuente: elaboración propia con UNSW-NB15.}
-  \label{fig:log-roc}
-\end{figure}
 
-\textbf{Diagnóstico.} No hay separación: convergió sin avisos y ninguna probabilidad ajustada está a menos de $10^{-8}$ de 0 o 1. Según la distancia de Cook, 166 flujos (4,7\,\%) superan $4/n$, pero el máximo es 0,019, muy lejos de 1. La calibración es razonable salvo el decil 10, que sobreestima (0,96 contra 0,84; Anexo A, Figura~\ref{fig:a-log-or-cal}).
+\textbf{Diagnóstico.} No hay separación (convergió sin avisos). Según la distancia de Cook, 166 flujos (4,7\,\%) superan $4/n$, pero el máximo es 0,019, muy lejos de 1. La calibración es razonable salvo el decil 10, que sobreestima (0,96 contra 0,84; Anexo A, Figura~\ref{fig:a-log-or-cal}).
 
 \textbf{Cierre.} H4 se confirma: el AUC en prueba es 0,882 y el límite inferior de su IC (0,864) también supera 0,80; con las componentes solas (M1, 0,795) no se cumpliría. La probabilidad es relativa a esta base (52\,\% de ataques, sin duplicados, ataques sintéticos): interpretamos odds ratios, no prevalencias.

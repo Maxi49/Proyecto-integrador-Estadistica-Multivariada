@@ -82,7 +82,7 @@ Tipos de tráfico (`attack_cat`): Normal, Generic, Exploits, Fuzzers, DoS, Recon
 
 Decisiones ya aplicadas en la base (y cómo defenderlas): sin duplicados (perfiles únicos; las proporciones no son prevalencias), muestra estratificada proporcional de 5.000 por `attack_cat`, `label` como respuesta (51,8 % ataque), 0 faltantes (`service = "-"` → "ninguno"), ceros estructurales no imputados, `log1p()` por asimetría extrema, atípicos marcados y conservados, categóricas agrupadas (todas ≥ 5 %).
 
-**Dato corregido:** con el criterio 1,5 × RIC sobre las 12 variables de X_num en escala log hay **1.714 flujos (34,3 %)** con al menos un atípico. El 32,1 % que decía la versión anterior corresponde a `n_atipicos` de la base, calculado sobre otro conjunto de variables.
+**Dato corregido:** con el criterio 1,5 × RIC sobre las 12 variables de X_num en escala log hay **1.715 flujos (34,3 %)** con al menos un atípico. El 32,1 % que decía la versión anterior corresponde a `n_atipicos` de la base, calculado sobre otro conjunto de variables.
 
 ### Partición para la logística (nuevo, 26/10)
 - 70/30 **estratificada por `attack_cat`** (las 10 categorías del diseño muestral), `set.seed(42)`: 3.501 entrenamiento / 1.499 prueba, 51,8 % de ataques en ambos; las proporciones por tipo difieren < 0,05 puntos (Worms: 4 / 2).

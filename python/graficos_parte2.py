@@ -203,7 +203,7 @@ dendrogram(linkage_r("cluster_dendrograma_variables", 12), labels=ABR, orientati
 axs[1].set(title="Ward de variables", xlabel="Distancia")
 guardar(fig, "12_cluster_perfiles_variables")
 
-fig, ax = plt.subplots(figsize=(8, 3.1), layout="constrained")
+fig, ax = plt.subplots(figsize=(6.4, 2.6), layout="constrained")  # compacta: va a media página
 texts = []
 coords_acs = []
 for name, color, marker in [("acs_filas", COL[0], "o"), ("acs_columnas", COL[4], "s")]:
@@ -211,14 +211,22 @@ for name, color, marker in [("acs_filas", COL[0], "o"), ("acs_columnas", COL[4],
     coords_acs.append(d.iloc[:, 1:3].to_numpy())
     ax.scatter(d.iloc[:,1], d.iloc[:,2], color=color, edgecolor=DARK, s=50, marker=marker,
         label="Tipo de tráfico" if name.endswith("filas") else "Estado")
-    texts.extend(ax.text(row.iloc[1], row.iloc[2], row.iloc[0], fontsize=12) for _, row in d.iterrows())
+    # Con solo ocho puntos, cada etiqueta se ubica con un desplazamiento fijo
+    # (en puntos) para que no tape su marcador ni a sus vecinas.
+    lugar = {"Otros ataques": (0, 7, "center"), "INT": (0, -13, "center"),
+             "Fuzzers": (0, 7, "center"), "Reconnaissance": (0, -13, "center"),
+             "FIN": (8, 0, "left"), "Exploits": (8, 0, "left"),
+             "Normal": (8, 0, "left"), "CON_otros": (0, -13, "center")}
+    for _, row in d.iterrows():
+        dx, dy, ha = lugar.get(row.iloc[0], (6, 6, "left"))
+        ax.annotate(row.iloc[0], (row.iloc[1], row.iloc[2]), xytext=(dx, dy),
+                    textcoords="offset points", ha=ha, va="center", fontsize=11)
 coords_acs = np.vstack(coords_acs)
-ax.set_xlim(coords_acs[:, 0].min() - .2, coords_acs[:, 0].max() + .2)
+ax.set_xlim(coords_acs[:, 0].min() - .25, coords_acs[:, 0].max() + .25)
 ax.set_ylim(coords_acs[:, 1].min() - .2, coords_acs[:, 1].max() + .2)
 origen(ax)
 ax.set(xlabel="Dimensión 1", ylabel="Dimensión 2", title="ACS · tipo de tráfico y estado")
-ax.legend(fontsize=12)
-adjust_text(texts, ax=ax, arrowprops=dict(arrowstyle="-", color="#AAB2B9", lw=.5))
+ax.legend(fontsize=10, loc="upper center", bbox_to_anchor=(0.42, 1), ncol=2)
 guardar(fig, "13_acs_mapa")
 
 e = leer("acm_autovalores")

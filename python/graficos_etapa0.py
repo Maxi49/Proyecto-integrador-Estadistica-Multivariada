@@ -103,18 +103,27 @@ def histogramas(lista, nombre, titulo, escala):
 histogramas(variables, "02_histogramas_log", "Distribuciones de X_num · escala log(x + 1)", "12 variables seleccionadas")
 histogramas(crudas, "03_histogramas_crudos", "Distribuciones originales · comparación con la transformación", "13 mediciones originales, incluido dpkts")
 
-fig, ax = plt.subplots(figsize=(13, 11), layout="constrained")
+# Tamaño compacto: la figura va a media columna en el informe, así que la letra
+# se dimensiona para que los valores se lean impresos (título y nota van en el epígrafe).
+fig, ax = plt.subplots(figsize=(4.6, 4.0), layout="constrained")
 cmap = LinearSegmentedColormap.from_list("pastel_divergente", ["#9CBAD4", "#FAFAF7", "#DFB0BC"])
 im = ax.imshow(correlaciones.to_numpy(), vmin=-1, vmax=1, cmap=cmap)
-labels = [v.removeprefix("log_") for v in variables]
-ax.set_xticks(range(12), labels, rotation=50, ha="right")
-ax.set_yticks(range(12), labels)
+labels = ["dur", "spkts", "sbytes", "dbytes", "sinpkt", "sjit", "synack",
+          "srv_src", "srv_dst", "src_ltm", "src_dport", "dst_sport"]
+labels = [dict(zip(["log_" + l for l in ["dur", "spkts", "sbytes", "dbytes", "sinpkt", "sjit", "synack",
+          "ct_srv_src", "ct_srv_dst", "ct_src_ltm", "ct_src_dport_ltm", "ct_dst_sport_ltm"]], labels)).get(v, v)
+          for v in variables]
+ax.set_xticks(range(12), labels, rotation=55, ha="right", fontsize=8.5)
+ax.set_yticks(range(12), labels, fontsize=8.5)
+ax.spines[:].set_visible(False)
 for i in range(12):
     for j in range(12):
-        ax.text(j, i, f"{correlaciones.iloc[i, j]:.2f}".replace(".", ","), ha="center", va="center", fontsize=8, color="#283C49")
-fig.colorbar(im, ax=ax, shrink=.75, label="Correlación de Pearson (r)")
-ax.set_title("Correlaciones entre las 12 variables de X_num", pad=16, fontsize=16)
-nota(fig, "5.000 flujos · todas las variables están en escala log(x + 1) · rango de color fijo: −1 a 1")
+        ax.text(j, i, f"{correlaciones.iloc[i, j]:.1f}".replace(".", ","), ha="center", va="center",
+                fontsize=7.5, color="#283C49")
+barra = fig.colorbar(im, ax=ax, shrink=.8)
+barra.ax.tick_params(labelsize=8)
+barra.set_label("r de Pearson", fontsize=8.5)
+coma_decimal(fig)
 guardar(fig, "04_correlaciones")
 
 fig, axes = plt.subplots(2, 4, figsize=(17, 9), layout="constrained")

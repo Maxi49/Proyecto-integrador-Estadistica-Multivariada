@@ -1,0 +1,24 @@
+% Tabla de integración de la Etapa 6a (una fila por técnica). Se ubica en el anexo
+% para respetar el límite de 15 páginas; el capítulo 8 remite a ella.
+\subsection{Integración de las técnicas}
+\label{anexo:integracion}
+\begin{table}[htbp]
+  \centering
+  \caption[Integración de las técnicas]{Integración de las técnicas: estructura hallada, protagonistas y relación con las demás. Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-integracion}
+  \begin{tablacompacta}
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.9cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+  \toprule
+  Técnica & Estructura & Protagonistas & Coincidencias y discrepancias \\
+  \midrule
+  ACP (§\ref{sec:acp}) & 3 componentes (74,5~\%): CP1 magnitud frente a repetición, CP2 volumen de tráfico, CP3 ritmo lento & CP1: \texttt{sjit}, \texttt{sinpkt} frente a las cinco \texttt{ct\_*}; CP2: \texttt{spkts}, \texttt{sbytes} & Aísla la repetición, como el AF; pero sus ejes son mixtos y no separan volumen de temporización \\
+  AF (§\ref{sec:af}) & 3 factores (GLS, varimax), 68,6~\%: F1 Repetición, F2 Temporización, F3 Volumen & Cargas de 0,54 a 0,91, sin cruces ambiguos & Idéntico al cluster de variables (ARI = 1,000); ajuste global flojo (TLI 0,609) \\
+  Cluster de variables (§\ref{sec:cluster}) & 3 bloques (Ward): temporización, volumen, repetición & Las cinco \texttt{ct\_*} juntas; \texttt{sinpkt}--\texttt{sjit} (0,85) & Igual al AF; el ACP mezcla los bloques en cada eje \\
+  Cluster de observaciones (§\ref{sec:cluster}) & 6 grupos (k-means), silhouette 0,333, estructura débil & C1 transferencias voluminosas (1,4~\% ataque); C3 ráfagas sin respuesta (100~\%); C2 y C6 mal separados & Se ordenan en CP1 y F1; en el ACM, C3 queda aislado en Dim 1. Con puntajes del ACP, ARI = 0,708 \\
+  ACS y ACM (§\ref{sec:acm}) & ACS: tipo $\times$ estado (V = 0,405). ACM: 2 dim., 41,4~\% crudo (87,4~\% ajustado) & Dim 1: INT, sin respuesta, UDP frente a FIN y TCP; Dim 2: DNS/CON frente a protocolo \emph{otros} & Dim 1 reproduce el contraste de CP1 y el cluster 3; \texttt{tipo\_trafico} pesa poco en Dim 1 ($\eta^2$ = 0,242) y más en Dim 2 (0,398) \\
+  Logística (§\ref{sec:logistica}) & M2 con CP1--CP3 y categorías: AUC 0,882 en prueba (IC 95~\% 0,864--0,900) & CP1 (OR 5,01), CP3 (2,54), CP2 (0,59); INT, CON\_otros (0,19), dns & Coincide con el ACM en INT y CON\_otros; dns cambia de signo al ajustar y los OR categóricos son inestables \\
+  \bottomrule
+  \end{tabularx}
+  \end{tablacompacta}
+\end{table}
