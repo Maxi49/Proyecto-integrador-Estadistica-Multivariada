@@ -129,7 +129,7 @@ Volumen: `spkts`, `sbytes`, `dbytes` · Temporización: `dur`, `sinpkt`, `sjit`,
 | `ttl_origen`, `perfil_estado_ttl` | No se usan | Artefacto del laboratorio (31 = 100 % normal) |
 | `repeticion_servicio`, `usa_http` | No se usan | — |
 
-⚠️ **Redundancias (verificadas el 26/10):** `state_g = INT` coincide **exactamente** con `respuesta_destino = sin_respuesta` (913 de 913 flujos). `proto_g = otros` implica siempre `service_g = ninguno` (363/363) y casi siempre INT (344/363). Explican la colinealidad de la logística y que el estado domine la Dim 1 del ACM.
+⚠️ **Redundancias (verificadas el 26/10):** **todos** los flujos con `state_g = INT` son `respuesta_destino = sin_respuesta` (913 de 913), y de los 945 sin respuesta solo 32 no son INT (son CON_otros). `proto_g = otros` implica siempre `service_g = ninguno` (363/363) y casi siempre INT (344/363). Explican la colinealidad de la logística y que el estado domine la Dim 1 del ACM.
 
 ---
 
