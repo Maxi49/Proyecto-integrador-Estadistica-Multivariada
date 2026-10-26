@@ -56,14 +56,14 @@ integracion <- data.frame(
     paste0("Tipo de tráfico por estado; V de Cramér = ", fmt(v_cramer, 3)),
     paste0("Plano de dos dimensiones; ", fmt(inercia_acm), "% de inercia ajustada")),
   interpretacion = c(
-    "Ejes mixtos: complejidad frente a repetición; volumen y actividad",
+    "Ejes mixtos: magnitud del flujo frente a repetición (CP1), volumen de tráfico (CP2) y ritmo lento (CP3)",
     paste0(paste(af$nombres, collapse = ", "), " (cargas >= 0,40; cruces ambiguos = ",
       ajuste_af$cruces_ambiguos, ")"),
     paste0("El AF reconoce los bloques (ARI bloques de variables vs. factores = ", fmt(ari_bloques_af, 3),
       "); ARI Ward/KM = ", fmt(cmp$ARI_ward_kmeans, 3), ", silhouette = ", fmt(sil_k, 3),
       "; con puntajes de ACP el ARI frente a k-means es ", fmt(cmp$ARI_kmeans_acp, 3), " (las CP cambian fronteras)"),
     "Normal-CON_otros y Exploits-FIN coinciden con asociaciones del ACM",
-    "Respuesta/protocolo/estado y oposición entre estados y tipos de servicio")
+    "Dim 1: conexión efímera sin respuesta frente a sesión TCP completa; Dim 2: DNS/UDP con estado CON frente a protocolo otros no establecido")
 )
 guardar(integracion, "integracion_tecnicas")
 print(integracion)
