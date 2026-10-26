@@ -50,7 +50,7 @@ def origen(ax):
     ax.axhline(0, color="#D0D6DB", lw=.7)
     ax.axvline(0, color="#D0D6DB", lw=.7)
 
-def adjust_text(texts, ax, expand=None, arrowprops=None, puntos=None, pad=7):
+def adjust_text(texts, ax, expand=None, arrowprops=None, puntos=None, pad=7, peso=3):
     """Colocar etiquetas sin solaparlas (solo Matplotlib).
 
     Búsqueda por descenso de coordenadas: cada etiqueta prueba posiciones en anillos
@@ -71,7 +71,7 @@ def adjust_text(texts, ax, expand=None, arrowprops=None, puntos=None, pad=7):
         v = "bottom" if dy > 3 else "top" if dy < -3 else "center"
         t.set_ha(h); t.set_va(v)
         t.set_position(ax.transData.inverted().transform(anclas[i] + [dx, dy]))
-        return t.get_window_extent(rend).expanded(1.06, 1.12)
+        return t.get_window_extent(rend).expanded(1.08, 1.2)
     def guia(bb, p):
         q = np.array([min(max(p[0], bb.x0), bb.x1), min(max(p[1], bb.y0), bb.y1)])
         return (p, q) if np.hypot(*(q - p)) > 9 else None
@@ -83,17 +83,20 @@ def adjust_text(texts, ax, expand=None, arrowprops=None, puntos=None, pad=7):
     def solape(a, b):
         w = min(a.x1, b.x1) - max(a.x0, b.x0); h = min(a.y1, b.y1) - max(a.y0, b.y0)
         return w * h if w > 0 and h > 0 else 0
+    todos = np.vstack([obst, np.array(anclas)]) if len(obst) else np.array(anclas)
+    OB = np.column_stack([todos[:, 0] - pad, todos[:, 1] - pad, todos[:, 0] + pad, todos[:, 1] + pad])
     n = len(texts)
     elec = [(0, 0)] * n
     cajas = [caja(t, i, 0, 0) for i, t in enumerate(texts)]
     def costo(i, c):
         bb = caja(texts[i], i, *c)
         if bb.x0 < ab.x0 or bb.x1 > ab.x1 or bb.y0 < ab.y0 or bb.y1 > ab.y1: return 1e9
-        k = 3 * np.hypot(*c)
+        k = peso * np.hypot(*c)
         for j in range(n):
-            if j != i: k += 40 * solape(bb, cajas[j])
-        for q in np.vstack([obst, np.array(anclas)]) if len(obst) else np.array(anclas):
-            k += 80 * solape(bb, type(bb)([[q[0]-pad, q[1]-pad], [q[0]+pad, q[1]+pad]]))
+            if j != i: k += 120 * solape(bb, cajas[j])
+        W = np.clip(np.minimum(bb.x1, OB[:, 2]) - np.maximum(bb.x0, OB[:, 0]), 0, None)
+        H = np.clip(np.minimum(bb.y1, OB[:, 3]) - np.maximum(bb.y0, OB[:, 1]), 0, None)
+        k += 80 * float(np.sum(W * H))
         g = guia(bb, anclas[i])
         if g is not None:
             for j in range(n):
@@ -101,11 +104,13 @@ def adjust_text(texts, ax, expand=None, arrowprops=None, puntos=None, pad=7):
                 if seg_en_caja(g, cajas[j]): k += 1500
                 gj = guia(cajas[j], anclas[j])
                 if gj is not None and cruza(*g, *gj): k += 1500
-            for q in obst:
-                if seg_en_caja(g, type(bb)([[q[0]-3, q[1]-3], [q[0]+3, q[1]+3]])): k += 150
+            if len(obst):
+                P = g[0] + (g[1] - g[0]) * np.linspace(0, 1, 14)[:, None]
+                d = np.min(np.hypot(P[:, None, 0] - obst[None, :, 0], P[:, None, 1] - obst[None, :, 1]), axis=1)
+                k += 150 * float(np.sum(d < 4))
         return k
     orden = sorted(range(n), key=lambda i: np.sum(np.hypot(*(np.array(anclas) - anclas[i]).T) < 60), reverse=True)
-    for _ in range(5):
+    for _ in range(8):
         for i in orden:
             mejor = min(cands, key=lambda c: costo(i, c))
             elec[i] = mejor; cajas[i] = caja(texts[i], i, *mejor)
@@ -203,8 +208,8 @@ from matplotlib.lines import Line2D
 handles = [Line2D([], [], marker="o", ls="", markersize=7, markerfacecolor=oscurecer(c, .3), markeredgecolor=DARK, markeredgewidth=.5) for c in TRAFICO.values()]
 fig.legend(handles, list(TRAFICO), loc="outside lower center", ncol=5, columnspacing=1.0, handletextpad=.2)
 adjust_text(texts, ax=ax, arrowprops=dict(arrowstyle="-", color="#929BA2", lw=.4),
-    puntos=np.vstack([u * 2 * r.loc[v, ["PC1", "PC2"]].to_numpy() for v in vars_num for u in np.linspace(.15, 1, 40)]
-        + [xy[scores.index[scores.id.eq(i)][0]][None] for i in ext.id]), pad=3)
+    puntos=np.vstack([u * 2 * r.loc[v, ["PC1", "PC2"]].to_numpy() for v in vars_num for u in np.linspace(.35, 1, 24)]
+        + [xy[scores.index[scores.id.eq(i)][0]][None] for i in ext.id]), pad=2, peso=25)
 guardar(fig, "08_acp_codo_biplot")
 
 par = leer("af_paralelo")
@@ -239,7 +244,7 @@ for ax, pref, titulo, ylabel in [(axs[0], "wss", "Codo", "Suma de cuadrados inte
     ax.plot(metricas.k, metricas[f"{pref}_kmeans"], "o-", color="#8AABC5", label="K-means")
     ax.axvline(k, color=DARK, lw=.7, ls=":")
     ax.set(title=titulo, xlabel="k", ylabel=ylabel, xticks=range(2, 9))
-    ax.legend()
+axs[0].legend(loc="upper right")
 guardar(fig, "10_cluster_seleccion")
 
 fuente(13)
@@ -250,16 +255,16 @@ ax.axhline((link[-k, 2] + link[-k + 1, 2]) / 2, color=DARK, ls="--", lw=.8)
 ax.set(title="Ward.D2 · últimos 15 nodos del árbol de 5.000 flujos", xlabel="Nodos agregados (tamaño entre paréntesis)", ylabel="Altura")
 guardar(fig, "11_cluster_dendrograma")
 
-fuente(10.5)  # 7,4 in -> 14,1 cm (x0,75): ~7,9 pt
-fig, axs = plt.subplots(1, 2, figsize=(7.4, 2.9), layout="constrained", gridspec_kw={"width_ratios": [1.45, 1]})
+fuente(11)  # 8,0 in -> 14,1 cm (x0,69): ~7,6 pt
+fig, axs = plt.subplots(1, 2, figsize=(8.0, 2.9), layout="constrained", gridspec_kw={"width_ratios": [2.0, 1]})
 perfil = leer("cluster_medias_estandarizadas").set_index("cluster")
 im = axs[0].imshow(perfil, cmap=CMAP, vmin=-3, vmax=3, aspect="auto")
 axs[0].set_xticks(range(12), ABR, rotation=55, ha="right")
 axs[0].set_yticks(range(k), [f"C{i}" for i in range(1, k + 1)])
 axs[0].set_title("Medias z por cluster")
 for i in range(k):
-    for j in range(12): axs[0].text(j, i, f"{perfil.iloc[i,j]:.1f}".replace(".", ","), ha="center", va="center", fontsize=10)
-fig.colorbar(im, ax=axs[0], shrink=.65, label="z (colores saturan en ±3)")
+    for j in range(12): axs[0].text(j, i, f"{perfil.iloc[i,j]:.1f}".replace(".", ","), ha="center", va="center", fontsize=11)
+fig.colorbar(im, ax=axs[0], shrink=.65, label="z (satura en ±3)")
 dendrogram(linkage_r("cluster_dendrograma_variables", 12), labels=ABR, orientation="right",
     ax=axs[1], link_color_func=lambda _: "#8EA9BE", leaf_font_size=10)
 axs[1].set(title="Ward de variables", xlabel="Distancia")
@@ -285,11 +290,11 @@ for name, color, marker in [("acs_filas", COL[0], "o"), ("acs_columnas", COL[4],
         ax.annotate(row.iloc[0], (row.iloc[1], row.iloc[2]), xytext=(dx, dy),
                     textcoords="offset points", ha=ha, va="center")
 coords_acs = np.vstack(coords_acs)
-ax.set_xlim(coords_acs[:, 0].min() - .25, coords_acs[:, 0].max() + .25)
-ax.set_ylim(coords_acs[:, 1].min() - .2, coords_acs[:, 1].max() + .2)
+ax.set_xlim(coords_acs[:, 0].min() - .4, coords_acs[:, 0].max() + .25)
+ax.set_ylim(coords_acs[:, 1].min() - .2, coords_acs[:, 1].max() + .45)
 origen(ax)
 ax.set(xlabel="Dimensión 1", ylabel="Dimensión 2", title="ACS · tipo de tráfico y estado")
-ax.legend(loc="upper center", bbox_to_anchor=(0.42, 1), ncol=2, columnspacing=1.0, handletextpad=.2)
+ax.legend(loc="upper center", bbox_to_anchor=(0.4, 1), ncol=2, columnspacing=1.0, handletextpad=.2)
 guardar(fig, "13_acs_mapa")
 
 e = leer("acm_autovalores")
@@ -320,9 +325,9 @@ for i, var in enumerate(variables_cat):
 ax.margins(.22)
 origen(ax)
 ax.set(title="ACM · categorías activas", xlabel="Dimensión 1 · 27,42% cruda", ylabel="Dimensión 2 · 14,03% cruda")
-fig.supxlabel("Tr tráfico · Pr protocolo · Sv servicio · Es estado · Rp respuesta · Du duración · By bytes", fontsize=11.5)
+fig.supxlabel("Tr tráfico · Pr protocolo · Sv servicio · Es estado\nRp respuesta · Du duración · By bytes", fontsize=11.5)
 adjust_text(texts, ax=ax, expand=(1.1, 1.2), arrowprops=dict(arrowstyle="-", color="#AAB2B9", lw=.5),
-    puntos=co[["Dim.1", "Dim.2"]].to_numpy(), pad=6)
+    puntos=co[["Dim.1", "Dim.2"]].to_numpy(), pad=6, peso=8)
 guardar(fig, "15_acm_categorias")
 
 fuente(10)  # 6,5 in -> ~13,6 cm (x0,82): ~8,2 pt
@@ -334,7 +339,7 @@ for i in range(1, k + 1):
     axs[0].scatter(d["Dim.1"], d["Dim.2"], s=5, alpha=.15, color=COL[i - 1], rasterized=True)
     r = su[su.cluster.eq(i)].iloc[0]
     axs[0].scatter(r["Dim.1"], r["Dim.2"], color=COL[i - 1], edgecolor=DARK, marker="D", s=65)
-    axs[0].annotate(f"C{i}", (r["Dim.1"], r["Dim.2"]), xytext=(5, 4), textcoords="offset points")
+    axs[0].annotate(f"C{i}", (r["Dim.1"], r["Dim.2"]), xytext={2: (0, 11), 4: (10, -3)}.get(i, (6, 4)), ha="center" if i == 2 else "left", va="center" if i == 4 else "baseline", textcoords="offset points")
 origen(axs[0])
 axs[0].set(title="Clusters suplementarios", xlabel="Dimensión 1", ylabel="Dimensión 2")
 eta = leer("acm_eta2")
@@ -343,6 +348,7 @@ axs[1].barh(y - .18, eta["Dim.1"], height=.35, color=COL[0], edgecolor=DARK, lw=
 axs[1].barh(y + .18, eta["Dim.2"], height=.35, color=COL[1], edgecolor=DARK, lw=.4, label="Dim 2")
 axs[1].set_yticks(y, eta.variable)
 axs[1].set(xlim=(0, 1), xlabel="eta²", title="Discriminación por variable")
-axs[1].legend()
+axs[1].set_ylim(-.6, len(eta) + .45)
+axs[1].legend(loc="upper right", ncol=2, columnspacing=1.0, handlelength=1.2)
 guardar(fig, "16_acm_clusters_eta")
 print("Figuras 07 a 16 generadas con Matplotlib.")
