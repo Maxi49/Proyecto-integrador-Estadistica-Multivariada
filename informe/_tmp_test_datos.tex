@@ -1,0 +1,179 @@
+% =====================================================================
+% Informe final · Estadística Multivariada · UCC Río Cuarto · 2.º sem. 2026
+% Proyecto integrador sobre UNSW-NB15.
+%
+% Normas de la Etapa 5: A4 · márgenes 2,5 cm · fuente tipo Arial 11 pt ·
+% interlineado 1,5 · justificado · número de página abajo a la derecha desde la
+% portada · índices de secciones, tablas y gráficos · epígrafe en cada gráfico ·
+% referencias en página nueva y en orden alfabético.
+% Límite del grupo: el cuerpo (Introducción a Conclusiones) no supera 15 páginas.
+%
+% Compilar desde esta carpeta (informe/) con pdfLaTeX + BibTeX:
+%   latexmk -pdf main.tex
+% Las figuras se leen de ../resultados/figuras y los scripts de ../R y ../python,
+% así que en Overleaf hay que subir el repositorio completo (o mantener esa estructura).
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla,es-nodecimaldot]{babel}  % "Tabla"; coma decimal sin espacio
+\usepackage{lmodern}
+
+% --- Fuente: Helvetica/Nimbus Sans, métricamente equivalente a Arial ---
+\usepackage[scaled=1]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+% --- Página ---
+\usepackage[a4paper,margin=2.5cm]{geometry}
+
+% --- Interlineado 1,5, sin espacio extra entre párrafos, justificado ---
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0pt}
+\setlength{\parindent}{1cm}
+\usepackage{microtype}
+
+% --- Número de página abajo a la derecha (también en la portada) ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[R]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% --- Títulos ---
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection.}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{4pt}
+\titlespacing*{\subsection}{0pt}{6pt}{2pt}
+
+% --- Tablas, gráficos y epígrafes ---
+\usepackage{graphicx}
+\graphicspath{{../resultados/figuras/}}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage[table]{xcolor}
+\usepackage[font={small,stretch=1},labelfont=bf,labelsep=period,
+            justification=justified,singlelinecheck=false,skip=4pt]{caption}
+\captionsetup[table]{position=above}
+\captionsetup[figure]{position=below}
+% Gráficos "encuadrados" (la consigna pide gráficos encuadrados con su referencia)
+\setlength{\fboxsep}{2pt}
+\setlength{\fboxrule}{0.4pt}
+\newcommand{\grafico}[2][\linewidth]{\fbox{\includegraphics[width=#1]{#2}}}
+% Tablas compactas: interlineado simple y letra un punto menor dentro de tablas
+\newenvironment{tablacompacta}{\begin{singlespace}\small}{\end{singlespace}}
+
+% --- Referencias ---
+\usepackage[authoryear,round]{natbib}
+\setlength{\bibsep}{2pt}
+
+% --- Código de los anexos ---
+\usepackage{listings}
+\definecolor{codigofondo}{HTML}{F7F7F5}
+\definecolor{codigocomentario}{HTML}{5C7A5C}
+\definecolor{codigoclave}{HTML}{1F4E79}
+\lstset{
+  basicstyle=\ttfamily\scriptsize\linespread{1.0}\selectfont,
+  backgroundcolor=\color{codigofondo},
+  commentstyle=\color{codigocomentario}\itshape,
+  keywordstyle=\color{codigoclave}\bfseries,
+  stringstyle=\color{black!70},
+  numbers=left, numberstyle=\tiny\color{gray}, numbersep=6pt,
+  frame=single, rulecolor=\color{black!25},
+  breaklines=true, breakatwhitespace=false, columns=fullflexible, keepspaces=true,
+  showstringspaces=false, tabsize=2, upquote=true,
+  postbreak=\mbox{\textcolor{gray}{$\hookrightarrow$}\space},
+  literate=
+    {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+    {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+    {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {Ü}{{\"U}}1
+    {¿}{{?`}}1 {¡}{{!`}}1 {°}{{\textdegree}}1 {º}{{\textordmasculine}}1 {ª}{{\textordfeminine}}1
+    {²}{{\textsuperscript{2}}}1 {³}{{\textsuperscript{3}}}1
+    {≥}{{$\geq$}}1 {≤}{{$\leq$}}1 {×}{{$\times$}}1 {→}{{$\rightarrow$}}1 {−}{{-}}1
+    {–}{{--}}1 {—}{{---}}1 {·}{{$\cdot$}}1 {…}{{...}}1 {“}{{``}}1 {”}{{''}}1
+    {‘}{{`}}1 {’}{{'}}1 {≈}{{$\approx$}}1 {±}{{$\pm$}}1 {α}{{$\alpha$}}1 {χ}{{$\chi$}}1
+    {η}{{$\eta$}}1 {λ}{{$\lambda$}}1 {∑}{{$\sum$}}1 {€}{{EUR}}1
+}
+
+\usepackage[hidelinks]{hyperref}
+
+% --- Datos de la portada: COMPLETAR ---
+\newcommand{\titulo}{Patrones multivariados del tráfico de red y detección de ataques en UNSW-NB15}
+\newcommand{\autores}{[Integrante 1]\par [Integrante 2]\par [Integrante 3]\par [Integrante 4]}
+\newcommand{\afiliacion}{Universidad Católica de Córdoba\par Facultad de [completar]\par Carrera de [completar]\par Sede Río Cuarto}
+\newcommand{\materia}{Estadística Multivariada}
+\newcommand{\docente}{Prof. Silvana Malpassi}
+\newcommand{\fechaentrega}{[día] de [mes] de 2026}
+
+\begin{document}
+
+% ===================== PORTADA =====================
+% (no se usa titlepage porque reinicia el contador de páginas)
+\begingroup
+  \thispagestyle{plain}
+  \centering
+  \vspace*{2.5cm}
+  {\Large\bfseries \titulo \par}
+  \vspace{1.2cm}
+  {\large Proyecto integrador \par}
+  \vspace{2cm}
+  {\large \autores \par}
+  \vspace{1.5cm}
+  {\afiliacion \par}
+  \vspace{1.5cm}
+  {\textbf{Materia:} \materia \par}
+  {\textbf{Docente a cargo:} \docente \par}
+  \vspace{1.5cm}
+  {\textbf{Fecha de entrega:} \fechaentrega \par}
+  \vfill
+\endgroup
+\clearpage
+
+% ===================== ÍNDICES =====================
+\begin{singlespace}
+\tableofcontents
+\clearpage
+\listoffigures
+\vspace{1cm}
+\listoftables
+\end{singlespace}
+\clearpage
+
+% ===================== CUERPO =====================
+\label{inicio-cuerpo}
+\input{capitulos/01_introduccion}
+\input{capitulos/02_datos}
+\input{capitulos/03_acp}
+\input{capitulos/04_af}
+\input{capitulos/05_cluster}
+\input{capitulos/06_acm}
+\input{capitulos/07_logistica}
+\input{capitulos/08_integracion}
+\label{fin-cuerpo}
+
+% ===================== REFERENCIAS (página nueva) =====================
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{Referencias bibliográficas}
+\renewcommand{\refname}{Referencias bibliográficas}
+\bibliographystyle{apalike}
+\bibliography{referencias}
+
+% ===================== ANEXOS =====================
+\clearpage
+\appendix
+\renewcommand{\thesection}{\Alph{section}}
+% En los anexos, figuras y tablas se numeran A.1, A.2, B.1...
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+\input{anexos/anexo_a_complementos}
+\input{anexos/a_datos}
+\input{anexos/anexo_b_scripts}
+
+\end{document}
