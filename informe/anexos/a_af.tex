@@ -1,7 +1,13 @@
 \subsection{Análisis factorial}
 \label{anexo:af}
 
-\begin{table}[H]
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.85\linewidth]{09_af_paralelo.png}
+  \caption[Análisis paralelo del AF]{Análisis paralelo: tres autovalores quedan muy por encima de la referencia aleatoria; el cuarto (0,127) apenas la supera (corte sugerido por el análisis paralelo). Retenemos tres (Kaiser reducido). Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:af-paralelo}
+\end{figure}
+\begin{table}[htbp]
   \centering
   \caption[Diagnóstico de soluciones factoriales]{Diagnóstico de soluciones factoriales (rotación varimax; la oblimin da los mismos valores de comunalidad). ``Heywood'' indica comunalidad $\ge 0{,}995$ (unicidad $\le 0{,}005$) en alguna variable. Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-af-diagnostico}
   \begin{tablacompacta}
@@ -23,7 +29,7 @@
 
 En todas las soluciones ninguna variable queda sin carga mayor o igual que 0,40 y no hay cargas cruzadas con diferencia menor que 0,20. Con cuatro factores el bloque de repetición de conexiones se divide en dos. La Tabla~\ref{tab:a-af-autovalores} reúne los autovalores que respaldan la decisión de retener tres factores.
 
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
   \caption[Autovalores observados y simulados]{Autovalores de la matriz de correlaciones y de la matriz reducida (comunalidades iniciales en la diagonal), y autovalores factoriales observados y simulados del análisis paralelo. Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-af-autovalores}
   \begin{tablacompacta}

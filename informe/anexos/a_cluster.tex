@@ -1,14 +1,14 @@
 \subsection{Análisis de conglomerados}
 \label{anexo:cluster}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \grafico[0.95\linewidth]{11_cluster_dendrograma.png}
   \caption[Dendrograma Ward.D2 de los flujos]{Dendrograma Ward.D2 de los 5.000 flujos (últimos 15 nodos; entre paréntesis, flujos de cada nodo). La línea punteada indica el corte en seis grupos. Fuente: elaboración propia con UNSW-NB15.}
   \label{fig:a-dendro}
 \end{figure}
 
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
   \caption[Cruce Ward y k-means]{Tabla cruzada entre el corte de Ward en seis grupos (filas) y los clusters de k-means (columnas); ARI = 0,813. Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-cruce-ward}
   \begin{tablacompacta}
@@ -27,7 +27,7 @@
   \end{tablacompacta}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
   \caption[Cruce k-means original y sobre puntajes del ACP]{Tabla cruzada entre k-means sobre las variables estandarizadas (filas) y k-means sobre los puntajes de las tres componentes principales (columnas); ARI = 0,708. Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-cruce-acp}
   \begin{tablacompacta}
@@ -46,7 +46,7 @@
   \end{tablacompacta}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
   \caption[Cruce entre clusters y tipo de tráfico]{Cruce entre los clusters y el tipo de tráfico (cantidad de flujos). Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-cluster-tipo}
   \begin{tablacompacta}

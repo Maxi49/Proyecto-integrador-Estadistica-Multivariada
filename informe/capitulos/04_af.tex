@@ -1,20 +1,14 @@
 \section{Análisis factorial}
 \label{sec:af}
 
-Los supuestos se verificaron en el capítulo de Datos (Sección~\ref{sec:datos}): determinante $6{,}3\times10^{-5}$, Bartlett con $p<0{,}001$, KMO 0,748 y MSA mínimo 0,621, por lo que no se eliminó ninguna variable. El análisis paralelo \citep{horn1965} sugiere cuatro factores, pero el cuarto autovalor observado es 0,127 (simulado: 0,036) y supera al azar sobre todo porque con $n=5.000$ se detecta casi cualquier estructura (Figura~\ref{fig:af-paralelo}). El criterio de Kaiser sobre la matriz reducida da 4,93; 1,78; 1,44 y 0,43: tres factores, y el cuarto aporta solo 4,8~\% de la varianza común. Con cuatro, además, el bloque de repetición se parte en dos factores que correlacionan 0,62 (oblimin), síntoma de sobreextracción. Retenemos \textbf{tres factores}, igual que el ACP.
+Los supuestos se cumplen (sección~\ref{sec:datos}: KMO 0,748, MSA mínimo 0,621, Bartlett y determinante), por lo que no se eliminó ninguna variable. El análisis paralelo \citep{horn1965} sugiere cuatro factores, pero el cuarto autovalor observado es 0,127 (simulado: 0,036) y supera al azar sobre todo porque con $n=5.000$ se detecta casi cualquier estructura; los tres primeros quedan muy por encima (Anexo A, Figura~\ref{fig:af-paralelo}). El criterio de Kaiser sobre la matriz reducida da 4,93; 1,78; 1,44 y 0,43: tres factores, y el cuarto aporta solo 4,8~\% de la varianza común. Con cuatro, además, el bloque de repetición se parte en dos factores que correlacionan 0,62 (oblimin), síntoma de sobreextracción. Retenemos \textbf{tres factores}, igual que el ACP.
 
-\begin{figure}[H]
-  \centering
-  \grafico[0.85\linewidth]{09_af_paralelo.png}
-  \caption[Análisis paralelo del AF]{Análisis paralelo: tres autovalores quedan muy por encima de la referencia aleatoria; el cuarto (0,127) apenas la supera (corte sugerido por el análisis paralelo). Retenemos tres (Kaiser reducido). Fuente: elaboración propia con UNSW-NB15.}
-  \label{fig:af-paralelo}
-\end{figure}
 
 \textbf{Caso Heywood y estimador.} Con cuatro factores \texttt{log\_spkts} alcanza una comunalidad de 1,029 (minres); con tres, también (minres 1,025; ejes principales 1,095; máxima verosimilitud 0,995), con cualquier rotación. La causa es que \texttt{log\_spkts} se reproduce casi por completo con el factor Volumen ($r=0{,}86$ con \texttt{log\_sbytes}), que tiene solo tres indicadores. La única combinación sin solución impropia es \textbf{tres factores con GLS} (comunalidad máxima 0,897; Anexo A, Tabla~\ref{tab:a-af-diagnostico}), que además no obliga a quitar una variable de X\_num. Usamos GLS con rotación varimax; la comunalidad de 0,87 de \texttt{log\_spkts} debe leerse como ``casi toda su varianza es Volumen''.
 
 \textbf{Interpretación.} Según la Tabla~\ref{tab:af-patron}, cada variable carga en un único factor (mínimo 0,54) y la menor diferencia con la segunda carga es 0,29 (\texttt{log\_ct\_src\_ltm}), por encima de 0,20: no hay cargas cruzadas ambiguas. Nombramos \textbf{F1 Repetición de conexiones}, \textbf{F2 Temporización} y \textbf{F3 Volumen}, que coinciden con los bloques de H1 y explican 68,6~\% de la varianza total. Guardamos los puntajes factoriales (\texttt{af\_puntajes.csv}); son estimaciones, no valores medidos.
 
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
   \caption[Matriz de patrón, comunalidades y unicidades del AF]{Matriz de patrón del AF (GLS, varimax; cargas $<0{,}40$ ocultas con ``--''), comunalidades ($h^2$) y unicidades ($u^2$). Fuente: elaboración propia con UNSW-NB15.}\label{tab:af-patron}
   \begin{tablacompacta}
@@ -43,7 +37,7 @@ Los supuestos se verificaron en el capítulo de Datos (Sección~\ref{sec:datos})
 
 \textbf{Ajuste global.} Es flojo: RMSR 0,051, TLI 0,609 y RMSEA 0,239, y el ajuste exacto se rechaza ($\chi^2=9.452$, 33 g.l., $p<0{,}001$, esperable con $n=5.000$). Con cuatro factores mejora (RMSR 0,033; TLI 0,79) pero con solución impropia: es el costo de la parsimonia. Usamos el AF de forma descriptiva y no confirmatoria \citep{hair2019,revelle2024}.
 
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
   \caption[Comparación entre ACP y AF]{Comparación entre el ACP (Etapa 1) y el AF (Etapa 2) sobre las mismas 12 variables. Fuente: elaboración propia con UNSW-NB15.}\label{tab:acp-af}
   \begin{tablacompacta}

@@ -1,7 +1,7 @@
 \subsection{Datos}
 \label{anexo:datos}
 
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
   \caption[Controles de calidad de la muestra]{Controles de calidad sobre la muestra de 5.000 flujos (cantidad de casos que incumplen cada control).}\label{tab:a-calidad}
   \begin{tablacompacta}
@@ -22,7 +22,7 @@
   \end{tablacompacta}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
   \caption[Atípicos de Tukey por variable]{Flujos fuera de los límites de Tukey ($1{,}5\times$ RIC) en cada variable de X\_num, sobre la escala logarítmica (n = 5.000). En \texttt{log\_ct\_dst\_sport\_ltm} el rango intercuartílico es nulo (el 90,7~\% de los flujos vale 1), de modo que cualquier valor mayor queda marcado.}\label{tab:a-atipicos}
   \begin{tablacompacta}
@@ -41,35 +41,35 @@
   \end{tablacompacta}
 \end{table}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \grafico[0.95\linewidth]{01_boxplots.png}
   \caption[Diagramas de caja de X\_num]{Diagramas de caja de las 12 variables de X\_num en escala logarítmica, con los límites de Tukey ($\pm 1{,}5$ RIC). El título de cada panel indica la cantidad de flujos fuera de los límites. Se conservan todos los registros. Fuente: elaboración propia con UNSW-NB15.}
   \label{fig:a-boxplots}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \grafico[0.95\linewidth]{02_histogramas_log.png}
   \caption[Histogramas en escala logarítmica]{Histogramas de las 12 variables de X\_num tras la transformación $\log(x+1)$. Varias distribuciones de volumen y de temporización son multimodales y las de repetición conservan una cola derecha. Fuente: elaboración propia con UNSW-NB15.}
   \label{fig:a-hist-log}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \grafico[0.95\linewidth]{03_histogramas_crudos.png}
   \caption[Histogramas en escala original]{Histogramas de las variables en su escala original (incluida \texttt{dpkts}, excluida de X\_num). La concentración cerca de cero y las colas extremas justifican la transformación logarítmica. Fuente: elaboración propia con UNSW-NB15.}
   \label{fig:a-hist-crudos}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \grafico[0.95\linewidth]{05_frecuencias_categoricas.png}
   \caption[Frecuencias de las variables de X\_cat]{Frecuencias relativas de las siete variables de X\_cat tras agrupar categorías y discretizar tres variables numéricas. Ninguna categoría queda por debajo del 5~\%. Fuente: elaboración propia con UNSW-NB15.}
   \label{fig:a-frecuencias}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \grafico[0.8\linewidth]{06_msa.png}
   \caption[MSA por variable y KMO global]{Medida de adecuación muestral (MSA) por variable, con KMO global de 0,748. Todas superan el umbral de 0,50; la menor es \texttt{log\_spkts} (0,621). Fuente: elaboración propia con UNSW-NB15.}
