@@ -74,7 +74,7 @@ guardar(fig, "17_logistica_roc_confusion")
 # Figura 18: forest plot de OR (escala log) + calibración por deciles
 co = leer("coeficientes").set_index("termino")
 orx = leer("or_por_desvio").set_index("termino")
-nombres = {"PC1": "PC1 (por desvío)", "PC2": "PC2 (por desvío)", "PC3": "PC3 (por desvío)",
+nombres = {"PC1": "CP1 (por desvío)", "PC2": "CP2 (por desvío)", "PC3": "CP3 (por desvío)",
            "proto_gudp": "Protocolo: udp (vs tcp)", "proto_gotros": "Protocolo: otros (vs tcp)",
            "service_gdns": "Servicio: dns (vs ninguno)", "service_ghttp": "Servicio: http (vs ninguno)",
            "service_gotros": "Servicio: otros (vs ninguno)",

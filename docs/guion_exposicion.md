@@ -2,7 +2,7 @@
 
 > Máximo 20 minutos. Este guion suma **18:45** (1:15 de margen). 15 diapositivas, 4 oradores.
 > Todas las cifras salen de los capítulos del informe o de `resultados/tablas/*.csv` (si difieren, manda el CSV).
-> Los OR de PC1, PC2 y PC3 son **por desvío del puntaje** (el CSV `log_reg_coeficientes.csv` trae también el OR por unidad bruta: 2,03; 0,70; 2,03). Decirlo siempre así.
+> Los OR de CP1, CP2 y CP3 son **por desvío del puntaje** (el CSV `log_reg_coeficientes.csv` trae también el OR por unidad bruta: 2,03; 0,70; 2,03). Decirlo siempre así.
 >
 > **Cómo se calcularon los tiempos.** Cada guion tiene 80 a 150 palabras (≈ 55 a 70 s hablado a ritmo normal). El resto del tiempo de cada diapositiva es para **señalar la figura** (marcado con `[pausa]`) y respirar. Si al ensayar sobran más de 90 s, sacar la última frase de las diapositivas 3, 7 y 9 (están marcadas con «recortable»).
 
@@ -205,13 +205,13 @@ Bloques por orador: Integrante 1 = 4:45 (diap. 1 a 4) · Integrante 2 = 4:30 (5 
 - Sin TTL, sin `tipo_trafico`, sin `attack_cat`
 - M1 (3 puntajes): AUC 0,795 · M2 (+ proto, service, state): **AUC 0,882** (IC 95 % 0,864 a 0,900)
 - Sensibilidad 0,915 · especificidad 0,713 · 207 normales marcados como ataque (28,7 %), 66 ataques perdidos (8,5 %)
-- OR por desvío: PC1 5,01 · PC3 2,54 · PC2 0,59. Estado INT vs FIN: 375 (IC 107 a 1.318) → **inestable**
+- OR por desvío: CP1 5,01 · CP3 2,54 · CP2 0,59. Estado INT vs FIN: 375 (IC 107 a 1.318) → **inestable**
 
 **Dato grande:** AUC = 0,882.
 **Figura:** `17_logistica_roc_confusion.png`. Respaldo: `18_logistica_or_calibracion.png` (forest plot de OR y calibración).
 
 **Guion**
-> Partimos la muestra 70/30, estratificada por tipo de ataque, y reajustamos el ACP solo con entrenamiento para no filtrar información. Excluimos TTL, que es un artefacto del laboratorio y daría un AUC irreal, y cualquier variable que contenga la etiqueta. Con solo los puntajes del ACP, el AUC en prueba es 0,795: H4 no se cumpliría. Agregando protocolo, servicio y estado sube a 0,882, con un intervalo de 0,864 a 0,900. [pausa: señalar la matriz de confusión] Detecta el 91,5 % de los ataques, pero marca como ataque casi 3 de cada 10 flujos normales. Los odds ratios de las componentes son estables: un desvío más de PC1 multiplica las chances por 5. Los de las categóricas no: el de INT, 375, tiene un intervalo de 107 a 1.318 y cambió de 93 a 375 al rehacer la partición. Sirve para la dirección, no como valor puntual.
+> Partimos la muestra 70/30, estratificada por tipo de ataque, y reajustamos el ACP solo con entrenamiento para no filtrar información. Excluimos TTL, que es un artefacto del laboratorio y daría un AUC irreal, y cualquier variable que contenga la etiqueta. Con solo los puntajes del ACP, el AUC en prueba es 0,795: H4 no se cumpliría. Agregando protocolo, servicio y estado sube a 0,882, con un intervalo de 0,864 a 0,900. [pausa: señalar la matriz de confusión] Detecta el 91,5 % de los ataques, pero marca como ataque casi 3 de cada 10 flujos normales. Los odds ratios de las componentes son estables: un desvío más de CP1 multiplica las chances por 5. Los de las categóricas no: el de INT, 375, tiene un intervalo de 107 a 1.318 y cambió de 93 a 375 al rehacer la partición. Sirve para la dirección, no como valor puntual.
 
 **Transición:** «Le paso a [Integrante 4], que integra todo.»
 
@@ -223,13 +223,13 @@ Bloques por orador: Integrante 1 = 4:45 (diap. 1 a 4) · Integrante 2 = 4:30 (5 
 - ACP: 3 comp. (74,5 %), ejes mixtos · AF: 3 factores (68,6 %), = cluster de variables (ARI 1,000)
 - Cluster de observaciones: 6 grupos, silhouette 0,333; C3 aislado
 - ACS/ACM: Dim 1 = INT, sin respuesta, UDP frente a FIN, TCP; plano 41,4 % crudo
-- Logística: AUC 0,882; PC1, estado INT, CON_otros, dns
+- Logística: AUC 0,882; CP1, estado INT, CON_otros, dns
 
-**Dato grande:** una sola oposición, «conexión repetitiva, breve y sin respuesta» frente a «sesión completa», que reaparece en CP1, F1, cluster 3, Dim 1 del ACM y PC1 de la logística.
-**Figura:** tabla de integración (Tabla del capítulo 8, abreviada a 5 filas y 3 columnas: estructura, protagonistas, coincide/discrepa). Es el entregable de la Etapa 6a.
+**Dato grande:** una sola oposición, «conexión repetitiva, breve y sin respuesta» frente a «sesión completa», que reaparece en CP1, F1, cluster 3, Dim 1 del ACM y CP1 de la logística.
+**Figura:** tabla de integración (Tabla A.11 del Anexo A del informe, abreviada a 5 filas y 3 columnas: estructura, protagonistas, coincide/discrepa). Es el entregable de la Etapa 6a.
 
 **Guion**
-> Esta es la tabla de integración, una fila por técnica. Si se la mira de lejos, aparece una misma oposición en todas: conexiones breves, repetidas y sin respuesta, frente a sesiones completas. Está en CP1 del ACP, en el factor de repetición del AF, en el cluster 3, en la Dim 1 del ACM y en PC1 y el estado INT de la logística. Los matices: el ACP y el AF coinciden en aislar la repetición, pero solo el AF y el cluster de variables dan los tres bloques puros. El ACM y la logística coinciden en INT y CON_otros, pero el servicio dns cambia de signo al ajustar, y eso lo vamos a ver como advertencia sobre leer coeficientes de a uno.
+> Esta es la tabla de integración, una fila por técnica. Si se la mira de lejos, aparece una misma oposición en todas: conexiones breves, repetidas y sin respuesta, frente a sesiones completas. Está en CP1 del ACP, en el factor de repetición del AF, en el cluster 3, en la Dim 1 del ACM y en CP1 y el estado INT de la logística. Los matices: el ACP y el AF coinciden en aislar la repetición, pero solo el AF y el cluster de variables dan los tres bloques puros. El ACM y la logística coinciden en INT y CON_otros, pero el servicio dns cambia de signo al ajustar, y eso lo vamos a ver como advertencia sobre leer coeficientes de a uno.
 
 **Transición:** (mismo orador) «¿Qué pasó entonces con las hipótesis?»
 
@@ -242,7 +242,7 @@ Bloques por orador: Integrante 1 = 4:45 (diap. 1 a 4) · Integrante 2 = 4:30 (5 
 - H2 **parcial**: C1 98,6 % normal y C3 100 % ataque; los otros cuatro, 34,9 a 72,6 %; y C3 sí distingue un tipo (130 de 147 = Generic)
 - H3 **parcial**: INT y sin respuesta con «Otros ataques» (62,3 % y 63,2 % vs 5,9 % y 6,9 % de Normal); Exploits es casi todo FIN
 - H4 **confirmada**: AUC 0,882, límite inferior 0,864 > 0,80 (con M1 solo, no)
-- Sorpresa: repetición alta en C3 (100 % ataque) y C6 (34,9 %); INT = sin respuesta (913 de 913)
+- Sorpresa: repetición alta en C3 (100 % ataque) y C6 (34,9 %); todo INT es sin respuesta (913 de 913)
 
 **Dato grande:** 2 confirmadas, 2 parciales.
 **Figura:** gráfico simple nuevo: cuatro filas H1 a H4 con semáforo (verde, amarillo, amarillo, verde) y la cifra clave de cada una.
@@ -313,7 +313,7 @@ Bloques por orador: Integrante 1 = 4:45 (diap. 1 a 4) · Integrante 2 = 4:30 (5 
 > Cada juicio tiene evidencia del informe, pero **son opiniones**: el grupo debe confirmarlas o cambiarlas antes de exponer, y que cada integrante pueda defenderlas. Etapa 6 pide «su propia crítica y opinión».
 
 1. **Para esta pregunta, lo que más aportó fue el estado de la conexión, no una técnica de reducción.** Con los tres puntajes del ACP el AUC en prueba es 0,795 (AIC 3.734,2); agregando protocolo, servicio y estado sube a 0,882 (AIC 2.876,5, razón de verosimilitud χ² = 871,7, 7 gl). Entre las técnicas de variables numéricas, el AF fue la más útil para *entender* (bloques puros) y el ACP para *predecir*. Defensa: el ACM y la logística coinciden en INT y CON_otros.
-2. **Confianza en la logística: media y acotada.** Es un buen resultado interno (IC 0,864 a 0,900), pero los ataques son sintéticos, la proporción de 52 % de ataques es del diseño muestral, una sola partición, y excluimos TTL porque con ellas el AUC sería irreal. Además, INT coincide con «sin respuesta» en 913 de 913 flujos: el modelo no puede separarlos. Defensa: nos fiamos de la dirección de los efectos y del AUC como cota para este laboratorio, no de los valores puntuales de OR ni de la probabilidad como prevalencia.
+2. **Confianza en la logística: media y acotada.** Es un buen resultado interno (IC 0,864 a 0,900), pero los ataques son sintéticos, la proporción de 52 % de ataques es del diseño muestral, una sola partición, y excluimos TTL porque con ellas el AUC sería irreal. Además, todo flujo INT es «sin respuesta» (913 de 913) y casi todo sin respuesta es INT (913 de 945): el modelo apenas puede separarlos. Defensa: nos fiamos de la dirección de los efectos y del AUC como cota para este laboratorio, no de los valores puntuales de OR ni de la probabilidad como prevalencia.
 3. **No «vendemos» los seis clusters como categorías.** Silhouette 0,333, k = 2, 4 y 5 casi empatan, el codo más marcado está en k = 4 y los clusters 2 y 6 tienen 36 % y 27 % de flujos con silhouette negativo. Lo valioso es el cluster 3, chico pero nítido (147 flujos, 100 % ataque, casi todo Generic).
 4. **Qué haríamos distinto.** (a) Fijar las hipótesis antes de correr las técnicas (las fijamos después de explorar). (b) Usar el testing set oficial en lugar de partir la muestra. (c) Probar el AF sin `log_spkts`, que elimina el caso Heywood con cualquier estimador (propuesta nuestra, no implementada para no tocar X_num). (d) Evaluar un umbral distinto de 0,5 según el costo de un falso positivo (especificidad 0,713).
 
@@ -327,7 +327,7 @@ Bloques por orador: Integrante 1 = 4:45 (diap. 1 a 4) · Integrante 2 = 4:30 (5 
 4. **¿Por qué k = 6 si el silhouette está casi empatado?** Es el máximo (0,333), con k = 2, 4 y 5 entre 0,327 y 0,329, y todos < 0,5. El codo más marcado está en k = 4, que también era defendible. Elegimos 6 porque aparece el cluster 3 (147 flujos, 100 % ataque) que k = 4 perdería. Lo declaramos como debilidad: los clusters 2 y 6 están mal separados.
 5. **¿Por qué terciles?** `dur` y `sbytes` son muy asimétricas (mediana de `sbytes` 918 y media 16.918); cortes de igual amplitud dejarían casi todo en una categoría. Los terciles (0,0185 s y 0,709 s; 564 y 1.580 bytes) dan 33 % por categoría, cumplen la regla del 5 % y no usan la etiqueta. Es un criterio estadístico; alternativas con sentido (< 0,01 s y < 1 s; ≤ 200 y 1.500 bytes) dan 31/45/24 y 21/43/36 %, también válidas.
 6. **¿Por qué no usaron TTL en la logística?** Es un artefacto del laboratorio: genera separación perfecta y un AUC irreal. Tampoco usamos `tipo_trafico` ni `attack_cat`, porque filtran la etiqueta.
-7. **¿Qué significa un OR de 375 con un IC tan ancho?** INT frente a FIN, con lo demás fijo, multiplica las chances de ataque por 375 (IC 107 a 1.318). El límite inferior > 1 respalda la dirección, pero no el valor: con otra partición dio 93, y INT tiene VIF 17,2 y coincide con «sin respuesta» en 913 de 913 casos. No hay separación (coeficiente máximo 5,9, convergió en 6 iteraciones). Se cita como «muy alto y positivo», no como número.
+7. **¿Qué significa un OR de 375 con un IC tan ancho?** INT frente a FIN, con lo demás fijo, multiplica las chances de ataque por 375 (IC 107 a 1.318). El límite inferior > 1 respalda la dirección, pero no el valor: con otra partición dio 93, y INT tiene VIF 17,2 y todo flujo INT es «sin respuesta» (913 de 913). No hay separación (coeficiente máximo 5,9, convergió en 6 iteraciones). Se cita como «muy alto y positivo», no como número.
 8. **¿Por qué la inercia ajustada es tan distinta de la cruda?** En el ACM los autovalores crudos están deprimidos por la codificación disyuntiva (inercia total cruda 2,286); la corrección de Greenacre reescala (total ajustada 0,414). El plano da 41,4 % crudo y 87,4 % ajustado; el segundo es optimista. Retenemos 2 dimensiones por el codo (la 3.ª aporta 1,8 % ajustado) y damos siempre ambos números.
 9. **¿Por qué estratificar por `attack_cat` y no por `label`?** Para que cada tipo de ataque quede en la misma proporción en entrenamiento y prueba (diferencias < 0,05 puntos; Worms 4 y 2 flujos); `label` queda balanceado (51,8 % en ambos) porque es función de `attack_cat`. Con `label` el AUC era 0,878 y con `attack_cat` 0,882: la conclusión no cambia, pero el OR de INT sí se movió (93 a 375), lo que muestra la inestabilidad de los OR categóricos.
 10. **¿Por qué `dns` tiene un OR de 19,1 si tiene menos ataques que «ninguno» (32 % frente a 49 %)?** Porque el OR es condicional al estado y al protocolo, con los que `dns` se solapa (udp e INT, VIF alto). El signo cambia al controlar; por eso no se leen los coeficientes categóricos de a uno.
@@ -347,7 +347,7 @@ Bloques por orador: Integrante 1 = 4:45 (diap. 1 a 4) · Integrante 2 = 4:30 (5 
 
 ## 6. Notas de consistencia (para el grupo)
 
-- **Silhouette de k = 2 a 6:** el capítulo 5 y el doc de validación dicen que «las diferencias entre k = 2 y 6 son menores que 0,006»; según `cluster_metricas.csv`, k = 6 (0,3334) y k = 4 (0,3265) difieren en 0,0068, y k = 3 (0,3018) en 0,0316. En el guion se dice «k = 2, 4 y 5 entre 0,327 y 0,329» (0,3283; 0,3265; 0,3290 en el CSV: sería «0,327 a 0,329» con redondeo) y no se repite la frase «menos de 0,006». Conviene corregirla en el informe.
-- **Atípicos:** el capítulo 2 dice 1.714 flujos (34,3 %); `atipicos_por_flujo.csv` da 1.715 con la columna `n_atipicos_revision_12` > 0 (1.607 con `n_atipicos_original` > 0). El guion usa solo «34,3 %».
-- **Porcentajes de ataque en la muestra:** Exploits 18,4 + Fuzzers 15,0 + Reconnaissance 7,0 + otros 11,5 = 51,9, frente a 51,8 total (redondeo).
-- **OR de PC:** `log_reg_coeficientes.csv` trae el OR por unidad (2,03; 0,70; 2,03); el informe y el guion usan el OR por desvío (5,01; 0,59; 2,54), que sale de `log_reg_or_por_desvio.csv`.
+- Las cifras del guion coinciden con el informe final (revisado el 26/10): 1.715 flujos con atípicos (34,3 %); silhouette de k = 2, 4, 5 y 6 entre 0,327 y 0,333, con k = 3 en 0,302.
+- **Porcentajes de ataque en la muestra:** Exploits 18,4 + Fuzzers 15,0 + Reconnaissance 7,0 + otros 11,5 = 51,9, frente a 51,8 total (redondeo). Decir «51,8 %».
+- **OR de las componentes:** `log_reg_coeficientes.csv` trae el OR por unidad (2,03; 0,70; 2,03); el informe y el guion usan el OR por desvío (5,01; 0,59; 2,54), de `log_reg_or_por_desvio.csv`. Decir siempre «por desvío».
+- En el informe, el guion y las figuras las componentes se llaman CP1, CP2 y CP3.
