@@ -1,5 +1,26 @@
 \subsection{Análisis de correspondencias}
 
+\begin{table}[htbp]
+  \centering
+  \caption[Variables y categorías de X\_cat]{X\_cat: variables y categorías finales (\% de 5.000 flujos). Fuente: elaboración propia con UNSW-NB15.}\label{tab:xcat}
+  \begin{tablacompacta}
+  \begin{tabularx}{\linewidth}{@{}lX@{}}
+    \toprule
+    Variable & Categorías (\%) \\
+    \midrule
+    \texttt{tipo\_trafico} & Normal 48,2 · Exploits 18,4 · Fuzzers 15,0 · Otros ataques 11,5 · Reconnaissance 7,0 \\
+    \texttt{proto\_g} & tcp 70,8 · udp 21,9 · otros 7,3 \\
+    \texttt{service\_g} & ninguno 60,0 · http 17,4 · otros 12,3 · dns 10,3 \\
+    \texttt{state\_g} & FIN 69,3 · INT 18,3 · CON\_otros 12,4 \\
+    \texttt{respuesta\_destino} & con\_respuesta 81,1 · sin\_respuesta 18,9 \\
+    \texttt{duracion\_banda} & corta 33,3 · media 33,3 · larga 33,3 \\
+    \texttt{bytes\_origen\_banda} & bajos 33,8 · medios 33,6 · altos 32,6 \\
+    \bottomrule
+  \end{tabularx}
+  \end{tablacompacta}
+\end{table}
+
+
 \begin{figure}[htbp]
   \centering
   \grafico[0.95\linewidth]{14_acm_inercia.png}

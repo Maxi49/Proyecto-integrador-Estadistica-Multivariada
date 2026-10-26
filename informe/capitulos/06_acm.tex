@@ -2,27 +2,7 @@
 \label{sec:acm}
 
 \subsection{Construcción de X\_cat}
-X\_cat reúne siete variables (Tabla~\ref{tab:xcat}): cuatro categóricas existentes y tres discretizadas. \texttt{tipo\_trafico} entra como variable activa, a diferencia del ACP, el AF y los conglomerados, porque la consigna pide asociaciones entre categóricas incluida la de contexto; por eso las asociaciones con el tipo de tráfico son descriptivas y en parte esperables. Todas las categorías superan el 5\,\% (la menor, 6,98\,\%), por lo que no fusionamos ninguna. Para \texttt{dur} y \texttt{sbytes} usamos terciles (0,0185 s y 0,709 s; 564 y 1.580 bytes): ambas son muy asimétricas (\texttt{sbytes}: mediana 918 y media 16.918 bytes), y cortes de igual amplitud dejarían casi todos los flujos en una categoría; los terciles dan 33\,\% por categoría y no usan la etiqueta. \texttt{respuesta\_destino} separa los flujos con \texttt{dpkts} = 0 (``sin respuesta''), un corte natural.
-
-\begin{table}[htbp]
-  \centering
-  \caption[Variables y categorías de X\_cat]{X\_cat: variables y categorías finales (\% de 5.000 flujos). Fuente: elaboración propia con UNSW-NB15.}\label{tab:xcat}
-  \begin{tablacompacta}
-  \begin{tabularx}{\linewidth}{@{}lX@{}}
-    \toprule
-    Variable & Categorías (\%) \\
-    \midrule
-    \texttt{tipo\_trafico} & Normal 48,2 · Exploits 18,4 · Fuzzers 15,0 · Otros ataques 11,5 · Reconnaissance 7,0 \\
-    \texttt{proto\_g} & tcp 70,8 · udp 21,9 · otros 7,3 \\
-    \texttt{service\_g} & ninguno 60,0 · http 17,4 · otros 12,3 · dns 10,3 \\
-    \texttt{state\_g} & FIN 69,3 · INT 18,3 · CON\_otros 12,4 \\
-    \texttt{respuesta\_destino} & con\_respuesta 81,1 · sin\_respuesta 18,9 \\
-    \texttt{duracion\_banda} & corta 33,3 · media 33,3 · larga 33,3 \\
-    \texttt{bytes\_origen\_banda} & bajos 33,8 · medios 33,6 · altos 32,6 \\
-    \bottomrule
-  \end{tabularx}
-  \end{tablacompacta}
-\end{table}
+X\_cat reúne siete variables (Anexo A, Tabla~\ref{tab:xcat}): cuatro categóricas existentes y tres discretizadas. \texttt{tipo\_trafico} entra como variable activa, a diferencia del ACP, el AF y los conglomerados, porque la consigna pide asociaciones entre categóricas incluida la de contexto, de modo que esas asociaciones son descriptivas y en parte esperables. Todas las categorías superan el 5\,\% (la menor, 6,98\,\%), por lo que no fusionamos ninguna. Para \texttt{dur} y \texttt{sbytes} usamos terciles (0,0185 s y 0,709 s; 564 y 1.580 bytes): ambas son muy asimétricas (\texttt{sbytes}: mediana 918 y media 16.918 bytes), y cortes de igual amplitud dejarían casi todos los flujos en una categoría; los terciles dan 33\,\% por categoría y no usan la etiqueta. \texttt{respuesta\_destino} separa los flujos con \texttt{dpkts} = 0 (``sin respuesta''), un corte natural.
 
 \subsection{Análisis de correspondencias simple: \texttt{tipo\_trafico} $\times$ \texttt{state\_g}}
 Elegimos \texttt{state\_g} por encarnar H3 y ser la más asociada al tipo de tráfico (V de Cramér 0,405, frente a 0,320 de \texttt{service\_g} y 0,302 de \texttt{proto\_g}). La asociación es significativa ($\chi^2 = 1.637{,}2$, 8 gl, $p < 0{,}001$; frecuencia esperada mínima 43,3) y dos dimensiones recogen el 100\,\% de la inercia (77,9\,\% y 22,1\,\%). La Dim 1 opone INT ($-1{,}009$) a CON\_otros ($+0{,}662$): INT concentra el 62,3\,\% de Otros ataques, el 33,0\,\% de Fuzzers y el 26,1\,\% de Reconnaissance contra el 5,9\,\% de Normal, y CON\_otros reúne al 24,0\,\% de Normal y a no más del 3,8\,\% de cada ataque. Exploits no sigue el patrón (90,4\,\% en FIN; Normal, 70,0\,\%).

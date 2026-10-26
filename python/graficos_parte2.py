@@ -190,10 +190,11 @@ ax.set_ylim(-1.5, 2.1)
 for i, v in enumerate(vars_num):
     arrow = 2 * r.loc[v, ["PC1", "PC2"]].to_numpy()
     ax.annotate("", xy=arrow, xytext=(0, 0), arrowprops=dict(arrowstyle="->", color=DARK, lw=.8))
-    texts.append(ax.text(arrow[0], arrow[1], ABR[i]))
+    texts.append(ax.text(arrow[0], arrow[1], ABR[i], bbox=dict(boxstyle="round,pad=.1", fc="white", ec="none", alpha=.7), zorder=5))
 ext = leer("acp_extremos")
 for row in ext.itertuples():
     j = scores.index[scores.id.eq(row.id)][0]
+    ax.scatter(*xy[j], s=26, facecolor="none", edgecolor=DARK, linewidth=.9, zorder=4)
     texts.append(ax.text(*xy[j], str(row.id), fontweight="bold", bbox=dict(boxstyle="round,pad=.12", fc="white", ec="none", alpha=.8)))
 origen(ax)
 pct = eig.porcentaje.iloc[:2].round(2).map(lambda v: f"{v:.2f}".replace(".", ","))
@@ -202,7 +203,7 @@ from matplotlib.lines import Line2D
 handles = [Line2D([], [], marker="o", ls="", markersize=7, markerfacecolor=oscurecer(c, .3), markeredgecolor=DARK, markeredgewidth=.5) for c in TRAFICO.values()]
 fig.legend(handles, list(TRAFICO), loc="outside lower center", ncol=5, columnspacing=1.0, handletextpad=.2)
 adjust_text(texts, ax=ax, arrowprops=dict(arrowstyle="-", color="#929BA2", lw=.4),
-    puntos=np.vstack([u * 2 * r.loc[v, ["PC1", "PC2"]].to_numpy() for v in vars_num for u in np.linspace(.3, 1, 8)]
+    puntos=np.vstack([u * 2 * r.loc[v, ["PC1", "PC2"]].to_numpy() for v in vars_num for u in np.linspace(.15, 1, 40)]
         + [xy[scores.index[scores.id.eq(i)][0]][None] for i in ext.id]), pad=3)
 guardar(fig, "08_acp_codo_biplot")
 
