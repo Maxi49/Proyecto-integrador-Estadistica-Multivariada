@@ -5,14 +5,14 @@ Los supuestos se verificaron en el capítulo de Datos (Sección~\ref{sec:datos})
 
 \begin{figure}[H]
   \centering
-  \grafico[0.92\linewidth]{09_af_paralelo.png}
-  \caption{Análisis paralelo sobre la matriz reducida: tres autovalores observados quedan muy por encima de la referencia aleatoria; el cuarto (0,127) apenas la supera, y es el corte que sugiere el análisis paralelo. Retenemos tres factores (Kaiser reducido). Fuente: elaboración propia con UNSW-NB15.}
+  \grafico[0.85\linewidth]{09_af_paralelo.png}
+  \caption{Análisis paralelo: tres autovalores quedan muy por encima de la referencia aleatoria; el cuarto (0,127) apenas la supera (corte sugerido por el análisis paralelo). Retenemos tres (Kaiser reducido). Fuente: elaboración propia con UNSW-NB15.}
   \label{fig:af-paralelo}
 \end{figure}
 
-\textbf{Caso Heywood y estimador.} Con cuatro factores \texttt{log\_spkts} alcanza una comunalidad de 1,029 (minres); con tres ocurre lo mismo con minres (1,025), ejes principales (1,095) y máxima verosimilitud (0,995), sea cual sea la rotación. La causa es que \texttt{log\_spkts} se reproduce casi por completo con el factor Volumen ($r=0{,}86$ con \texttt{log\_sbytes}), que tiene solo tres indicadores. La única combinación sin solución impropia es \textbf{tres factores con GLS} (comunalidad máxima 0,897; Anexo A, Tabla~\ref{tab:a-af-diagnostico}), que además no obliga a quitar una variable de X\_num. Usamos GLS con rotación varimax; la comunalidad de 0,87 de \texttt{log\_spkts} debe leerse como ``casi toda su varianza es Volumen''.
+\textbf{Caso Heywood y estimador.} Con cuatro factores \texttt{log\_spkts} alcanza una comunalidad de 1,029 (minres); con tres, también (minres 1,025; ejes principales 1,095; máxima verosimilitud 0,995), con cualquier rotación. La causa es que \texttt{log\_spkts} se reproduce casi por completo con el factor Volumen ($r=0{,}86$ con \texttt{log\_sbytes}), que tiene solo tres indicadores. La única combinación sin solución impropia es \textbf{tres factores con GLS} (comunalidad máxima 0,897; Anexo A, Tabla~\ref{tab:a-af-diagnostico}), que además no obliga a quitar una variable de X\_num. Usamos GLS con rotación varimax; la comunalidad de 0,87 de \texttt{log\_spkts} debe leerse como ``casi toda su varianza es Volumen''.
 
-\textbf{Interpretación.} Según la Tabla~\ref{tab:af-patron}, cada variable carga en un único factor (mínimo 0,54) y la menor diferencia con la segunda carga es 0,29 (\texttt{log\_ct\_src\_ltm}), por encima de 0,20: no hay cargas cruzadas ambiguas. Nombramos \textbf{F1 Repetición de conexiones}, \textbf{F2 Temporización} y \textbf{F3 Volumen}, que coinciden con los bloques de H1 y explican 68,6~\% de la varianza total. La variable peor explicada es \texttt{log\_ct\_src\_ltm} (0,36). Guardamos los puntajes factoriales (\texttt{af\_puntajes.csv}); son estimaciones, no valores medidos.
+\textbf{Interpretación.} Según la Tabla~\ref{tab:af-patron}, cada variable carga en un único factor (mínimo 0,54) y la menor diferencia con la segunda carga es 0,29 (\texttt{log\_ct\_src\_ltm}), por encima de 0,20: no hay cargas cruzadas ambiguas. Nombramos \textbf{F1 Repetición de conexiones}, \textbf{F2 Temporización} y \textbf{F3 Volumen}, que coinciden con los bloques de H1 y explican 68,6~\% de la varianza total. Guardamos los puntajes factoriales (\texttt{af\_puntajes.csv}); son estimaciones, no valores medidos.
 
 \begin{table}[H]
   \centering
@@ -55,7 +55,6 @@ Los supuestos se verificaron en el capítulo de Datos (Sección~\ref{sec:datos})
   Retenido & 3 componentes, 74,5~\% de la varianza total & 3 factores, 68,6~\% de la varianza total \\
   Qué representan los ejes & Combinaciones lineales que resumen la varianza; ejes mixtos & Causas latentes de las correlaciones; bloques \\
   Variables en cada eje & CP1: temporización y volumen (+0,54 a +0,82) frente a repetición ($-0{,}56$ a $-0{,}70$); CP2: volumen (+0,45 a +0,64) junto con repetición (+0,29 a +0,51); CP3: \texttt{sinpkt}, \texttt{synack} y \texttt{ct\_*\_port} (+0,41 a +0,59) frente a volumen ($-0{,}32$ a $-0{,}39$) & F1: las cinco \texttt{ct\_*}; F2: \texttt{dur}, \texttt{sinpkt}, \texttt{sjit}, \texttt{synack}; F3: \texttt{spkts}, \texttt{sbytes}, \texttt{dbytes} \\
-  Puntajes & Exactos & Estimados \\
   \bottomrule
   \end{tabularx}
   \end{tablacompacta}
