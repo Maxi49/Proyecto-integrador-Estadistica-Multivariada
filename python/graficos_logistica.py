@@ -40,17 +40,24 @@ conf = leer("confusion")
 met = leer("metricas").iloc[0]
 
 # Figura 17: ROC en prueba + matriz de confusión (umbral 0,5)
-fig, axs = plt.subplots(1, 2, figsize=(10, 4.2), layout="constrained")
+# Tamaño compacto: en el informe va a 0,6 del ancho de texto (9,6 cm); con esta
+# figura de 13,2 cm la letra impresa queda en unos 7,5 pt.
+plt.rcParams.update({"font.size": 10.5})
+fig, axs = plt.subplots(1, 2, figsize=(5.2, 2.3), layout="constrained")
 ax = axs[0]
 ax.plot([0, 1], [0, 1], ls="--", color="#AAB2B9", lw=1, label="Azar (AUC = 0,500)")
 ax.plot(roc.fpr, roc.tpr, color="#6F9BBC", lw=2.2,
         label=f"Modelo (AUC = {auc.AUC:.3f})".replace(".", ","))
 ax.fill_between(roc.fpr, roc.tpr, alpha=.15, color=COL[0])
 punto = (1 - met.especificidad, met.sensibilidad)
-ax.scatter(*punto, s=55, color="#D9A7B5", edgecolor=DARK, zorder=3, label="Umbral 0,5")
-ax.set(xlabel="1 - especificidad (falsos positivos)", ylabel="Sensibilidad (verdaderos positivos)",
+ax.scatter(*punto, s=30, color="#D9A7B5", edgecolor=DARK, zorder=3, label="Umbral 0,5")
+ax.set(xlabel="1 − especificidad", ylabel="Sensibilidad",
        xlim=(0, 1), ylim=(0, 1.01), aspect="equal")
-ax.legend(loc="lower right", fontsize=11, frameon=False)
+# Sin leyenda (no entra a este tamaño): el AUC va rotulado y el epígrafe del
+# informe explica la diagonal de azar y el punto del umbral 0,5.
+ax.text(.97, .05, f"AUC = {auc.AUC:.3f}".replace(".", ","), transform=ax.transAxes,
+        ha="right", va="bottom", fontsize=10.5, color=DARK, fontweight="bold")
+ax.annotate("umbral 0,5", punto, xytext=(8, -12), textcoords="offset points", fontsize=9.5, color=DARK)
 
 ax = axs[1]
 m = np.array([[conf.query('real=="normal" and predicho=="normal"').n.iloc[0],
@@ -62,7 +69,7 @@ ax.imshow(pct, cmap=CMAP, vmin=0, vmax=1)
 for i in range(2):
     for j in range(2):
         ax.text(j, i, f"{m[i, j]}\n({100 * pct[i, j]:.1f}%)".replace(".", ","), ha="center", va="center",
-                fontsize=14, color=DARK, fontweight="bold" if i == j else "normal")
+                fontsize=11, color=DARK, fontweight="bold" if i == j else "normal")
 ax.set_xticks([0, 1], ["Normal", "Ataque"])
 ax.set_yticks([0, 1], ["Normal", "Ataque"])
 ax.set(xlabel="Clase predicha", ylabel="Clase real")
@@ -70,6 +77,7 @@ for s in ax.spines.values():
     s.set_visible(False)
 ax.tick_params(length=0)
 guardar(fig, "17_logistica_roc_confusion")
+plt.rcParams.update({"font.size": 13})
 
 # Figura 18: forest plot de OR (escala log) + calibración por deciles
 co = leer("coeficientes").set_index("termino")

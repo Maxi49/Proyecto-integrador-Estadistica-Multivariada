@@ -16,10 +16,9 @@ también se cumpla si la docente cuenta portada, índices y referencias, el obje
 | capitulos/07_logistica.tex | Regresión logística | 1,25 |
 | capitulos/08_integracion.tex | Integración, hipótesis, limitaciones, conclusiones | 1,5 |
 
-Lo que no entre va al **Anexo A** (anexos/anexo_a_complementos.tex), que no cuenta para el
-límite: figuras secundarias, tablas largas, detalles. En el cuerpo se cita: "(ver Anexo A, Figura A.3)".
-Para escribir en el Anexo A, NO edites el archivo directamente si otro agente también lo hace:
-creá `anexos/a_<tu_capitulo>.tex` (p. ej. `anexos/a_acp.tex`) y el orquestador lo incluye.
+Actualización: el informe tiene como máximo 15 páginas y solo el anexo de código no cuenta; ya no hay
+Anexo A de complementos. Lo que no entre se menciona en una oración y queda en `resultados/tablas` y
+`resultados/figuras`.
 
 ## Formato LaTeX (el preámbulo ya está en informe/main.tex: no lo modifiques)
 - Cada capítulo empieza con `\section{...}` y `\label{sec:...}` (ya están en los archivos). Usá `\subsection` con moderación.

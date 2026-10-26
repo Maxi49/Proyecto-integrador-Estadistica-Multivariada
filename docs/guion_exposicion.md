@@ -79,7 +79,7 @@ Bloques por orador: Integrante 1 = 4:45 (diap. 1 a 4) · Integrante 2 = 4:30 (5 
 - Atípicos: 34,3 % de los flujos con alguno; **se conservan**
 
 **Dato grande:** KMO 0,748.
-**Figura:** `07_datos_resumen.png` (histograma crudo frente a log, boxplots de volumen y mapa de correlaciones con los tres bloques). Alternativa si se quiere solo el mapa: `04_correlaciones.png`.
+**Figura:** `07_datos_resumen.png` (mapa de calor de correlaciones con los tres bloques, diagramas de caja con atípicos de las 12 variables y MSA por variable; es la Figura 1 del informe). Alternativa si se quiere solo el mapa: `04_correlaciones.png`.
 
 **Guion**
 > Las variables son positivas, muy asimétricas y con rangos enormes, así que aplicamos log de x más uno, que conserva los ceros: la asimetría de `sbytes` baja de 33 a 1. Trabajamos con 12 variables numéricas. Teníamos 14 candidatas, pero `dpkts` es casi igual a `dbytes` y `rate` es casi el opuesto de `sinpkt`; con las dos adentro el determinante daba 10 a la menos 7, y sacando solo `dpkts` seguía por debajo de 10 a la menos 5. Sacando ambas queda en 6,3 por 10 a la menos 5, KMO de 0,748 y MSA mínima de 0,62. [pausa: señalar el mapa de correlaciones] Ya acá se ven tres zonas: volumen, temporización y repetición, esta última con correlaciones negativas con el resto. Los atípicos, un 34 %, los conservamos: en ciberseguridad lo extremo puede ser justamente el fenómeno de interés. *(recortable: última oración)*
@@ -226,7 +226,7 @@ Bloques por orador: Integrante 1 = 4:45 (diap. 1 a 4) · Integrante 2 = 4:30 (5 
 - Logística: AUC 0,882; CP1, estado INT, CON_otros, dns
 
 **Dato grande:** una sola oposición, «conexión repetitiva, breve y sin respuesta» frente a «sesión completa», que reaparece en CP1, F1, cluster 3, Dim 1 del ACM y CP1 de la logística.
-**Figura:** tabla de integración (Tabla A.11 del Anexo A del informe, abreviada a 5 filas y 3 columnas: estructura, protagonistas, coincide/discrepa). Es el entregable de la Etapa 6a.
+**Figura:** tabla de integración (Tabla 8 del capítulo 8 del informe, abreviada a 5 filas y 3 columnas: estructura, protagonistas, coincide/discrepa). Es el entregable de la Etapa 6a.
 
 **Guion**
 > Esta es la tabla de integración, una fila por técnica. Si se la mira de lejos, aparece una misma oposición en todas: conexiones breves, repetidas y sin respuesta, frente a sesiones completas. Está en CP1 del ACP, en el factor de repetición del AF, en el cluster 3, en la Dim 1 del ACM y en CP1 y el estado INT de la logística. Los matices: el ACP y el AF coinciden en aislar la repetición, pero solo el AF y el cluster de variables dan los tres bloques puros. El ACM y la logística coinciden en INT y CON_otros, pero el servicio dns cambia de signo al ajustar, y eso lo vamos a ver como advertencia sobre leer coeficientes de a uno.

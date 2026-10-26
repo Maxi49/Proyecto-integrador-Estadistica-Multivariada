@@ -16,8 +16,8 @@
 - **Materia:** Estadística Multivariada, 2.º semestre 2026. UCC (Universidad Católica de Córdoba), sede Río Cuarto.
 - **Docente:** Prof. Silvana Malpassi.
 - **Trabajo:** proyecto integrador grupal. Se aplican sobre **una misma base** las técnicas multivariadas vistas en clase.
-- **Herramientas (decidido por el grupo el 26/10):** los **scripts de análisis quedan en R** (`psych` para KMO, MSA, Bartlett y AF; `cluster`; `ca` y `FactoMineR` para ACS/ACM; `MASS` y `pROC` para la logística). Las **representaciones gráficas se hacen en Python** (Matplotlib) leyendo las tablas que exporta R. **Todos los scripts se anexan al informe** (Anexo B).
-- **Informe:** en LaTeX (`informe/`), con las normas de la Etapa 5 y un límite de **15 páginas sin contar anexos**.
+- **Herramientas (decidido por el grupo el 26/10):** los **scripts de análisis quedan en R** (`psych` para KMO, MSA, Bartlett y AF; `cluster`; `ca` y `FactoMineR` para ACS/ACM; `MASS` y `pROC` para la logística). Las **representaciones gráficas se hacen en Python** (Matplotlib) leyendo las tablas que exporta R. **Todos los scripts se anexan al informe** (anexo de código).
+- **Informe:** en LaTeX (`informe/`), con las normas de la Etapa 5 y un límite de **15 páginas, solo el código queda fuera** (todo lo demás, incluidas figuras y tablas complementarias, cuenta).
 - **Técnicas de la Parte 2:** ACP, AF, conglomerados (de observaciones y de variables), ACS y ACM. Además, **regresión logística** para predecir si un flujo es ataque o normal.
 - **Repositorio:** https://github.com/Maxi49/Proyecto-integrador-Estadistica-Multivariada
 
@@ -38,7 +38,7 @@
 | Etapa 6 integración `R/05_integracion.R` | ✅ Hecho (sin cifras escritas a mano desde el 26/10) |
 | Regresión logística `R/06_logistica.R` | ✅ Hecha el 26/10 **[validar con el grupo]** |
 | Gráficos en Python (`python/`) | ✅ 18 figuras, coma decimal, `verificar_resultados.py` pasa |
-| Informe LaTeX (`informe/`) | ✅ 8 capítulos + Anexo A (complementos, diccionario, resumen numérico, tabla de integración) + Anexo B (código). 15 páginas sin anexos (portada, 2 de índices, cuerpo pp. 4–14, referencias p. 15). Revisado por un revisor independiente el 26/10 y corregido. **Falta:** completar la portada (integrantes, facultad, carrera, fecha) y revisar la opinión del grupo (`% REVISAR GRUPO`) |
+| Informe LaTeX (`informe/`) | ✅ 8 capítulos + un único anexo de código fuente (el Anexo A de complementos se eliminó: todo lo pedido por la consigna está en el cuerpo). 15 páginas: portada p. 1, los tres índices en la p. 2, cuerpo pp. 3–14 (Introducción a Conclusiones), referencias p. 15; el anexo de código empieza en la p. 16 y no cuenta. Revisado por un revisor independiente el 26/10 y corregido. **Falta:** completar la portada (integrantes, facultad, carrera, fecha) y revisar la opinión del grupo (`% REVISAR GRUPO`) |
 | Exposición oral (≤ 20 min) | ✅ Guion en `docs/guion_exposicion.md` (15 diapositivas, 18:45 min, 4 oradores, preguntas probables) y presentación de 15 diapositivas en Claude (artefacto privado «Exposición · UNSW-NB15 multivariado»; se descarga como PowerPoint o PDF y hay que compartirlo para que lo vea el resto del grupo). **[ensayar; completar nombres]** |
 | Todo el pipeline | ✅ `Rscript R/ejecutar_todo.R` + 3 scripts de Python corren de punta a punta en ~15 s y reproducen los resultados |
 
@@ -48,11 +48,11 @@
 
 | Etapa | Qué pide | Dónde está |
 |---|---|---|
-| **0. Exploración y preparación** | Pregunta guía y 3 hipótesis; diccionario; calidad (faltantes, duplicados, imposibles, atípicos con boxplots y criterio); descriptiva; piloto de supuestos; congelar X_num y X_cat; un script por etapa con `set.seed` | `R/00_datos.R`, cap. 1 y 2 del informe, Anexo A.1 |
+| **0. Exploración y preparación** | Pregunta guía y 3 hipótesis; diccionario; calidad (faltantes, duplicados, imposibles, atípicos con boxplots y criterio); descriptiva; piloto de supuestos; congelar X_num y X_cat; un script por etapa con `set.seed` | `R/00_datos.R`, cap. 1 y 2 del informe |
 | **1. ACP** | `prcomp(scale. = TRUE)` justificando la estandarización; autovalores, Kaiser, codo; correlaciones, contribuciones, cos2; nombrar 2 CP; biplot coloreado; ≥ 3 extremos | `R/01_acp.R`, cap. 3 |
-| **2. AF** | Determinante > 0,00001, Bartlett, KMO, MSA; nº de factores (gráfico y analítico); patrón con cargas < 0,40 ocultas, comunalidades, unicidades, varianza, cruzadas (≥ 0,20); nombres; puntajes; tabla ACP vs AF | `R/02_af.R`, cap. 4, Anexo A.2 |
-| **3. Conglomerados** | Ward.D2 euclidiano; codo y silhouette k = 2–8; k-means nstart = 25; tabla cruzada; repetir con puntajes; cluster de variables; perfiles; cruce con contexto; guardar | `R/03_cluster.R`, cap. 5, Anexo A.3 |
-| **4. ACS y ACM** | X_cat con ≥ 3 discretizadas y categorías ≥ 5 %; ACS de dos variables; ACM con inercia ajustada, dimensiones, mapa, contribuciones, cos2, eta², nombres; cluster suplementario; 3 asociaciones | `R/04_acm.R`, cap. 6, Anexo A.4 |
+| **2. AF** | Determinante > 0,00001, Bartlett, KMO, MSA; nº de factores (gráfico y analítico); patrón con cargas < 0,40 ocultas, comunalidades, unicidades, varianza, cruzadas (≥ 0,20); nombres; puntajes; tabla ACP vs AF | `R/02_af.R`, cap. 4 |
+| **3. Conglomerados** | Ward.D2 euclidiano; codo y silhouette k = 2–8; k-means nstart = 25; tabla cruzada; repetir con puntajes; cluster de variables; perfiles; cruce con contexto; guardar | `R/03_cluster.R`, cap. 5 |
+| **4. ACS y ACM** | X_cat con ≥ 3 discretizadas y categorías ≥ 5 %; ACS de dos variables; ACM con inercia ajustada, dimensiones, mapa, contribuciones, cos2, eta², nombres; cluster suplementario; 3 asociaciones | `R/04_acm.R`, cap. 6 |
 | **5. Informe y exposición** | PDF A4, márgenes 2,5 cm, Arial/Calibri 11, interlineado 1,5, justificado, nº de página abajo a la derecha, portada, índices, epígrafes, referencias en página aparte; exposición ≤ 20 min | `informe/main.tex`; `docs/guion_exposicion.md` |
 | **6. Integración** | Tabla por técnica; ¿hipótesis? ¿bloques coinciden? ¿clusters explicados?; limitaciones y próximos pasos; opinión propia | `R/05_integracion.R`, cap. 8, exposición |
 
@@ -148,7 +148,7 @@ Volumen: `spkts`, `sbytes`, `dbytes` · Temporización: `dur`, `sinpkt`, `sjit`,
 - [ ] Revisar y reescribir con voz propia la opinión crítica (`% REVISAR GRUPO` en `informe/capitulos/08_integracion.tex` y en `docs/guion_exposicion.md`).
 - [ ] Repartir oradores y ensayar la exposición cronometrada (≤ 20 min).
 - [ ] Confirmar que la base corregida del 23/10 se reenvió a la profe.
-- [ ] Después de completar la portada, recompilar el PDF y controlar que siga en 15 páginas sin anexos (hoy no hay margen: cualquier agregado al cuerpo debe compensarse moviendo material al Anexo A).
+- [ ] Después de completar la portada, recompilar el PDF y controlar que `fin-cuerpo` siga en la p. 14, las referencias en la p. 15 y el código desde la p. 16 (queda muy poco margen en la p. 14: cualquier agregado al cuerpo debe compensarse recortando texto; los gráficos y tablas que no entran quedan en `resultados/`).
 - [ ] (Opcional) Discutir la propuesta de sensibilidad del AF: sin `log_spkts` no hay Heywood con ningún estimador (no se aplicó porque X_num está congelado).
 
 ---
@@ -159,13 +159,13 @@ Volumen: `spkts`, `sbytes`, `dbytes` · Temporización: `dur`, `sinpkt`, `sjit`,
 R/                 00_datos.R … 06_logistica.R, aux_diagnostico_af.R, ejecutar_todo.R
 python/            graficos_etapa0.py, graficos_parte2.py, graficos_logistica.py, verificar_resultados.py
 resultados/        tablas/*.csv, figuras/*.png (01–18), *.rds, muestra_particion_70_30.xlsx
-informe/           main.tex, capitulos/01–08, anexos/ (A complementos, B código), referencias.bib, main.pdf
+informe/           main.tex, capitulos/01–08, anexos/ (anexo_b_scripts.tex = código fuente, único anexo incluido; los a_*.tex y anexo_a_complementos.tex ya no se usan), referencias.bib, main.pdf
 docs/              etapa0_pregunta_hipotesis.md, validacion_decisiones.md, logistica_resumen.md,
                    guion_exposicion.md, guia_redaccion_informe.md
 Como_ejecutar.txt  orden de ejecución y paquetes
 ```
 
-Nota: el commit del 23/10 había sacado los documentos del repositorio. El informe LaTeX se incluye ahora dentro (`informe/`) porque su Anexo B lee los scripts directamente de `R/` y `python/`; si el grupo prefiere tenerlo afuera, hay que mantener esa estructura relativa.
+Nota: el commit del 23/10 había sacado los documentos del repositorio. El informe LaTeX se incluye ahora dentro (`informe/`) porque su anexo de código lee los scripts directamente de `R/` y `python/`; si el grupo prefiere tenerlo afuera, hay que mantener esa estructura relativa.
 
 ---
 
@@ -183,7 +183,7 @@ Nota: el commit del 23/10 había sacado los documentos del repositorio. El infor
 10. Si algo no cierra (KMO raro, cluster vacío, warning, Heywood), **avisar**. No esconderlo.
 11. Los números salen de `resultados/tablas/` de la muestra de 5.000. Si se cita otra fuente, decirlo.
 12. **Análisis en R, gráficos en Python** leyendo las tablas de `resultados/tablas`. Sin cifras escritas a mano en los gráficos ni en las tablas de integración.
-13. **Informe:** máximo 15 páginas sin anexos; epígrafe debajo de cada gráfico, encima de cada tabla; coma decimal.
+13. **Informe:** máximo 15 páginas (solo el código del anexo queda fuera); epígrafe debajo de cada gráfico, encima de cada tabla; coma decimal.
 
 ---
 

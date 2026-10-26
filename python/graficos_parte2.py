@@ -147,32 +147,62 @@ def dendrogram(link, ax, labels=None, truncate_mode=None, p=25, orientation="top
     if orientation == "right": ax.set_yticks(range(len(hojas)), nombres)
     else: ax.set_xticks(range(len(hojas)), nombres)
 
-# Resumen gráfico de datos para el informe; las figuras completas de Etapa 0 se conservan.
-fig = plt.figure(figsize=(10, 4.2), layout="constrained")
-rejilla = fig.add_gridspec(2, 4, width_ratios=[1, 1, 1.25, 1.25])
-axs = np.array([[fig.add_subplot(rejilla[0, 0]), fig.add_subplot(rejilla[0, 1])],
-    [fig.add_subplot(rejilla[1, :2]), fig.add_subplot(rejilla[:, 2:])]])
-for ax, v, unidad in [(axs[0, 0], "dur", "segundos"), (axs[0, 1], "log_dur", "log(segundos + 1)")]:
-    ax.hist(base[v], bins=40, color=COL[0], edgecolor=DARK, lw=.3)
-    ax.set(title=v, xlabel=unidad, ylabel="Flujos")
+# Resumen gráfico de datos para el informe (Etapa 0): mapa de calor de correlaciones con
+# valores, diagramas de caja de las 12 variables con los límites de Tukey y MSA por variable,
+# alineados fila a fila. Ancho 11,5 pulgadas -> impreso a 16 cm (factor 0,55): letra de 14 pt
+# = 7,7 pt impresos. Todo se lee de resultados/tablas; las figuras completas se conservan.
+fuente(14)
 lim = leer("atipicos_limites").set_index("variable")
-seleccion = ["log_spkts", "log_sbytes", "log_dbytes"]
+corr = leer("correlaciones").set_index("variable").loc[vars_num, vars_num]
+msa = leer("msa_por_variable").set_index("variable").loc[vars_num, "msa"]
+piloto = leer("piloto_supuestos").iloc[0]
+fig = plt.figure(figsize=(11.5, 5.0), layout="constrained")
+rej = fig.add_gridspec(1, 3, width_ratios=[6.1, 2.6, 1.9])
+ax1, ax2, ax3 = (fig.add_subplot(rej[0, i]) for i in range(3))
+im = ax1.imshow(corr.to_numpy(), cmap=CMAP, vmin=-1, vmax=1, aspect="auto")
+ax1.set_xticks(range(12), ABR, rotation=60, ha="right")
+ax1.set_yticks(range(12), ABR)
+ax1.spines[:].set_visible(False)
+for i in range(12):
+    for j in range(12):
+        ax1.text(j, i, f"{corr.iloc[i, j]:.1f}".replace(".", ","), ha="center", va="center", fontsize=14)
+ax1.set_title("Correlaciones de Pearson")
 stats = []
-for v in seleccion:
+for v in vars_num:
     r = lim.loc[v]; x = base[v]
-    stats.append(dict(label=v.removeprefix("log_"), med=r.mediana, q1=r.q1_tukey,
-        q3=r.q3_tukey, whislo=r.bigote_inferior, whishi=r.bigote_superior,
-        fliers=x[(x < r.limite_inferior) | (x > r.limite_superior)].to_numpy()))
-axs[1, 0].bxp(stats, patch_artist=True, boxprops=dict(facecolor=COL[1], edgecolor=DARK),
-    medianprops=dict(color=DARK), flierprops=dict(marker=".", markersize=2, alpha=.2))
-axs[1, 0].set(title="Atípicos de volumen", ylabel="log(x + 1)")
-corr = leer("correlaciones").set_index("variable")
-im = axs[1, 1].imshow(corr, cmap=CMAP, vmin=-1, vmax=1)
-axs[1, 1].set_xticks(range(12), ABR, rotation=55, ha="right", fontsize=11)
-axs[1, 1].set_yticks(range(12), ABR, fontsize=11)
-axs[1, 1].set_title("Correlaciones (12 log_)")
-fig.colorbar(im, ax=axs[1, 1], shrink=.7)
+    stats.append(dict(med=r.mediana, q1=r.q1_tukey, q3=r.q3_tukey, whislo=r.bigote_inferior,
+        whishi=r.bigote_superior, fliers=x[(x < r.limite_inferior) | (x > r.limite_superior)].to_numpy()))
+ax2.bxp(stats, positions=range(12), vert=False, widths=.6, patch_artist=True, manage_ticks=False,
+    boxprops=dict(facecolor=COL[1], edgecolor=DARK), medianprops=dict(color=DARK, lw=1.5),
+    whiskerprops=dict(color=DARK), capprops=dict(color=DARK),
+    flierprops=dict(marker=".", markersize=2.5, alpha=.25, markeredgecolor=DARK, markerfacecolor=DARK))
+ax2.set_ylim(11.5, -.5); ax2.set_yticks([]); ax2.set_xlim(-.5, 17)
+ax2.set_xticks([0, 5, 10, 15]); ax2.set_xlabel("log(x + 1)")
+ax2.set_title("Cajas (Tukey)")
+for i, v in enumerate(vars_num):
+    ax2.text(1.03, i, f"{int(lim.loc[v, 'n_atipicos']):,}".replace(",", "."), transform=ax2.get_yaxis_transform(),
+        va="center", ha="left", fontsize=13)
+ax3.barh(range(12), msa.to_numpy(), color=COL[0], edgecolor=DARK, lw=.5)
+ax3.axvline(.5, color="#7C5363", ls="--", lw=1.2)
+ax3.set_ylim(11.5, -.5); ax3.set_yticks([]); ax3.set_xlim(0, 1.3); ax3.set_xticks([0, .5, 1])
+for i, m in enumerate(msa):
+    ax3.text(m + .03, i, f"{m:.2f}".replace(".", ","), va="center", fontsize=13)
+ax3.set_xlabel("MSA")
+ax3.set_title(f"MSA (KMO {piloto.kmo_global:.3f})".replace(".", ","))
 guardar(fig, "07_datos_resumen")
+
+# Histogramas de seis variables de X_num (dos por bloque, escala log), compactos para el cuerpo del informe;
+# los de las 12 variables están en 02_histogramas_log.png.
+sel = ["log_spkts", "log_dbytes", "log_dur", "log_sjit", "log_ct_srv_src", "log_ct_dst_sport_ltm"]
+fig, axes = plt.subplots(2, 3, figsize=(11.5, 3.9), layout="constrained")
+for ax, v in zip(axes.flat, sel):
+    ax.hist(base[v], bins=30, color=COL[1], edgecolor=DARK, lw=.3)
+    ax.set_title(ABR[vars_num.index(v)])
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=4))
+    ax.yaxis.set_major_locator(MaxNLocator(nbins=3))
+for ax in axes[:, 0]: ax.set_ylabel("Flujos")
+guardar(fig, "07b_histogramas_log")
+fuente(13)
 
 # ACP: el biplot usa escalas recíprocas, conservando el producto fila-columna.
 eig = leer("acp_autovalores")

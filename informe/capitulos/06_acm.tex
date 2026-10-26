@@ -2,20 +2,34 @@
 \label{sec:acm}
 
 \subsection{Construcción de X\_cat}
-X\_cat reúne siete variables (Anexo A, Tabla~\ref{tab:xcat}): cuatro categóricas existentes y tres discretizadas. \texttt{tipo\_trafico} entra como variable activa, a diferencia del ACP, el AF y los conglomerados, porque la consigna pide asociaciones entre categóricas incluida la de contexto, de modo que esas asociaciones son descriptivas y en parte esperables. Todas las categorías superan el 5\,\% (la menor, 6,98\,\%), por lo que no fusionamos ninguna. Para \texttt{dur} y \texttt{sbytes} usamos terciles (0,0185 s y 0,709 s; 564 y 1.580 bytes): ambas son muy asimétricas (\texttt{sbytes}: mediana 918 y media 16.918 bytes), y cortes de igual amplitud dejarían casi todos los flujos en una categoría; los terciles dan 33\,\% por categoría y no usan la etiqueta. \texttt{respuesta\_destino} separa los flujos con \texttt{dpkts} = 0 (``sin respuesta''), un corte natural.
+X\_cat tiene siete variables (Tabla~\ref{tab:xcat}). \texttt{tipo\_trafico} entra como variable activa, a diferencia del ACP, el AF y los conglomerados, porque se piden asociaciones entre categóricas, incluida la de contexto; son descriptivas y en parte esperables. Todas las categorías superan el 5\,\% (la menor, 6,98\,\%), por lo que no fusionamos ninguna. Para \texttt{dur} y \texttt{sbytes}, muy asimétricas (\texttt{sbytes}: mediana 918 y media 16.918 bytes), usamos terciles: cortes de igual amplitud dejarían casi todos los flujos en una categoría, y los terciles dan 33\,\% por categoría sin usar la etiqueta. \texttt{respuesta\_destino} separa los flujos con \texttt{dpkts} = 0 (``sin respuesta''), un corte natural.
+
+\begin{table}[htbp]
+  \centering
+  \caption[Variables y categorías finales de X\_cat]{X\_cat: variables, origen y categorías finales (\% de los 5.000 flujos). Fuente: elaboración propia con UNSW-NB15.}\label{tab:xcat}
+  \begin{tablacompacta}
+  \footnotesize\setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{3.6cm}X@{}}
+    \toprule
+    Variable & Origen & Categorías (\%) \\
+    \midrule
+    \texttt{tipo\_trafico} & \texttt{attack\_cat} agrupada & Normal 48,2 · Exploits 18,4 · Fuzzers 15,0 · Otros ataques 11,5 · Reconnaissance 7,0 \\
+    \texttt{proto\_g} & \texttt{proto} agrupada & tcp 70,8 · udp 21,9 · otros 7,3 \\
+    \texttt{service\_g} & \texttt{service} agrupada & ninguno 60,0 · http 17,4 · otros 12,3 · dns 10,3 \\
+    \texttt{state\_g} & \texttt{state} agrupada & FIN 69,3 · INT 18,3 · CON\_otros 12,4 \\
+    \texttt{respuesta\_destino} & \texttt{dpkts} = 0 o > 0 & con\_respuesta 81,1 · sin\_respuesta 18,9 \\
+    \texttt{duracion\_banda} & terciles de \texttt{dur} (cortes 0,0185 s y 0,709 s) & corta 33,3 · media 33,3 · larga 33,3 \\
+    \texttt{bytes\_origen\_banda} & terciles de \texttt{sbytes} (cortes 564 y 1.580 bytes) & bajos 33,8 · medios 33,6 · altos 32,6 \\
+    \bottomrule
+  \end{tabularx}
+  \end{tablacompacta}
+\end{table}
 
 \subsection{Análisis de correspondencias simple: \texttt{tipo\_trafico} $\times$ \texttt{state\_g}}
-Elegimos \texttt{state\_g} por encarnar H3 y ser la más asociada al tipo de tráfico (V de Cramér 0,405, frente a 0,320 de \texttt{service\_g} y 0,302 de \texttt{proto\_g}). La asociación es significativa ($\chi^2 = 1.637{,}2$, 8 gl, $p < 0{,}001$; frecuencia esperada mínima 43,3) y dos dimensiones recogen el 100\,\% de la inercia (77,9\,\% y 22,1\,\%). La Dim 1 opone INT ($-1{,}009$) a CON\_otros ($+0{,}662$): INT concentra el 62,3\,\% de Otros ataques, el 33,0\,\% de Fuzzers y el 26,1\,\% de Reconnaissance contra el 5,9\,\% de Normal, y CON\_otros reúne al 24,0\,\% de Normal y a no más del 3,8\,\% de cada ataque. Exploits no sigue el patrón (90,4\,\% en FIN; Normal, 70,0\,\%).
-
-\begin{figure}[htbp]
-  \centering
-  \grafico[0.55\linewidth]{13_acs_mapa.png}
-  \caption[Mapa del análisis de correspondencias simple]{ACS de tipo de tráfico y estado (100\,\% de la inercia). Otros ataques queda junto a INT, Normal hacia CON\_otros y Exploits cerca de FIN. Fuente: elaboración propia con UNSW-NB15.}
-  \label{fig:acs}
-\end{figure}
+Elegimos \texttt{state\_g} por encarnar H3 y ser la más asociada al tipo de tráfico (V de Cramér 0,405, frente a 0,320 de \texttt{service\_g} y 0,302 de \texttt{proto\_g}). La asociación es significativa ($\chi^2 = 1.637{,}2$, 8 gl, $p < 0{,}001$) y dos dimensiones recogen el 100\,\% de la inercia (77,9 y 22,1\,\%). La Dim 1 opone INT ($-1{,}009$) a CON\_otros ($+0{,}662$): INT concentra el 62,3\,\% de Otros ataques, el 33,0\,\% de Fuzzers y el 26,1\,\% de Reconnaissance contra el 5,9\,\% de Normal, y CON\_otros al 24,0\,\% de Normal y no más del 3,8\,\% de cada ataque. Exploits no sigue el patrón (90,4\,\% en FIN; Normal, 70,0\,\%). (mapa en \texttt{13\_acs\_mapa.png}).
 
 \subsection{Análisis de correspondencias múltiples}
-Con $Q = 7$ y $J = 23$, la inercia total cruda es $J/Q - 1 = 2{,}286$ y el autovalor medio $1/Q = 0{,}143$ (seis lo superan: criterio poco exigente). Los porcentajes crudos son bajos (Dim 1: 27,4\,\%, autovalor 0,627; Dim 2: 14,0\,\%, 0,321; acumulado 41,4\,\%). \texttt{mjca} del paquete \texttt{ca} \citep{nenadic2007} usa por defecto \texttt{lambda = \textquotedbl{}adjusted\textquotedbl{}}, la corrección de Greenacre \citep{greenacre2017}, que reportamos: inercia total ajustada 0,414, Dim 1 = 77,0\,\%, Dim 2 = 10,4\,\%, Dim 3 = 1,8\,\%; el plano suma 87,4\,\% de inercia ajustada, cifra optimista que debe leerse junto con el 41,4\,\% crudo. Retenemos \textbf{dos dimensiones}: el codo se marca tras la Dim 2 (Anexo A, Figura~\ref{fig:a-acm-inercia}) y la tercera aporta menos del 2\,\% ajustado. Coordenadas y contribuciones salen de \texttt{FactoMineR::MCA} \citep{le2008,husson2017}.
+Con $Q = 7$ y $J = 23$, la inercia total cruda es $J/Q - 1 = 2{,}286$ y el autovalor medio $1/Q = 0{,}143$ (seis lo superan: criterio poco exigente). Los porcentajes crudos son bajos (Dim 1: 27,4\,\%, autovalor 0,627; Dim 2: 14,0\,\%, 0,321; acumulado 41,4\,\%). \texttt{mjca} del paquete \texttt{ca} \citep{nenadic2007} usa por defecto la corrección de Greenacre (\texttt{lambda = \textquotedbl{}adjusted\textquotedbl{}}; \citealp{greenacre2017}), que reportamos: inercia total ajustada 0,414, Dim 1 = 77,0\,\%, Dim 2 = 10,4\,\%, Dim 3 = 1,8\,\% (gráfico de inercia en \texttt{14\_acm\_inercia.png}); el plano suma 87,4\,\% de inercia ajustada, cifra optimista que debe leerse junto con el 41,4\,\% crudo. Retenemos \textbf{dos dimensiones}: el codo de los autovalores se marca tras la Dim 2 y la tercera aporta menos del 2\,\% ajustado. Contribuciones, cos2 y $\eta^2$ salen de \texttt{FactoMineR::MCA} \citep{le2008,husson2017}.
 
 \begin{figure}[htbp]
   \centering
@@ -24,12 +38,34 @@ Con $Q = 7$ y $J = 23$, la inercia total cruda es $J/Q - 1 = 2{,}286$ y el autov
   \label{fig:acm-mapa}
 \end{figure}
 
-\textbf{Dim 1: ``conexión efímera sin respuesta'' frente a ``sesión TCP completa''.} Aportan INT (12,1\,\%), sin\_respuesta (12,1\,\%), duración corta (11,0\,\%), UDP (9,7\,\%) y bytes bajos (7,8\,\%) contra FIN (6,1\,\%) y TCP (5,9\,\%); TCP (cos2 0,886) y FIN (0,866) son las mejor representadas. Discriminan \texttt{state\_g} ($\eta^2 = 0{,}909$), \texttt{proto\_g} (0,891) y \texttt{duracion\_banda} (0,726); \texttt{tipo\_trafico} apenas (0,242).
+\begin{table}[htbp]
+  \centering
+  \caption[Contribuciones y cos2 de las categorías del ACM]{Categorías que más contribuyen (Ctr, \%) a las dimensiones 1 y 2, con su cos2 en cada una. Fuente: elaboración propia con UNSW-NB15.}\label{tab:acm-contrib}
+  \begin{tablacompacta}
+  \footnotesize\setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lrrrr@{\hspace{0.8cm}}lrrrr@{}}
+    \toprule
+    Categoría & Ctr 1 & cos2 1 & Ctr 2 & cos2 2 & Categoría & Ctr 1 & cos2 1 & Ctr 2 & cos2 2 \\
+    \midrule
+    \texttt{state\_g}: INT & 12,1 & 0,651 & 9,2 & 0,252 & \texttt{state\_g}: FIN & 6,1 & 0,866 & 0,2 & 0,016 \\
+    \texttt{respuesta}: sin & 12,1 & 0,656 & 8,7 & 0,242 & \texttt{proto\_g}: tcp & 5,9 & 0,886 & 0,1 & 0,010 \\
+    \texttt{duracion}: corta & 11,0 & 0,726 & 0,5 & 0,018 & \texttt{service\_g}: dns & 5,7 & 0,277 & 15,2 & 0,381 \\
+    \texttt{proto\_g}: udp & 9,7 & 0,545 & 6,9 & 0,199 & \texttt{state\_g}: CON\_otros & 2,5 & 0,127 & 22,8 & 0,585 \\
+    \texttt{bytes\_origen}: bajos & 7,8 & 0,520 & 0,4 & 0,015 & \texttt{proto\_g}: otros & 4,7 & 0,223 & 12,0 & 0,291 \\
+    \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
 
-\textbf{Dim 2: ``DNS/UDP con estado CON'' frente a ``protocolo \emph{otros} no establecido''.} Aportan CON\_otros (22,8\,\%, cos2 0,585), dns (15,2\,\%) y proto \emph{otros} (12,0\,\%) y Normal queda del lado DNS/CON (cos2 0,384); los demás tipos tienen cos2 de 0,03 a 0,08 y su posición es solo indicativa. Detalle en el Anexo A (Tablas~\ref{tab:a-acm-contrib} y~\ref{tab:a-acm-eta}). \textbf{Redundancia:} \texttt{proto\_g} = \emph{otros} implica \texttt{service\_g} = ninguno (363 de 363) y casi siempre INT (344 de 363); FIN solo ocurre en TCP; y todo flujo INT es sin\_respuesta (913 de 913), mientras que casi todo flujo sin respuesta es INT (913 de 945). Por eso se agrupan en el mapa.
+\textbf{Dim 1: ``conexión efímera sin respuesta'' frente a ``sesión TCP completa''.} La construyen INT, sin\_respuesta, duración corta, UDP y bytes bajos contra FIN y TCP (Tabla~\ref{tab:acm-contrib}); discriminan sobre todo \texttt{state\_g} ($\eta^2 = 0{,}909$), \texttt{proto\_g} (0,891) y \texttt{duracion\_banda} (0,726), y \texttt{tipo\_trafico} apenas (0,242; Figura~\ref{fig:acm-clusters}, derecha). \textbf{Dim 2: ``DNS/UDP con estado CON'' frente a ``protocolo \emph{otros} no establecido''.} La construyen CON\_otros (22,8~\%), dns (15,2~\%) y proto \emph{otros} (12,0~\%), y Normal queda del lado DNS/CON (cos2 0,384); los demás tipos tienen cos2 de 0,03 a 0,08 (posición solo indicativa). \textbf{Redundancia:} \texttt{proto\_g} = \emph{otros} implica \texttt{service\_g} = ninguno (363 de 363) y casi siempre INT (344 de 363); FIN solo ocurre en TCP; todo flujo INT es sin\_respuesta (913 de 913) y casi todo flujo sin respuesta es INT (913 de 945). Por eso se agrupan en el mapa.
 
-\textbf{Clusters suplementarios} (Anexo A, Figura~\ref{fig:a-acm-clusters}). No ocupan zonas totalmente distintas: los clusters 1 (transferencias voluminosas), 2 (sesiones largas y pesadas) y 4 (conexiones medianas de ritmo lento) se superponen en la zona TCP/FIN (Dim 1 entre $-0{,}62$ y $-0{,}55$) y se distinguen por duración y bytes. El cluster 3 (ráfagas repetidas sin respuesta; Dim 1 = 2,16) queda aislado a la derecha: 100\,\% INT, sin respuesta, duración corta y bytes bajos, y 87,8\,\% UDP y dns. El cluster 5 (intercambios mínimos; Dim 1 = 1,37) es breve (96,1\,\% corta), UDP (73,9\,\%) y con 45,6\,\% CON\_otros; el 6 (repetición moderada de bajo volumen) es intermedio. Los cos2 de los clusters en el plano son bajos salvo el 5 (0,59): lectura parcial.
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.95\linewidth]{16_acm_clusters_eta.png}
+  \caption[Clusters suplementarios y eta$^2$ del ACM]{Izquierda: clusters de la Etapa 3 proyectados como suplementarios (rombos) sobre las observaciones; los clusters 1, 2 y 4 se superponen (Dim 1 entre $-0{,}62$ y $-0{,}55$). Derecha: $\eta^2$ por variable en Dim 1 y Dim 2; \texttt{state\_g} y \texttt{proto\_g} dominan la Dim 1. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:acm-clusters}
+\end{figure}
 
-\textbf{Tres asociaciones.} (i) \emph{Otros ataques con INT, sin respuesta y flujos pequeños}: 62,3\,\% INT y 63,2\,\% sin respuesta (Normal: 5,9\,\% y 6,9\,\%), 62,8\,\% con bytes bajos. (ii) \emph{Normal con CON\_otros y con respuesta} (24,0\,\% y 93,1\,\%); el DNS no es exclusivo de lo normal (14,4\,\% frente a 27,6\,\% de Otros ataques). (iii) \emph{Exploits con TCP/FIN, duración larga y http}: 54,7\,\% larga (Normal: 23,7\,\%) y 44,2\,\% http (Normal: 9,9\,\%). Son frecuencias de laboratorio y el ACM es descriptivo.
+\textbf{Clusters suplementarios} (Figura~\ref{fig:acm-clusters}). No ocupan zonas totalmente distintas: los clusters 1, 2 y 4 se superponen en la zona TCP/FIN y se distinguen por duración y bytes. El cluster 3 (Dim 1 = 2,16) queda aislado a la derecha: 100\,\% INT, sin respuesta, duración corta y bytes bajos, y 87,8\,\% UDP y dns. El 5 (Dim 1 = 1,37) es breve (96,1\,\% corta), UDP (73,9\,\%) y con 45,6\,\% CON\_otros; el 6 es intermedio. Los cos2 en el plano son bajos salvo el 5 (0,59): lectura parcial.
 
-\textbf{Sobre H3.} Se confirma en parte: INT y la falta de respuesta se asocian con ataques, pero solo con Otros ataques, Fuzzers y Reconnaissance (Exploits son casi todos FIN y con respuesta), y FIN, http y dns no caracterizan solo a lo normal.
+\textbf{Tres asociaciones.} (i) \emph{Otros ataques con INT, sin respuesta y flujos pequeños}: 62,3\,\% INT y 63,2\,\% sin respuesta (Normal: 5,9 y 6,9\,\%), 62,8\,\% con bytes bajos. (ii) \emph{Normal con CON\_otros y con respuesta} (24,0\,\% y 93,1\,\%); el DNS no es exclusivo de lo normal (14,4\,\% frente a 27,6\,\% en Otros ataques). (iii) \emph{Exploits con TCP/FIN, duración larga y http}: 54,7\,\% larga (Normal: 23,7\,\%) y 44,2\,\% http (Normal: 9,9\,\%). Son frecuencias de laboratorio; el ACM es descriptivo.

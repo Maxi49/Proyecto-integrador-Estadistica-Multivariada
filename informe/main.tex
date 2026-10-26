@@ -6,7 +6,8 @@
 % interlineado 1,5 · justificado · número de página abajo a la derecha desde la
 % portada · índices de secciones, tablas y gráficos · epígrafe en cada gráfico ·
 % referencias en página nueva y en orden alfabético.
-% Límite del grupo: el cuerpo (Introducción a Conclusiones) no supera 15 páginas.
+% Límite del grupo: el informe tiene como máximo 15 páginas (portada, índices, cuerpo y
+% referencias); solo el anexo de código fuente (desde la p. 16) queda fuera del límite.
 %
 % Compilar desde esta carpeta (informe/) con pdfLaTeX + BibTeX:
 %   latexmk -pdf main.tex
@@ -64,6 +65,13 @@
             justification=justified,singlelinecheck=false,skip=4pt]{caption}
 \captionsetup[table]{position=above}
 \captionsetup[figure]{position=below}
+% Parámetros de flotantes más permisivos (evitan huecos) y separación compacta
+\setcounter{topnumber}{3}\setcounter{bottomnumber}{3}\setcounter{totalnumber}{6}
+\renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.9}
+\renewcommand{\textfraction}{0.05}\renewcommand{\floatpagefraction}{0.8}
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
 % Gráficos "encuadrados" (la consigna pide gráficos encuadrados con su referencia)
 \setlength{\fboxsep}{2pt}
 \setlength{\fboxrule}{0.4pt}
@@ -138,12 +146,13 @@
 \clearpage
 
 % ===================== ÍNDICES =====================
+% Los tres índices caben en una sola página (interlineado simple y letra pequeña).
 \begin{singlespace}
-\tableofcontents
-\clearpage
 \small
+\tableofcontents
+\vspace{0.3cm}
 \listoffigures
-\vspace{0.4cm}
+\vspace{0.3cm}
 \listoftables
 \end{singlespace}
 \clearpage
@@ -168,14 +177,10 @@
 \bibliographystyle{apalike}
 \bibliography{referencias}
 
-% ===================== ANEXOS =====================
+% ===================== ANEXO: CÓDIGO (no cuenta para el límite de páginas) =====================
 \clearpage
 \appendix
 \renewcommand{\thesection}{\Alph{section}}
-% En los anexos, figuras y tablas se numeran A.1, A.2, B.1...
-\counterwithin{figure}{section}
-\counterwithin{table}{section}
-\input{anexos/anexo_a_complementos}
 \input{anexos/anexo_b_scripts}
 
 \end{document}

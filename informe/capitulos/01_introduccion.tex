@@ -1,9 +1,9 @@
 \section{Introducción}
 \label{sec:introduccion}
 
-La detección de intrusiones busca identificar, a partir del tráfico que circula por una red, las conexiones que forman parte de un ataque. Para estudiar este problema se usan bases etiquetadas; una de las más difundidas es UNSW-NB15, creada por \citet{moustafa2015} en el laboratorio de ciberseguridad de UNSW Canberra, que combina tráfico normal con nueve tipos de ataque generados de forma sintética \citep{moustafa2016}. Cada fila es un flujo, una conversación entre un origen y un destino, descrita por variables de volumen, tiempo, conexión y contexto. Reúne muchas variables numéricas correlacionadas, varias categóricas y una etiqueta externa (normal o ataque) con la cual contrastar los patrones que las técnicas encuentren; ni el ACP, ni el AF, ni los conglomerados la usan para construirlos.
+La detección de intrusiones busca identificar, a partir del tráfico de una red, las conexiones que forman parte de un ataque. Una de las bases etiquetadas más difundidas es UNSW-NB15, creada por \citet{moustafa2015} en UNSW Canberra, que combina tráfico normal con nueve tipos de ataque generados de forma sintética \citep{moustafa2016}. Cada fila es un flujo (una conversación entre un origen y un destino) descrito por variables de volumen, tiempo, conexión y contexto, con muchas numéricas correlacionadas, varias categóricas y una etiqueta externa (normal o ataque) con la cual contrastar los patrones; el ACP, el AF y los conglomerados no la usan.
 
-Nuestra pregunta guía es: \emph{¿qué patrones de volumen, temporización y repetición de conexiones caracterizan a los flujos de red de UNSW-NB15, y en qué medida esos patrones, junto con el protocolo, el servicio y el estado de la conexión, distinguen el tráfico normal del de ataque al punto de permitir estimar la probabilidad de que un flujo sea un ataque?} Las hipótesis se apoyan en el diseño de la base y en el dominio; como ya habíamos explorado los datos al fijarlas, son de partida y las contrastamos al final, incluidas las que no se cumplan.
+Nuestra pregunta guía es: \emph{¿qué patrones de volumen, temporización y repetición de conexiones caracterizan a los flujos de UNSW-NB15, y en qué medida esos patrones, junto con el protocolo, el servicio y el estado de la conexión, distinguen el tráfico normal del de ataque al punto de permitir estimar la probabilidad de que un flujo sea un ataque?} Las hipótesis se apoyan en el diseño de la base y en el dominio; como ya habíamos explorado los datos al fijarlas, las contrastamos al final, incluidas las que no se cumplan.
 
 \begin{itemize}\setlength{\itemsep}{0pt}\setlength{\topsep}{2pt}
   \item \textbf{H1.} Las 12 variables numéricas forman tres bloques correlacionados entre sí: volumen, temporización y repetición de conexiones; el ACP, el AF y el cluster de variables deberían recuperarlos.
@@ -11,5 +11,3 @@ Nuestra pregunta guía es: \emph{¿qué patrones de volumen, temporización y re
   \item \textbf{H3.} El ataque se asocia con conexiones incompletas (estado INT) y sin respuesta del destino; lo normal, con conexiones cerradas (FIN, CON) y servicios identificados.
   \item \textbf{H4.} Un modelo logístico con los ejes del ACP, el protocolo, el servicio y el estado alcanza un AUC mayor a 0,80 en datos de validación.
 \end{itemize}
-
-El informe sigue el orden del análisis (secciones~\ref{sec:datos} a~\ref{sec:logistica}) y cierra con el contraste de H1--H4 y las conclusiones (\ref{sec:integracion}).

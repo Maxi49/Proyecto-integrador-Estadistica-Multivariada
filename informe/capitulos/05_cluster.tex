@@ -1,26 +1,7 @@
 \section{Análisis de conglomerados}
 \label{sec:cluster}
 
-Agrupamos los 5.000 flujos con las 12 variables de X\_num estandarizadas, con distancia euclidiana y Ward.D2 (dendrograma en el Anexo A, Figura~\ref{fig:a-dendro}), y comparamos con k-means (\texttt{nstart} = 25, semilla 42). Para elegir k usamos el codo y el silhouette promedio de k = 2 a 8 (Figura~\ref{fig:cl-seleccion}).
-
-\begin{table}[htbp]
-  \centering
-  \caption[Perfil de los seis clusters]{Perfil de los seis clusters (k-means, k = 6): tamaño, porcentaje de ataques y rasgos. Fuente: elaboración propia con UNSW-NB15.}\label{tab:cl-perfiles}
-  \begin{tablacompacta}
-  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.6cm}>{\raggedleft\arraybackslash}p{1.5cm}>{\raggedleft\arraybackslash}p{1.0cm}>{\raggedright\arraybackslash}X@{}}
-  \toprule
-  Cluster & $n$ (\%) & \% ataque & Rasgos distintivos (promedios originales) \\
-  \midrule
-  1 Transferencias voluminosas de respuesta rápida & 898 (18,0) & 1,4 & Muchos paquetes (54) y bytes de respuesta (48.466); intervalos cortos \\
-  2 Sesiones largas y pesadas & 405 (8,1) & 72,6 & Duración 10,4 s; 183.786 bytes enviados; poca repetición \\
-  3 Ráfagas repetidas sin respuesta & 147 (2,9) & 100 & 2 paquetes y 0 bytes de respuesta; duración casi nula; \texttt{ct\_dst\_sport\_ltm} = 12,0 ($+5{,}1$ desvíos) \\
-  4 Conexiones medianas de ritmo lento & 2.131 (42,6) & 71,0 & Duración 1,03 s; 11,9 paquetes; \texttt{sinpkt} 729 ms; \texttt{sjit}, \texttt{synack} altos \\
-  5 Intercambios mínimos & 1.135 (22,7) & 46,3 & Duración 0,006 s; 2,4 paquetes; volumen bajo; repetición promedio \\
-  6 Repetición moderada de bajo volumen & 284 (5,7) & 34,9 & \texttt{ct\_srv\_*} $\approx$ 17; \texttt{ct\_src\_dport\_ltm} 5,9 ($+2{,}0$ desvíos); volumen bajo \\
-  \bottomrule
-  \end{tabularx}
-  \end{tablacompacta}
-\end{table}
+Agrupamos los 5.000 flujos con las 12 variables de X\_num estandarizadas, con distancia euclidiana y Ward.D2 (el dendrograma de los flujos, cortado en seis grupos, está en \texttt{resultados/figuras/11\_cluster\_dendrograma.png}; el de las variables, en la Figura~\ref{fig:cl-perfiles}), y comparamos con k-means (\texttt{nstart} = 25, semilla 42). El codo y el silhouette promedio para k = 2 a 8 están en la Figura~\ref{fig:cl-seleccion}.
 
 \begin{figure}[htbp]
   \centering
@@ -29,13 +10,13 @@ Agrupamos los 5.000 flujos con las 12 variables de X\_num estandarizadas, con di
   \label{fig:cl-seleccion}
 \end{figure}
 
-La elección de k = 6 es defendible pero no contundente. El silhouette de k-means es 0,328 (k = 2), 0,302 (3), 0,327 (4), 0,329 (5), 0,333 (6), 0,277 (7) y 0,284 (8): k = 2, 4, 5 y 6 son un empate práctico (entre 0,327 y 0,333; diferencias menores que 0,007), k = 3 queda más abajo y todos están por debajo de 0,5, lo que indica una estructura débil \citep{kaufman1990}; lo claro es la caída en k = 7. El codo más marcado está en k = 4 (la suma de cuadrados baja 7.496, 6.722, 3.046, 2.054 y 1.858 al pasar de 2 a 3, \dots, 6 a 7). Elegimos k = 6 por el silhouette máximo y porque aísla como grupo propio al de 147 flujos (cluster 3); con k = 4 esos mismos flujos quedan íntegros, pero diluidos en un grupo de 215 junto con otros 68 flujos. k = 4 también era razonable. Los clusters 2 y 6 están mal separados: su silhouette medio es 0,063 y 0,119, con 35,6~\% y 26,8~\% de flujos de silhouette negativo.
+La elección de k = 6 es defendible pero no contundente. El silhouette de k-means es 0,328 (k = 2), 0,302 (3), 0,327 (4), 0,329 (5), 0,333 (6), 0,277 (7) y 0,284 (8): k = 2, 4, 5 y 6 empatan en la práctica (diferencias menores que 0,007), todos están bajo 0,5 (estructura débil; \citealp{kaufman1990}) y lo claro es la caída en k = 7. El codo más marcado está en k = 4. Elegimos k = 6 por el silhouette máximo y porque aísla al grupo de 147 flujos (cluster 3), diluido con k = 4 en uno de 215. Los clusters 2 y 6 están mal separados: su silhouette medio es 0,063 y 0,119, con 35,6 y 26,8~\% de flujos de silhouette negativo.
 
-\textbf{Jerárquico, k-means y preprocesamiento.} Ward con seis grupos y k-means coinciden bastante (ARI = 0,813; Anexo A, Tabla~\ref{tab:a-cruce-ward}); perfilamos k-means. Sobre los puntajes de las tres componentes el ARI baja a 0,708 (0,605 con Ward; Anexo A, Tabla~\ref{tab:a-cruce-acp}): los grupos cambian, aunque el de 147 flujos queda íntegro. Es esperable: las componentes descartan 25,5~\% de la varianza y, sin reescalar, la primera pesa más en la distancia y desplaza las fronteras entre grupos vecinos.
+\textbf{Jerárquico, k-means y preprocesamiento.} Los seis grupos de Ward se corresponden casi uno a uno con los de k-means: la tabla cruzada tiene 4.508 de los 5.000 flujos en la correspondencia principal (90,2~\%; ARI = 0,813), y los 147 flujos del cluster 3 de k-means casi íntegros en un grupo de Ward (143). Perfilamos k-means. Sobre los puntajes de las tres componentes del ACP el ARI baja a 0,708 (0,605 con Ward): los grupos cambian. Los clusters 3 (147 flujos) y 5 (1.126 de 1.135) se conservan casi íntegros, el 4 se divide en dos (1.578 y 515 de 2.131) y el 6 se reparte entre cuatro grupos (95, 42, 71 y 76 flujos). Es esperable: las componentes descartan 25,5~\% de la varianza y, sin reescalar, la primera pesa más en la distancia.
 
-\textbf{Cluster de variables.} Ward sobre las columnas estandarizadas (Figura~\ref{fig:cl-perfiles}, derecha) separa tres bloques: temporización, volumen y repetición de conexiones (las cinco \texttt{ct\_*}). Coincide exactamente con los tres factores del AF (ARI = 1,000) y con H1, mientras que las componentes del ACP mezclan bloques en cada eje.
+\textbf{Cluster de variables.} Ward sobre las columnas estandarizadas (Figura~\ref{fig:cl-perfiles}, derecha) separa tres bloques: temporización, volumen y repetición de conexiones (las cinco \texttt{ct\_*}). Coincide exactamente con los tres factores del AF (ARI = 1,000) y con H1; las componentes del ACP mezclan bloques.
 
-\textbf{Perfiles.} La Figura~\ref{fig:cl-perfiles} (izquierda) muestra las medias estandarizadas y la Tabla~\ref{tab:cl-perfiles} los nombres, tamaños y rasgos en unidades originales; el cruce con \texttt{tipo\_trafico}, solo descriptivo, está en el Anexo A, Tabla~\ref{tab:a-cluster-tipo}.
+\textbf{Perfiles.} La Figura~\ref{fig:cl-perfiles} (izquierda) da las medias estandarizadas por cluster y la Tabla~\ref{tab:cl-perfiles}, los nombres, rasgos en unidades originales y el cruce con \texttt{tipo\_trafico} (descriptivo; no se usó para agrupar).
 
 \begin{figure}[htbp]
   \centering
@@ -44,6 +25,24 @@ La elección de k = 6 es defendible pero no contundente. El silhouette de k-mean
   \label{fig:cl-perfiles}
 \end{figure}
 
-Hipotetizamos (sin poder contrastarlo) que el cluster 1 es transferencia legítima de datos; el 3, ráfagas automáticas de paquetes pequeños sin respuesta (130 de sus 147 flujos son Generic); el 5, consultas breves, y el 6, conexiones repetidas hacia un mismo servicio. Los clusters se guardaron en la base para el ACM.
+\begin{table}[htbp]
+  \centering
+  \caption[Perfil de los seis clusters]{Perfil de los seis clusters (k-means, k = 6): tamaño, porcentaje de ataques, tipos de tráfico más frecuentes (\%) y rasgos distintivos (promedios originales). Fuente: elaboración propia con UNSW-NB15.}\label{tab:cl-perfiles}
+  \begin{tablacompacta}
+  \footnotesize\setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedleft\arraybackslash}p{1.35cm}>{\raggedleft\arraybackslash}p{0.9cm}>{\raggedright\arraybackslash}p{2.9cm}>{\raggedright\arraybackslash}X@{}}
+  \toprule
+  Cluster & $n$ (\%) & \% ataq. & Tipos de tráfico (\%) & Rasgos distintivos \\
+  \midrule
+  1 Transferencias voluminosas de respuesta rápida & 898 (18,0) & 1,4 & Normal 98,6 & 54 paquetes y 48.466 bytes de respuesta; intervalos cortos \\
+  2 Sesiones largas y pesadas & 405 (8,1) & 72,6 & Exploits 44,2; Normal 27,4; Fuzzers 19,3 & Duración 10,4 s; 183.786 bytes enviados; poca repetición \\
+  3 Ráfagas repetidas sin respuesta & 147 (2,9) & 100 & Otros ataques 96,6 & 2 paquetes, 0 bytes de respuesta, duración casi nula; \texttt{ct\_dst\_sport\_ltm} 12,0 ($+5{,}1$ desvíos) \\
+  4 Conexiones medianas de ritmo lento & 2.131 (42,6) & 71,0 & Exploits 30,9; Normal 29,0; Fuzzers 19,5; Recon. 12,0 & Duración 1,03 s; 11,9 paquetes; \texttt{sinpkt} 729 ms; \texttt{sjit} y \texttt{synack} altos \\
+  5 Intercambios mínimos & 1.135 (22,7) & 46,3 & Normal 53,7; Fuzzers 16,3; Otros ataques 16,1 & Duración 0,006 s; 2,4 paquetes; volumen bajo; repetición promedio \\
+  6 Repetición moderada de bajo volumen & 284 (5,7) & 34,9 & Normal 65,1; Fuzzers 21,8 & \texttt{ct\_srv\_*} $\approx$ 17; \texttt{ct\_src\_dport\_ltm} 5,9 ($+2{,}0$ desvíos); volumen bajo \\
+  \bottomrule
+  \end{tabularx}
+  \end{tablacompacta}
+\end{table}
 
-\textbf{Vínculo con H2.} H2 se cumple en parte. Un cluster es casi puramente normal (el 1, 98,6~\%) y otro íntegramente de ataques (el 3), definidos por la forma de la conexión; los otros cuatro mezclan ambos (34,9 a 72,6~\% de ataques). Además, la parte de H2 sobre los tipos de ataque no se sostiene del todo: el cluster 3 aísla casi solo ataques Generic. Dada la silhouette baja, leemos los grupos como descripción útil y no como categorías naturales.
+Hipotetizamos (sin poder contrastarlo) que el cluster 1 es transferencia legítima de datos; el 3, ráfagas automáticas de paquetes pequeños sin respuesta (130 de 147 son Generic); el 5, consultas breves, y el 6, conexiones repetidas a un mismo servicio. Dada la silhouette baja, los leemos como descripción útil y no como categorías naturales. Los clusters se guardaron en la base para el ACM.
