@@ -48,7 +48,7 @@ q = base[["tipo_trafico", "proto_g", "service_g", "state_g"]].copy()
 q["respuesta_destino"] = np.where(base.dpkts.eq(0), "sin_respuesta", "con_respuesta")
 c = leer("cortes_discretizacion").set_index("variable")
 q["duracion_banda"] = pd.cut(base.dur, [-np.inf, c.loc["dur", "corte_1"], c.loc["dur", "corte_2"], np.inf], labels=["corta", "media", "larga"])
-q["bytes_origen_banda"] = pd.cut(base.sbytes, [-np.inf, 564, 1580, np.inf], labels=["bajos", "medios", "altos"])
+q["bytes_origen_banda"] = pd.cut(base.sbytes, [-np.inf, c.loc["sbytes", "corte_1"], c.loc["sbytes", "corte_2"], np.inf], labels=["bajos", "medios", "altos"])
 A = pd.get_dummies(q, dtype=float).to_numpy()
 n, Q, J = len(q), len(q.columns), A.shape[1]
 P = A / (n * Q)

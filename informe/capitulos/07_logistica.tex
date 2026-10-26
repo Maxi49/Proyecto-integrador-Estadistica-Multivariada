@@ -1,51 +1,50 @@
 \section{Regresión logística}
 \label{sec:logistica}
 
-\textbf{Objetivo y diseño.} Para contrastar H4 modelamos la probabilidad de que un flujo sea ataque (\texttt{label} = 1) con regresión logística \citep{hosmer2013}. Dividimos la muestra de 5.000 flujos en 3.500 de entrenamiento (51,8\,\% ataques) y 1.500 de prueba (51,9\,\%), de forma estratificada por \texttt{label} y con semilla 42. No usamos el testing set original porque no está en el repositorio y habría que prepararlo con el mismo tratamiento. Para evitar fuga de información reajustamos el ACP solo con el entrenamiento y proyectamos la prueba con esas cargas; estas son casi idénticas a las del capítulo~\ref{sec:acp} (correlación $\ge 0{,}999$, diferencia máxima 0,015), por lo que las componentes se interpretan igual. Los predictores son los puntajes de PC1, PC2 y PC3 y tres categóricas agrupadas: \texttt{proto\_g} (referencia tcp), \texttt{service\_g} (ninguno) y \texttt{state\_g} (FIN), tomando como referencia la categoría más frecuente. Excluimos las variables TTL, que separan perfectamente las clases por un artefacto del laboratorio y darían un AUC irreal, y \texttt{tipo\_trafico} y \texttt{attack\_cat}, que contienen la etiqueta.
+\textbf{Diseño.} Para contrastar H4 modelamos la probabilidad de que un flujo sea ataque (\texttt{label} = 1) con regresión logística \citep{hosmer2013}. Dividimos la muestra en 3.500 flujos de entrenamiento (51,8\,\% ataques) y 1.500 de prueba (51,9\,\%), estratificando por \texttt{label} (semilla 42) (no usamos el testing set original: no está en el repositorio y habría que prepararlo igual). Para evitar fuga reajustamos el ACP solo con el entrenamiento y proyectamos la prueba; las cargas son casi idénticas a las del capítulo~\ref{sec:acp} (correlación $\ge 0{,}999$). Los predictores son PC1 a PC3 y \texttt{proto\_g} (referencia tcp), \texttt{service\_g} (ninguno) y \texttt{state\_g} (FIN), con la categoría más frecuente como referencia. Excluimos TTL (separación perfecta artefactual) y \texttt{tipo\_trafico} y \texttt{attack\_cat} (fuga de la etiqueta).
 
-\textbf{Elección del modelo.} Comparamos M1 (solo los tres puntajes) con M2 (M1 más protocolo, servicio y estado). La prueba de razón de verosimilitud favorece a M2 ($\chi^2 = 862{,}2$; 7 gl; $p < 0{,}001$), que además reduce el AIC en unos 850 puntos y mejora el AUC en 0,08 (Tabla~\ref{tab:log-modelos}). Elegimos M2.
+\textbf{Elección del modelo.} M1 usa solo los puntajes; M2 agrega protocolo, servicio y estado. La razón de verosimilitud favorece a M2 ($\chi^2 = 862{,}2$; 7 gl; $p < 0{,}001$), con unos 850 puntos menos de AIC y 0,08 más de AUC (Tabla~\ref{tab:log-modelos}). Elegimos M2.
 
 \begin{table}[H]
   \centering
-  \caption{Comparación de modelos. El AUC se calcula sobre la muestra de prueba.}\label{tab:log-modelos}
+  \caption{Comparación de modelos; el AUC es sobre la muestra de prueba.}\label{tab:log-modelos}
   \begin{tablacompacta}
   \begin{tabular}{lrrr} \toprule
-  Modelo & AIC & $R^2$ de McFadden & AUC prueba \\ \midrule
+  Modelo & AIC & $R^2$ McFadden & AUC prueba \\ \midrule
   M1: 3 puntajes del ACP & 3.744,1 & 0,229 & 0,794 \\
   M2: M1 + protocolo, servicio, estado & 2.895,9 & 0,407 & 0,878 \\ \bottomrule
   \end{tabular}
   \end{tablacompacta}
 \end{table}
 
-\textbf{Odds ratios.} Los OR de las componentes se expresan por cada desvío estándar del puntaje y los de las categóricas frente a su referencia (Tabla~\ref{tab:log-or}; IC 95\,\% por verosimilitud perfilada). Con los demás predictores fijos, un desvío más de PC1 (más volumen y temporización, menos repetición de conexiones) multiplica las chances de ataque por 4,7; un desvío más de PC2 (más volumen y más repetición a la vez) las reduce un 39\,\%. Frente al estado FIN, las conexiones con estado CON\_otros tienen chances mucho menores de ser ataque (OR 0,05). Los OR de las categóricas son condicionales y poco estables: hay colinealidad entre ellas (VIF $\approx 16$ en \texttt{udp} e INT, 8,1 en CON\_otros; $\le 3{,}7$ en las componentes), de modo que no deben leerse de a uno. Por ejemplo, dns tiene 31\,\% de ataques en el entrenamiento (49\,\% en servicio ninguno), pero su OR ajustado es 18,7, porque el signo cambia al controlar por estado y protocolo. El IC de INT (22,6 a 361,8) es tan ancho que el valor puntual no debe citarse como ``93 veces'': solo concluimos que INT se asocia con mayores chances de ataque. Los OR de \texttt{proto\_g} (udp, otros) y de servicio ``otros'' no se distinguen de 1.
+\textbf{Odds ratios.} Con lo demás fijo, un desvío más de PC1 (más volumen y temporización, menos repetición) multiplica las chances de ataque por 4,7, y uno más de PC2 (más volumen y repetición a la vez) las reduce un 39\,\% (Tabla~\ref{tab:log-or}). El estado CON\_otros tiene chances mucho menores que FIN (OR 0,05). Los OR de las categóricas son condicionales y poco estables por colinealidad (VIF $\approx 16$ en \texttt{udp} e INT; $\le 3{,}7$ en las componentes), así que no deben leerse de a uno: dns tiene 31\,\% de ataques en el entrenamiento (49\,\% en servicio ninguno) pero OR ajustado 18,7: el signo cambia al controlar por estado y protocolo. El IC de INT es muy ancho: no debe citarse ``93 veces''.
 
 \begin{table}[H]
   \centering
-  \caption{Odds ratios del modelo M2 (principales términos). Componentes: OR por desvío del puntaje. El resto de los términos (protocolo otros, servicio otros) tiene IC que incluye 1.}\label{tab:log-or}
+  \caption{Odds ratios de M2 con IC 95\,\% por verosimilitud perfilada (componentes: por desvío del puntaje; categóricas: frente a la referencia). Los términos de protocolo (udp, otros) y servicio otros tienen IC que incluyen 1.}\label{tab:log-or}
   \begin{tablacompacta}
   \begin{tabular}{lrr} \toprule
   Término & OR & IC 95\,\% \\ \midrule
-  PC1 (por desvío) & 4,68 & 3,82 -- 5,77 \\
-  PC2 (por desvío) & 0,61 & 0,54 -- 0,69 \\
-  PC3 (por desvío) & 2,55 & 2,27 -- 2,89 \\
+  PC1 & 4,68 & 3,82 -- 5,77 \\
+  PC2 & 0,61 & 0,54 -- 0,69 \\
+  PC3 & 2,55 & 2,27 -- 2,89 \\
   Estado INT vs FIN & 92,7 & 22,6 -- 361,8 \\
   Estado CON\_otros vs FIN & 0,05 & 0,02 -- 0,13 \\
   Servicio dns vs ninguno & 18,7 & 8,5 -- 43,0 \\
-  Servicio http vs ninguno & 1,88 & 1,47 -- 2,42 \\
-  Protocolo udp vs tcp & 0,42 & 0,11 -- 1,73 \\ \bottomrule
+  Servicio http vs ninguno & 1,88 & 1,47 -- 2,42 \\ \bottomrule
   \end{tabular}
   \end{tablacompacta}
 \end{table}
 
-\textbf{Desempeño en prueba.} Con umbral 0,5, M2 alcanza AUC = 0,878 (IC 95\,\% de DeLong, calculado con \texttt{pROC} \citep{robin2011}: 0,860 -- 0,896), exactitud 0,817, sensibilidad 0,910, especificidad 0,717 y precisión 0,776. El error dominante son los falsos positivos: 204 flujos normales marcados como ataque (28,3\,\% de los normales) frente a 70 ataques no detectados (9,0\,\%; Figura~\ref{fig:log-roc}). En detección de intrusiones esto significa que el modelo prioriza no dejar pasar ataques a costa de generar alertas falsas, que en una red real implican carga de revisión; como el umbral no está optimizado, podría ajustarse según el costo relativo de cada error.
+\textbf{Desempeño en prueba.} Con umbral 0,5, M2 logra AUC = 0,878 (IC 95\,\% de DeLong con \texttt{pROC} \citep{robin2011}: 0,860 -- 0,896), exactitud 0,817, sensibilidad 0,910, especificidad 0,717 y precisión 0,776. Domina el falso positivo: 204 normales marcados como ataque (28,3\,\% de los normales) frente a 70 ataques no detectados (9,0\,\%; Figura~\ref{fig:log-roc}). En detección de intrusiones el modelo prioriza no dejar pasar ataques a costa de alertas falsas.
 
 \begin{figure}[H]
   \centering
-  \grafico[0.88\linewidth]{17_logistica_roc_confusion.png}
-  \caption{Curva ROC y matriz de confusión de M2 en la muestra de prueba (umbral 0,5). La curva se aleja claramente de la diagonal del azar; el error principal son los normales clasificados como ataque. Fuente: elaboración propia con UNSW-NB15.}
+  \grafico[0.6\linewidth]{17_logistica_roc_confusion.png}
+  \caption{Curva ROC y matriz de confusión de M2 en la prueba (umbral 0,5). La curva se aleja de la diagonal del azar; el error principal son los normales clasificados como ataque. Fuente: elaboración propia con UNSW-NB15.}
   \label{fig:log-roc}
 \end{figure}
 
-\textbf{Diagnóstico.} No hay separación: el algoritmo convergió en 6 iteraciones sin avisos, el coeficiente máximo en valor absoluto es 4,5 (error estándar máximo 0,71) y ninguna probabilidad ajustada está a menos de $10^{-8}$ de 0 o 1. Respecto de la influencia, 151 flujos (4,3\,\%) superan el umbral $4/n$ de la distancia de Cook, pero el máximo es 0,030, muy lejos de 1, y no quitamos ninguno. La calibración es razonable en el centro, aunque los deciles altos sobreestiman (decil 10: predicho 0,94, observado 0,86) y el decil 4 subestima (0,38 frente a 0,48), con ruido de varios puntos por decil de 150 flujos (Anexo A, Figura A.\ref{fig:a-log-or-cal}, donde también se grafican los OR).
+\textbf{Diagnóstico.} No hay separación: convergió en 6 iteraciones sin avisos, el coeficiente máximo es 4,5 y ninguna probabilidad ajustada está a menos de $10^{-8}$ de 0 o 1. En influencia, 151 flujos (4,3\,\%) superan $4/n$ en la distancia de Cook, pero el máximo es 0,030, muy lejos de 1. La calibración es razonable, salvo que el decil 10 sobreestima (predicho 0,94, observado 0,86; Anexo A, Figura~\ref{fig:a-log-or-cal}).
 
-\textbf{Cierre e H4.} H4 se confirma: el AUC en prueba es 0,878 y el límite inferior de su IC (0,860) también supera 0,80. La mejora se debe a incorporar protocolo, servicio y estado, ya que con las componentes solas (M1, AUC 0,794) la hipótesis no se cumpliría. La probabilidad estimada es relativa a esta base (52\,\% de ataques, sin duplicados, ataques sintéticos de laboratorio): interpretamos odds ratios y no prevalencias absolutas, y el desempeño no se extrapola a una red real.
+\textbf{Cierre.} H4 se confirma: el AUC en prueba es 0,878 y el límite inferior de su IC (0,860) también supera 0,80; con las componentes solas (M1, 0,794) no se cumpliría. La probabilidad estimada es relativa a esta base (52\,\% de ataques, sin duplicados, ataques sintéticos): interpretamos odds ratios, no prevalencias, y no extrapolamos a una red real.

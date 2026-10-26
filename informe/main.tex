@@ -169,6 +169,9 @@
 \clearpage
 \appendix
 \renewcommand{\thesection}{\Alph{section}}
+% En los anexos, figuras y tablas se numeran A.1, A.2, B.1...
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
 \input{anexos/anexo_a_complementos}
 \input{anexos/anexo_b_scripts}
 

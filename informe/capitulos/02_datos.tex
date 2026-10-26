@@ -1,5 +1,48 @@
 \section{Datos}
 \label{sec:datos}
 
-[Pendiente]
+\textbf{Origen y unidad de análisis.} Trabajamos con UNSW-NB15 \citep{moustafa2015,moustafa2016}, publicada por UNSW Canberra para uso académico con obligación de citar a sus autores. El tráfico normal es realista, pero los ataques se generaron de forma sintética en un laboratorio. La unidad de análisis es el flujo; el prefijo \texttt{s} indica el sentido origen$\to$destino y \texttt{d} el inverso. Partimos del archivo de entrenamiento (175.341 flujos y 45 columnas) y construimos una muestra de 5.000 flujos únicos, estratificada de forma proporcional por \texttt{attack\_cat}: 48,2~\% normales y 51,8~\% ataques (Exploits 18,4~\%, Fuzzers 15,0~\%, Reconnaissance 7,0~\% y el resto, 11,5~\%, agrupado como ``otros ataques''). Al eliminar los duplicados, que en el archivo original eran el 38,6~\% y en su mayoría ataques automáticos, analizamos perfiles distintos de flujo: las proporciones de la muestra no son prevalencias reales de la red.
 
+\textbf{Transformación.} Las variables son positivas, con colas muy largas y rangos de varios órdenes de magnitud. Aplicamos $\log(x+1)$, que conserva los ceros y reduce la asimetría de \texttt{sbytes} de 33,3 a 1,0, la de \texttt{spkts} de 30,9 a 0,8 y la de \texttt{dbytes} de 36,2 a $-0,4$. Persisten colas en \texttt{log\_dur} (2,8), \texttt{log\_ct\_src\_dport\_ltm} (3,1) y \texttt{log\_ct\_dst\_sport\_ltm} (4,7). Los gráficos antes y después están en el Anexo A (Figuras~\ref{fig:a-hist-crudos} y~\ref{fig:a-hist-log}).
+
+\textbf{Variables.} El conjunto X\_num queda formado por las 12 variables de la Tabla~\ref{tab:xnum}, todas en escala logarítmica, agrupadas en los tres bloques esperados. El conjunto X\_cat tiene siete variables: \texttt{tipo\_trafico} (Normal, Exploits, Fuzzers, Reconnaissance y Otros ataques), \texttt{proto\_g} (tcp 70,8~\%, udp 21,9~\%, otros 7,3~\%), \texttt{service\_g} (ninguno 60,0~\%, http 17,4~\%, otros 12,3~\%, dns 10,3~\%), \texttt{state\_g} (FIN 69,3~\%, INT 18,3~\%, CON\_otros 12,4~\%) y tres numéricas discretizadas, \texttt{respuesta\_destino}, \texttt{duracion\_banda} y \texttt{bytes\_origen\_banda}, cuyos cortes se justifican en la sección~\ref{sec:acm}. Ninguna categoría baja del 5~\% (la menor es Reconnaissance, con 7,0~\%). Las variables \texttt{tipo\_trafico}, \texttt{attack\_cat} y \texttt{label} no intervienen en la construcción de componentes, factores ni clusters: solo colorean o se cruzan después.
+
+\begin{table}[H]
+  \centering
+  \caption{Variables de X\_num (todas en escala $\log(x+1)$; la unidad es la de la variable original).}\label{tab:xnum}
+  \begin{tablacompacta}
+  \begin{tabular}{@{}llp{6.6cm}l@{}}
+  \toprule
+  Variable & Bloque esperado & Significado & Unidad \\
+  \midrule
+  \texttt{spkts} & Volumen & Paquetes enviados por el origen & paquetes \\
+  \texttt{sbytes} & Volumen & Bytes enviados por el origen & bytes \\
+  \texttt{dbytes} & Volumen & Bytes enviados por el destino & bytes \\
+  \texttt{dur} & Temporización & Duración total del flujo & segundos \\
+  \texttt{sinpkt} & Temporización & Tiempo entre paquetes del origen & ms \\
+  \texttt{sjit} & Temporización & Jitter (variabilidad de esos tiempos) del origen & ms \\
+  \texttt{synack} & Temporización & Tiempo entre SYN y SYN-ACK (0 si no es TCP) & segundos \\
+  \texttt{ct\_srv\_src} & Repetición & Últimas 100 conexiones con igual servicio y origen & conexiones \\
+  \texttt{ct\_srv\_dst} & Repetición & Ídem con igual servicio y destino & conexiones \\
+  \texttt{ct\_src\_ltm} & Repetición & Ídem con igual origen & conexiones \\
+  \texttt{ct\_src\_dport\_ltm} & Repetición & Ídem con igual origen y puerto destino & conexiones \\
+  \texttt{ct\_dst\_sport\_ltm} & Repetición & Ídem con igual destino y puerto origen & conexiones \\
+  \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+
+\textbf{Calidad.} No hay valores faltantes ni textos vacíos, filas duplicadas ni identificadores repetidos, y tampoco valores negativos, TTL fuera de 0--255, conteos no enteros ni flujos con menos bytes que paquetes (Anexo A, Tabla~\ref{tab:a-calidad}). La única incidencia es un flujo con \texttt{is\_ftp\_login} = 4, un código no binario; lo conservamos porque esa variable no entra en los análisis. El servicio ``\texttt{-}'' se recodificó como ``ninguno'' (sin servicio identificado, no faltante). Hay ceros estructurales que no imputamos: \texttt{synack} en 1.482 flujos (29,6~\%, sin handshake TCP), \texttt{sjit} en 1.294 (25,9~\%) y \texttt{dbytes} en 945 (18,9~\%, el destino no respondió). Para los atípicos usamos el criterio de Tukey, fuera de $[Q_1-1{,}5\,\mathrm{RIC};\,Q_3+1{,}5\,\mathrm{RIC}]$ sobre la escala logarítmica. Resultan 1.714 flujos (34,3~\%) con al menos una de las 12 variables fuera de los límites; la mayor cifra es la de \texttt{log\_dbytes}, 1.056 casos (21,1~\%), de los cuales 945 son los ceros de flujos sin respuesta. En \texttt{log\_ct\_dst\_sport\_ltm} el criterio es poco informativo, porque el 90,7~\% de los flujos vale 1 y el rango intercuartílico es nulo. Decidimos conservar todos los flujos: en ciberseguridad lo extremo puede ser el fenómeno de interés y un valor extremo no prueba un error (boxplots en Anexo A, Figura~\ref{fig:a-boxplots}).
+
+\textbf{Descriptiva y supuestos.} La Figura~\ref{fig:correlaciones} muestra tres zonas. Las variables de volumen se correlacionan entre sí (\texttt{spkts}--\texttt{sbytes} 0,86; \texttt{spkts}--\texttt{dbytes} 0,80), las de temporización también (\texttt{sinpkt}--\texttt{sjit} 0,85; \texttt{dur}--\texttt{sinpkt} 0,68) y las de repetición forman un tercer grupo (\texttt{ct\_srv\_src}--\texttt{ct\_srv\_dst} 0,85; \texttt{ct\_src\_dport\_ltm}--\texttt{ct\_dst\_sport\_ltm} 0,74). Las repeticiones se correlacionan de forma negativa con el resto (entre $-0,13$ y $-0,43$), y \texttt{sjit} tiene correlaciones de 0,46 a 0,55 con las de volumen, de modo que los bloques no están completamente aislados.
+
+\begin{figure}[H]
+  \centering
+  \grafico[0.56\linewidth]{04_correlaciones.png}
+  \caption{Correlaciones de Pearson entre las 12 variables de X\_num. Se distinguen los bloques de volumen, temporización y repetición de conexiones; el último se asocia de forma negativa con los otros dos. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:correlaciones}
+\end{figure}
+
+Los supuestos se cumplen: el determinante de la matriz de correlaciones es $6{,}3\times10^{-5}$ (mayor que $10^{-5}$), el KMO global es 0,748, la menor MSA es 0,621 (\texttt{log\_spkts}; ninguna variable queda bajo 0,50, Anexo A, Figura~\ref{fig:a-msa}) y la prueba de Bartlett rechaza que la matriz sea identidad ($\chi^2$ = 48.303,5; 66 gl; p < 0,001), aunque con n = 5.000 esto ocurre ante casi cualquier asociación y pesa más el KMO. Con las 14 variables candidatas el determinante era $1{,}0\times10^{-7}$, por la redundancia de \texttt{dpkts} (r = 0,95 con \texttt{dbytes}) y de \texttt{rate} (r = $-0,91$ con \texttt{sinpkt}, y calculada a partir de los paquetes y la duración). Quitar solo \texttt{dpkts} dejaba el determinante en $5{,}2\times10^{-6}$, aún bajo el umbral; por eso excluimos las dos. Estas columnas siguen en la base: \texttt{dpkts} define \texttt{respuesta\_destino}.
+
+\textbf{Vínculo con H1.} Las correlaciones son compatibles con tres bloques, aunque la separación entre volumen y temporización es parcial; las secciones siguientes ponen a prueba si ACP, AF y el cluster de variables los recuperan.

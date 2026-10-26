@@ -15,6 +15,7 @@ python python/verificar_resultados.py
 R/00_datos.R conserva el estilo del script Consultar Diccionario de Variables.R.
 La hoja muestra y n_atipicos originales no se modifican. Los clusters se guardan
 en otra base: resultados/base_con_clusters.rds.
-Minres produce un caso Heywood; se informa y se contrasta con ML acotado.
-Ese aviso es un resultado metodológico, no un error ocultado de la ejecución.
+El AF usa 3 factores con GLS y varimax. Minres, pa y ML producen un caso Heywood (log_spkts);
+se informa en resultados/tablas/af_diagnostico_minres.csv y se explica en docs/validacion_decisiones.md.
+El diagnóstico completo se corre aparte: Rscript R/aux_diagnostico_af.R
 Los documentos y sus generadores se guardan fuera del repositorio, en la carpeta de entrega.

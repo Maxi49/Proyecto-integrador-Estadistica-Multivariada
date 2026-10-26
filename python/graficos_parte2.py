@@ -147,7 +147,8 @@ ax.plot(par.dimension, par.factor_simulado, "s--", color="#B7A4C9", label="Refer
 ax.axvline(3.5, color=DARK, ls=":", lw=1, label="Factores retenidos (3, Kaiser reducido)")
 ax.axvline(4.5, color="#929BA2", ls="--", lw=.8, label="Corte del análisis paralelo (4)")
 ax.set(xlabel="Número de factor", ylabel="Autovalor reducido", title="Análisis paralelo de factores · 100 repeticiones", xticks=range(1, 13))
-ax.legend(fontsize=12)
+ax.set_ylim(-0.8, 6.2)
+ax.legend(fontsize=10, ncol=2, loc="upper right")
 guardar(fig, "09_af_paralelo")
 
 def linkage_r(nombre, n):
