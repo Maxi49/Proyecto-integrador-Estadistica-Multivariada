@@ -1,0 +1,72 @@
+% Anexo B: código fuente. Se lee directamente de ../R y ../python, así que
+% el anexo siempre muestra la versión actual de cada script.
+\section{Código fuente}
+\label{anexo:scripts}
+Los scripts se ejecutan desde la carpeta principal del repositorio. Primero se corre \texttt{R/ejecutar\_todo.R}, que genera las tablas en \texttt{resultados/tablas}; luego los scripts de Python dibujan las figuras a partir de esas tablas. Todos los procesos aleatorios usan la semilla 42.
+\subsection{Scripts de R}
+\IfFileExists{../R/00_datos.R}{%
+\subsubsection*{\texttt{R/00\_datos.R} · Etapa 0: importación, calidad, descriptiva y supuestos}
+\addcontentsline{toc}{subsection}{\texttt{R/00\_datos.R}}
+\lstinputlisting[language=R]{../R/00_datos.R}
+}{}
+\IfFileExists{../R/01_acp.R}{%
+\subsubsection*{\texttt{R/01\_acp.R} · Etapa 1: análisis de componentes principales}
+\addcontentsline{toc}{subsection}{\texttt{R/01\_acp.R}}
+\lstinputlisting[language=R]{../R/01_acp.R}
+}{}
+\IfFileExists{../R/02_af.R}{%
+\subsubsection*{\texttt{R/02\_af.R} · Etapa 2: análisis factorial}
+\addcontentsline{toc}{subsection}{\texttt{R/02\_af.R}}
+\lstinputlisting[language=R]{../R/02_af.R}
+}{}
+\IfFileExists{../R/aux_diagnostico_af.R}{%
+\subsubsection*{\texttt{R/aux\_diagnostico\_af.R} · Etapa 2 (auxiliar): diagnóstico del caso Heywood}
+\addcontentsline{toc}{subsection}{\texttt{R/aux\_diagnostico\_af.R}}
+\lstinputlisting[language=R]{../R/aux_diagnostico_af.R}
+}{}
+\IfFileExists{../R/03_cluster.R}{%
+\subsubsection*{\texttt{R/03\_cluster.R} · Etapa 3: conglomerados de observaciones y de variables}
+\addcontentsline{toc}{subsection}{\texttt{R/03\_cluster.R}}
+\lstinputlisting[language=R]{../R/03_cluster.R}
+}{}
+\IfFileExists{../R/04_acm.R}{%
+\subsubsection*{\texttt{R/04\_acm.R} · Etapa 4: correspondencias simple y múltiples}
+\addcontentsline{toc}{subsection}{\texttt{R/04\_acm.R}}
+\lstinputlisting[language=R]{../R/04_acm.R}
+}{}
+\IfFileExists{../R/05_integracion.R}{%
+\subsubsection*{\texttt{R/05\_integracion.R} · Etapa 6: integración de técnicas}
+\addcontentsline{toc}{subsection}{\texttt{R/05\_integracion.R}}
+\lstinputlisting[language=R]{../R/05_integracion.R}
+}{}
+\IfFileExists{../R/06_logistica.R}{%
+\subsubsection*{\texttt{R/06\_logistica.R} · Regresión logística}
+\addcontentsline{toc}{subsection}{\texttt{R/06\_logistica.R}}
+\lstinputlisting[language=R]{../R/06_logistica.R}
+}{}
+\IfFileExists{../R/ejecutar_todo.R}{%
+\subsubsection*{\texttt{R/ejecutar\_todo.R} · Ejecución completa del proyecto}
+\addcontentsline{toc}{subsection}{\texttt{R/ejecutar\_todo.R}}
+\lstinputlisting[language=R]{../R/ejecutar_todo.R}
+}{}
+\subsection{Scripts de Python}
+\IfFileExists{../python/graficos_etapa0.py}{%
+\subsubsection*{\texttt{python/graficos\_etapa0.py} · Gráficos de la Etapa 0}
+\addcontentsline{toc}{subsection}{\texttt{python/graficos\_etapa0.py}}
+\lstinputlisting[language=Python]{../python/graficos_etapa0.py}
+}{}
+\IfFileExists{../python/graficos_parte2.py}{%
+\subsubsection*{\texttt{python/graficos\_parte2.py} · Gráficos de las Etapas 1 a 4}
+\addcontentsline{toc}{subsection}{\texttt{python/graficos\_parte2.py}}
+\lstinputlisting[language=Python]{../python/graficos_parte2.py}
+}{}
+\IfFileExists{../python/graficos_logistica.py}{%
+\subsubsection*{\texttt{python/graficos\_logistica.py} · Gráficos de la regresión logística}
+\addcontentsline{toc}{subsection}{\texttt{python/graficos\_logistica.py}}
+\lstinputlisting[language=Python]{../python/graficos_logistica.py}
+}{}
+\IfFileExists{../python/verificar_resultados.py}{%
+\subsubsection*{\texttt{python/verificar\_resultados.py} · Verificación independiente de resultados}
+\addcontentsline{toc}{subsection}{\texttt{python/verificar\_resultados.py}}
+\lstinputlisting[language=Python]{../python/verificar_resultados.py}
+}{}

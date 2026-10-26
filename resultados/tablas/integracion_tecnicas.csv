@@ -1,6 +1,6 @@
 "tecnica","estructura","interpretacion"
 "ACP","3 componentes; 74,51% de varianza","Ejes mixtos: complejidad frente a repetición; volumen y actividad"
-"AF","4 factores; solución ML con unicidad en el límite","Tiempo, volumen, repetición por puertos y repetición por servicio"
-"Clustering","Tres bloques de variables y 6 grupos de observaciones","AF reconoce los bloques; ARI Ward/KM = 0,813 y silhouette = 0,333; las CP cambian fronteras"
+"AF","3 factores (GLS, varimax); 68,58% de la varianza total; sin caso Heywood (unicidad mínima 0,103)","Repetición de conexiones, Temporización, Volumen (cargas >= 0,40; cruces ambiguos = 0)"
+"Clustering","Tres bloques de variables y 6 grupos de observaciones","El AF reconoce los bloques (ARI bloques de variables vs. factores = 1,000); ARI Ward/KM = 0,813, silhouette = 0,333; con puntajes de ACP el ARI frente a k-means es 0,708 (las CP cambian fronteras)"
 "ACS","Tipo de tráfico por estado; V de Cramér = 0,405","Normal-CON_otros y Exploits-FIN coinciden con asociaciones del ACM"
 "ACM","Plano de dos dimensiones; 87,40% de inercia ajustada","Respuesta/protocolo/estado y oposición entre estados y tipos de servicio"

@@ -1,0 +1,27 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Introducción}{4}{section.1}%
+\contentsline {section}{\numberline {2}Datos}{4}{section.2}%
+\contentsline {section}{\numberline {3}Análisis de componentes principales}{4}{section.3}%
+\contentsline {section}{\numberline {4}Análisis factorial}{4}{section.4}%
+\contentsline {section}{\numberline {5}Análisis de conglomerados}{4}{section.5}%
+\contentsline {section}{\numberline {6}Análisis de correspondencias simple y múltiples}{4}{section.6}%
+\contentsline {section}{\numberline {7}Regresión logística}{4}{section.7}%
+\contentsline {section}{\numberline {8}Integración y conclusiones}{4}{section.8}%
+\contentsline {section}{Referencias bibliográficas}{5}{section*.1}%
+\contentsline {section}{\numberline {A}Figuras y tablas complementarias}{6}{appendix.Alph1}%
+\contentsline {section}{\numberline {B}Código fuente}{6}{appendix.Alph2}%
+\contentsline {subsection}{\numberline {B.1}Scripts de R}{6}{subsection.Alph2.1}%
+\contentsline {subsection}{\texttt {R/00\_datos.R}}{6}{subsection.Alph2.1}%
+\contentsline {subsection}{\texttt {R/01\_acp.R}}{8}{lstnumber.-1.184}%
+\contentsline {subsection}{\texttt {R/02\_af.R}}{9}{lstnumber.-2.40}%
+\contentsline {subsection}{\texttt {R/aux\_diagnostico\_af.R}}{10}{lstnumber.-3.56}%
+\contentsline {subsection}{\texttt {R/03\_cluster.R}}{11}{lstnumber.-4.83}%
+\contentsline {subsection}{\texttt {R/04\_acm.R}}{12}{lstnumber.-5.82}%
+\contentsline {subsection}{\texttt {R/05\_integracion.R}}{13}{lstnumber.-6.74}%
+\contentsline {subsection}{\texttt {R/06\_logistica.R}}{14}{lstnumber.-7.36}%
+\contentsline {subsection}{\texttt {R/ejecutar\_todo.R}}{17}{lstnumber.-8.213}%
+\contentsline {subsection}{\numberline {B.2}Scripts de Python}{17}{subsection.Alph2.2}%
+\contentsline {subsection}{\texttt {python/graficos\_etapa0.py}}{17}{subsection.Alph2.2}%
+\contentsline {subsection}{\texttt {python/graficos\_parte2.py}}{19}{lstnumber.-10.145}%
+\contentsline {subsection}{\texttt {python/graficos\_logistica.py}}{23}{lstnumber.-11.261}%
+\contentsline {subsection}{\texttt {python/verificar\_resultados.py}}{25}{lstnumber.-12.103}%
