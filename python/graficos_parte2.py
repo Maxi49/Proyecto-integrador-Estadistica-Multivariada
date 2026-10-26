@@ -4,7 +4,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MaxNLocator, FuncFormatter, ScalarFormatter
 import numpy as np
 import pandas as pd
 
@@ -24,7 +24,15 @@ plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 13,
     "axes.spines.top": False, "axes.spines.right": False, "axes.titlesize": 13,
     "text.color": DARK, "axes.labelcolor": DARK, "figure.facecolor": "white"})
 
+def coma_decimal(fig):
+    """Usar coma decimal en los ejes numéricos, como en el resto del informe."""
+    for ax in fig.axes:
+        for eje in (ax.xaxis, ax.yaxis):
+            if isinstance(eje.get_major_formatter(), ScalarFormatter):
+                eje.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}".replace(".", ",")))
+
 def guardar(fig, nombre):
+    coma_decimal(fig)
     fig.savefig(F / f"{nombre}.png", dpi=220, bbox_inches="tight", facecolor="white")
     plt.close(fig)
 
@@ -135,7 +143,8 @@ for row in ext.itertuples():
     j = scores.index[scores.id.eq(row.id)][0]
     texts.append(ax.text(*xy[j], str(row.id), fontsize=11, fontweight="bold"))
 origen(ax)
-ax.set(title="Biplot de individuos y variables", xlabel="CP1 (43,29%)", ylabel="CP2 (16,88%)")
+pct = eig.porcentaje.iloc[:2].round(2).map(lambda v: f"{v:.2f}".replace(".", ","))
+ax.set(title="Biplot de individuos y variables", xlabel=f"CP1 ({pct.iloc[0]}%)", ylabel=f"CP2 ({pct.iloc[1]}%)")
 fig.legend(*ax.get_legend_handles_labels(), fontsize=10, loc="outside lower center", ncol=5, markerscale=2)
 adjust_text(texts, ax=ax, arrowprops=dict(arrowstyle="-", color="#929BA2", lw=.4))
 guardar(fig, "08_acp_codo_biplot")
@@ -215,8 +224,9 @@ guardar(fig, "13_acs_mapa")
 e = leer("acm_autovalores")
 fig, axs = plt.subplots(1, 2, figsize=(10, 2.1), layout="constrained")
 axs[0].plot(e.dimension, e.autovalor, "o-", color="#8AABC5")
-axs[0].axhline(1/7, color=DARK, ls="--", lw=.8)
+axs[0].axhline(1/leer("acm_resumen").Q.iloc[0], color=DARK, ls="--", lw=.8)
 axs[0].set(title="Autovalores crudos del ACM", xlabel="Dimensión", ylabel="Autovalor")
+axs[0].xaxis.set_major_locator(MaxNLocator(integer=True))
 axs[1].bar(e.dimension.iloc[:6], e.porcentaje_ajustado.iloc[:6], color=COL[1], edgecolor=DARK, linewidth=.5)
 axs[1].set(title="Inercia ajustada (ca::mjca)", xlabel="Dimensión", ylabel="Porcentaje ajustado")
 guardar(fig, "14_acm_inercia")

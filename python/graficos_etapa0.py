@@ -5,7 +5,7 @@ import matplotlib
 matplotlib.use("Agg")  # Exportación reproducible: no abre ventanas ni requiere pantalla.
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MaxNLocator, FuncFormatter, ScalarFormatter
 import numpy as np
 import pandas as pd
 
@@ -37,7 +37,15 @@ plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 10,
 PASTEL = ["#C7DCEB", "#D7CCE8", "#CDE2D3", "#F0D4BE", "#EBCDD5"]
 EDGE = "#556874"
 
+def coma_decimal(fig):
+    """Usar coma decimal en los ejes numéricos, como en el resto del informe."""
+    for ax in fig.axes:
+        for eje in (ax.xaxis, ax.yaxis):
+            if isinstance(eje.get_major_formatter(), ScalarFormatter):
+                eje.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}".replace(".", ",")))
+
 def guardar(fig, name):
+    coma_decimal(fig)
     fig.savefig(FIGURES / f"{name}.png", dpi=200, bbox_inches="tight", facecolor="white")
     plt.close(fig)
 

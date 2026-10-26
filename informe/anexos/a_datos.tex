@@ -22,6 +22,25 @@
   \end{tablacompacta}
 \end{table}
 
+\begin{table}[H]
+  \centering
+  \caption{Flujos fuera de los límites de Tukey ($1{,}5\times$ RIC) en cada variable de X\_num, sobre la escala logarítmica (n = 5.000). En \texttt{log\_ct\_dst\_sport\_ltm} el rango intercuartílico es nulo (el 90,7~\% de los flujos vale 1), de modo que cualquier valor mayor queda marcado.}\label{tab:a-atipicos}
+  \begin{tablacompacta}
+  \begin{tabular}{@{}lrr@{\hspace{1cm}}lrr@{}}
+  \toprule
+  Variable & Casos & \% & Variable & Casos & \% \\
+  \midrule
+  \texttt{log\_dur} & 189 & 3,8 & \texttt{log\_ct\_srv\_src} & 10 & 0,2 \\
+  \texttt{log\_spkts} & 19 & 0,4 & \texttt{log\_ct\_srv\_dst} & 10 & 0,2 \\
+  \texttt{log\_sbytes} & 256 & 5,1 & \texttt{log\_ct\_src\_ltm} & 127 & 2,5 \\
+  \texttt{log\_dbytes} & 1.056 & 21,1 & \texttt{log\_ct\_src\_dport\_ltm} & 581 & 11,6 \\
+  \texttt{log\_sinpkt} & 33 & 0,7 & \texttt{log\_ct\_dst\_sport\_ltm} & 466 & 9,3 \\
+  \texttt{log\_sjit} & 0 & 0,0 & \texttt{log\_synack} & 44 & 0,9 \\
+  \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+
 \begin{figure}[H]
   \centering
   \grafico[0.95\linewidth]{01_boxplots.png}
@@ -32,7 +51,7 @@
 \begin{figure}[H]
   \centering
   \grafico[0.95\linewidth]{02_histogramas_log.png}
-  \caption{Histogramas de las 12 variables de X\_num tras la transformación $\log(x+1)$. Las distribuciones de volumen y de temporización son multimodales (las modas corresponden a protocolos y tipos de flujo) y las de repetición conservan una cola derecha. Fuente: elaboración propia con UNSW-NB15.}
+  \caption{Histogramas de las 12 variables de X\_num tras la transformación $\log(x+1)$. Varias distribuciones de volumen y de temporización son multimodales y las de repetición conservan una cola derecha. Fuente: elaboración propia con UNSW-NB15.}
   \label{fig:a-hist-log}
 \end{figure}
 

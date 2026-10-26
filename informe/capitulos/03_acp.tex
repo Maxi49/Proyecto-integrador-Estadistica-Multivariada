@@ -1,5 +1,46 @@
 \section{Análisis de componentes principales}
 \label{sec:acp}
 
-[Pendiente]
+\textbf{Estandarización.} Aplicamos \texttt{prcomp(X\_num, scale. = TRUE)}. Las varianzas de las variables en escala logarítmica son muy desiguales: van de 0,002 (\texttt{log\_synack}) a 13,61 (\texttt{log\_sjit}), más de 7.500 veces, y tres de ellas (\texttt{log\_sjit}, \texttt{log\_dbytes} y \texttt{log\_sinpkt}) reúnen el 83,2~\% de la varianza total. Sin estandarizar, la primera componente captaría el 66,4~\% de la variabilidad, frente al 43,3~\% con estandarización: ese resultado reflejaría las unidades y no las relaciones entre variables. Por eso trabajamos con la matriz de correlaciones \citep{johnson2007}.
 
+\textbf{Cantidad de componentes.} Los autovalores son 5,195, 2,026 y 1,721 para las tres primeras componentes, y el cuarto cae a 0,759; solo tres superan 1 (criterio de Kaiser). El gráfico del codo (Figura~\ref{fig:acp-biplot}, izquierda) muestra una caída marcada hasta la tercera y un tramo casi plano después. Las tres componentes explican el 43,3~\%, el 16,9~\% y el 14,3~\% de la varianza, 74,5~\% acumulado, y cada una de las restantes aporta menos del 6,4~\%. Retenemos tres, que son interpretables y coinciden en número con los bloques de H1.
+
+\textbf{Interpretación.} La Tabla~\ref{tab:acp-cargas} muestra las correlaciones variable--componente. En CP1, las siete variables de volumen y temporización tienen signo positivo (0,54 a 0,82) y las cinco de repetición, negativo ($-0,56$ a $-0,70$); las que más contribuyen son \texttt{log\_sjit} (13,1~\%), \texttt{log\_sinpkt} (9,9~\%) y \texttt{log\_ct\_srv\_dst} (9,4~\%). CP2 se construye sobre todo con \texttt{log\_spkts} (20,1~\%), \texttt{log\_sbytes} (15,7~\%) y las repeticiones \texttt{log\_ct\_srv\_src} (12,7~\%) y \texttt{log\_ct\_srv\_dst} (11,8~\%), todas con signo positivo. CP3 se define por \texttt{log\_sinpkt} (20,1~\%) y \texttt{log\_synack} (19,6~\%), con signo contrario al de los bytes y paquetes. La variable peor representada es \texttt{log\_ct\_src\_ltm} (cos2 total 0,52); la mejor, \texttt{log\_spkts} (0,94).
+
+\begin{table}[H]
+  \centering
+  \caption{Correlaciones entre cada variable y las tres componentes retenidas, en negrita las de $|r| \geq 0{,}5$, y calidad de representación acumulada (suma de cos2 en CP1--CP3).}\label{tab:acp-cargas}
+  \begin{tablacompacta}
+  \begin{tabular}{@{}llrrrr@{}}
+  \toprule
+  Variable & Bloque esperado & CP1 & CP2 & CP3 & cos2 total \\
+  \midrule
+  \texttt{log\_spkts} & Volumen & \textbf{0,64} & \textbf{0,64} & $-$0,35 & 0,94 \\
+  \texttt{log\_sbytes} & Volumen & \textbf{0,60} & \textbf{0,56} & $-$0,32 & 0,78 \\
+  \texttt{log\_dbytes} & Volumen & \textbf{0,64} & 0,45 & $-$0,39 & 0,76 \\
+  \texttt{log\_dur} & Temporización & \textbf{0,64} & 0,27 & 0,40 & 0,64 \\
+  \texttt{log\_sinpkt} & Temporización & \textbf{0,72} & 0,03 & \textbf{0,59} & 0,86 \\
+  \texttt{log\_sjit} & Temporización & \textbf{0,82} & 0,23 & 0,36 & 0,87 \\
+  \texttt{log\_synack} & Temporización & \textbf{0,54} & 0,00 & \textbf{0,58} & 0,63 \\
+  \texttt{log\_ct\_srv\_src} & Repetición & \textbf{$-$0,68} & \textbf{0,51} & 0,08 & 0,73 \\
+  \texttt{log\_ct\_srv\_dst} & Repetición & \textbf{$-$0,70} & 0,49 & 0,04 & 0,73 \\
+  \texttt{log\_ct\_src\_ltm} & Repetición & \textbf{$-$0,56} & 0,45 & 0,00 & 0,52 \\
+  \texttt{log\_ct\_src\_dport\_ltm} & Repetición & \textbf{$-$0,69} & 0,43 & 0,41 & 0,82 \\
+  \texttt{log\_ct\_dst\_sport\_ltm} & Repetición & \textbf{$-$0,61} & 0,29 & 0,44 & 0,65 \\
+  \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+
+\textbf{Nombre de las componentes.} CP1 opone el tamaño y el ritmo del flujo (más paquetes y bytes, más duración, mayor espaciado y jitter) a la repetición de conexiones: la llamamos \emph{magnitud del flujo frente a repetición}. Un puntaje alto describe flujos largos o voluminosos, y uno bajo, ráfagas breves entre los mismos equipos. CP2 es ortogonal a la anterior y reúne volumen (paquetes y bytes) con repetición, ambos en positivo; la llamamos \emph{volumen de tráfico}, aunque no es un eje puro, porque las repeticiones también cargan sobre ella (0,29 a 0,51). CP3 queda definida por el espaciado entre paquetes y el tiempo del handshake, opuestos a los bytes: \emph{ritmo lento}.
+
+\begin{figure}[H]
+  \centering
+  \grafico[0.9\linewidth]{08_acp_codo_biplot.png}
+  \caption{Gráfico del codo (izquierda) y biplot de CP1 y CP2 (derecha), con los flujos coloreados por \texttt{tipo\_trafico}. Los tipos de tráfico se solapan en gran medida; los tres flujos extremos están rotulados con su identificador. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:acp-biplot}
+\end{figure}
+
+\textbf{Observaciones extremas.} Medimos la distancia de cada flujo al centro en el espacio de las tres componentes, ponderada por la varianza de cada una. Los tres más alejados (id 127446, 125215 y 136451, con distancias de 43,6, 38,0 y 32,6) tienen el mismo perfil: tráfico UDP al servicio DNS en estado INT, de 2 paquetes y 114 bytes, sin respuesta y con duración de 6 a 9 microsegundos. Son del tipo ``otros ataques'' (categoría Generic). Lo que los vuelve extremos es la repetición: sus conteos \texttt{ct\_srv\_src} van de 45 a 50 (la mediana es 3) y \texttt{ct\_src\_ltm} de 33 a 50 (mediana 2), lo que explica el puntaje muy negativo en CP1 ($-8,7$ a $-9,6$). No son errores: 152 flujos de la muestra comparten ese patrón de tamaño y todos son ataques. En el biplot, el tipo de tráfico no separa grupos nítidos.
+
+\textbf{Vínculo con H1.} El ACP necesita tres componentes, como bloques se esperaban, y aísla el bloque de repetición, que se opone al resto en CP1. En cambio, volumen y temporización no se separan en CP1 (ambos con signo positivo) y \texttt{log\_sjit} carga más en CP1 que en CP3. Hasta aquí H1 se sostiene en parte; la rotación del análisis factorial dirá si los tres bloques emergen de forma más limpia.
