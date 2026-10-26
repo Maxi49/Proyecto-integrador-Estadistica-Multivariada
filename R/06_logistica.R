@@ -29,21 +29,47 @@ coma <- function(x, d = 3) formatC(x, format = "f", digits = d)
 stopifnot(all(base$label %in% c("ataque", "normal")))
 base$y <- as.integer(base$label == "ataque")
 
-# 2. Partición estratificada 70/30 por label: se sortea dentro de cada clase para que
-# ambos conjuntos conserven ~51,8 % de ataques.
-idx_train <- unlist(lapply(split(seq_len(nrow(base)), base$y), function(i)
-  sample(i, size = round(0.7 * length(i)))))
+# 2. Partición 70/30 estratificada por attack_cat (10 categorías), no solo por label.
+# Por qué: la muestra de 5.000 se armó estratificando por attack_cat; volver a estratificar
+# así respeta el diseño muestral y deja cada tipo de ataque (incluso los raros, como Worms
+# con 6 flujos) en la misma proporción en entrenamiento y prueba. label queda balanceado
+# automáticamente porque es función de attack_cat (Normal = normal, el resto = ataque).
+# Dentro de cada categoría van round(0,7 * n) flujos al entrenamiento y el resto a prueba.
+idx_train <- unlist(lapply(split(seq_len(nrow(base)), base$attack_cat), function(i)
+  i[sample.int(length(i), size = round(0.7 * length(i)))]))
 idx_train <- sort(idx_train)
 idx_test <- setdiff(seq_len(nrow(base)), idx_train)
 stopifnot(length(intersect(idx_train, idx_test)) == 0)
+# Ninguna categoría puede quedar vacía en prueba ni en entrenamiento.
+n_cat <- table(base$attack_cat, ifelse(seq_len(nrow(base)) %in% idx_train, "entrenamiento", "prueba"))
+stopifnot(all(n_cat > 0), n_cat["Worms", "entrenamiento"] == 4, n_cat["Worms", "prueba"] == 2)
+conjunto <- ifelse(seq_len(nrow(base)) %in% idx_train, "entrenamiento", "prueba")
+
+# Resumen general (n y % de ataques por conjunto)
 particion <- data.frame(conjunto = c("entrenamiento", "prueba"),
   n = c(length(idx_train), length(idx_test)),
   n_ataques = c(sum(base$y[idx_train]), sum(base$y[idx_test])),
   pct_ataques = c(100 * mean(base$y[idx_train]), 100 * mean(base$y[idx_test])))
 guardar(particion, "particion")
-guardar(data.frame(id = base$id, conjunto = ifelse(seq_len(nrow(base)) %in% idx_train,
-  "entrenamiento", "prueba")), "particion_ids")
-print(particion)
+# Comparación de proporciones por attack_cat entre ambos conjuntos
+cats <- rownames(n_cat)[order(-rowSums(n_cat))]
+comp_cat <- data.frame(attack_cat = cats, n_total = as.integer(rowSums(n_cat)[cats]),
+  n_entrenamiento = as.integer(n_cat[cats, "entrenamiento"]), n_prueba = as.integer(n_cat[cats, "prueba"]),
+  pct_entrenamiento = 100 * n_cat[cats, "entrenamiento"] / sum(n_cat[, "entrenamiento"]),
+  pct_prueba = 100 * n_cat[cats, "prueba"] / sum(n_cat[, "prueba"]))
+comp_cat$pct_dentro_entrenamiento <- 100 * comp_cat$n_entrenamiento / comp_cat$n_total
+guardar(comp_cat, "particion_attack_cat")
+# Ids de cada partición (id, attack_cat, label, conjunto)
+guardar(data.frame(id = base$id, attack_cat = base$attack_cat, label = base$label,
+  conjunto = conjunto), "particion_ids")
+# Excel con las 68 columnas de la muestra (la hoja original NO se modifica):
+# hojas entrenamiento, prueba y resumen. base es exactamente la hoja `muestra`.
+if (requireNamespace("writexl", quietly = TRUE)) {
+  writexl::write_xlsx(list(entrenamiento = as.data.frame(base[idx_train, setdiff(names(base), "y")]),
+    prueba = as.data.frame(base[idx_test, setdiff(names(base), "y")]), resumen = comp_cat),
+    "resultados/muestra_particion_70_30.xlsx")
+} else cat("writexl no instalado: usar python/exportar_particion.py\n")
+print(particion); print(comp_cat)
 
 # 3. ACP reajustado SOLO con el entrenamiento; la prueba se proyecta con predict(), que
 # usa las medias y desvíos del entrenamiento.
