@@ -68,7 +68,7 @@ if (requireNamespace("writexl", quietly = TRUE)) {
   writexl::write_xlsx(list(entrenamiento = as.data.frame(base[idx_train, setdiff(names(base), "y")]),
     prueba = as.data.frame(base[idx_test, setdiff(names(base), "y")]), resumen = comp_cat),
     "resultados/muestra_particion_70_30.xlsx")
-} else cat("writexl no instalado: usar python/exportar_particion.py\n")
+} else cat("Paquete writexl no instalado: install.packages(\"writexl\") para exportar la partición\n")
 print(particion); print(comp_cat)
 
 # 3. ACP reajustado SOLO con el entrenamiento; la prueba se proyecta con predict(), que

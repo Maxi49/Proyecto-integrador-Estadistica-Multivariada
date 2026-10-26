@@ -1,21 +1,35 @@
 EJECUTAR DESDE LA CARPETA PRINCIPAL DEL REPOSITORIO
 
 1. Una sola vez, en R:
-install.packages(c("readxl", "psych", "cluster", "ca", "FactoMineR"))
+install.packages(c("readxl", "psych", "GPArotation", "cluster", "ca", "FactoMineR",
+                   "MASS", "pROC", "writexl"))
 
-2. Ejecutar los análisis completos en R:
+2. Ejecutar todos los análisis en R (Etapas 0 a 4, integración y regresión logística):
 source("R/ejecutar_todo.R", encoding = "UTF-8")
+   Desde una terminal: Rscript R/ejecutar_todo.R
+   (en Linux/macOS, si aparece "invalid input found", ejecutar con LANG=C.UTF-8)
 
-3. En la terminal de Python:
+3. En la terminal de Python (figuras y verificación):
 python -m pip install -r requirements.txt
 python python/graficos_etapa0.py
 python python/graficos_parte2.py
+python python/graficos_logistica.py
 python python/verificar_resultados.py
 
-R/00_datos.R conserva el estilo del script Consultar Diccionario de Variables.R.
-La hoja muestra y n_atipicos originales no se modifican. Los clusters se guardan
-en otra base: resultados/base_con_clusters.rds.
-El AF usa 3 factores con GLS y varimax. Minres, pa y ML producen un caso Heywood (log_spkts);
-se informa en resultados/tablas/af_diagnostico_minres.csv y se explica en docs/validacion_decisiones.md.
-El diagnóstico completo se corre aparte: Rscript R/aux_diagnostico_af.R
-Los documentos y sus generadores se guardan fuera del repositorio, en la carpeta de entrega.
+4. Informe en LaTeX (carpeta informe/):
+cd informe
+latexmk -pdf main.tex
+   El informe lee las figuras de ../resultados/figuras y anexa el código de ../R y ../python,
+   así que hay que compilarlo dentro del repositorio completo (en Overleaf: subir todo el repo
+   y poner informe/main.tex como documento principal).
+
+Notas
+- R/00_datos.R conserva el estilo del script Consultar Diccionario de Variables.R.
+- La hoja muestra y n_atipicos originales no se modifican. Los clusters se guardan
+  en otra base: resultados/base_con_clusters.rds.
+- El AF usa 3 factores con GLS y varimax. Minres, pa y ML producen un caso Heywood (log_spkts);
+  se informa en resultados/tablas/af_diagnostico_minres.csv y se explica en docs/validacion_decisiones.md.
+  El diagnóstico completo se corre aparte: Rscript R/aux_diagnostico_af.R
+- La regresión logística usa una partición 70/30 estratificada por attack_cat (semilla 42).
+  Los dos conjuntos quedan en resultados/muestra_particion_70_30.xlsx.
+- Documentación de decisiones en docs/ y contexto general en CONTEXTO_PROYECTO.md.

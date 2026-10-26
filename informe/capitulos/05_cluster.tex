@@ -5,7 +5,7 @@ Agrupamos los 5.000 flujos con las 12 variables de X\_num estandarizadas, con di
 
 \begin{table}[H]
   \centering
-  \caption{Perfil de los seis clusters (k-means, k = 6): tamaño, porcentaje de ataques y rasgos. Fuente: elaboración propia con UNSW-NB15.}\label{tab:cl-perfiles}
+  \caption[Perfil de los seis clusters]{Perfil de los seis clusters (k-means, k = 6): tamaño, porcentaje de ataques y rasgos. Fuente: elaboración propia con UNSW-NB15.}\label{tab:cl-perfiles}
   \begin{tablacompacta}
   \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.6cm}>{\raggedleft\arraybackslash}p{1.5cm}>{\raggedleft\arraybackslash}p{1.0cm}>{\raggedright\arraybackslash}X@{}}
   \toprule
@@ -25,7 +25,7 @@ Agrupamos los 5.000 flujos con las 12 variables de X\_num estandarizadas, con di
 \begin{figure}[H]
   \centering
   \grafico[0.95\linewidth]{10_cluster_seleccion.png}
-  \caption{Codo (izquierda) y silhouette promedio (derecha) para k = 2 a 8, con Ward y k-means. El silhouette de k-means es máximo en k = 6 (0,333), pero es casi igual para k = 2 a 5 (0,302 a 0,329) y cae en k = 7 (0,277). La línea punteada marca k = 6. Fuente: elaboración propia con UNSW-NB15.}
+  \caption[Codo y silhouette para elegir k]{Codo (izquierda) y silhouette promedio (derecha) para k = 2 a 8, con Ward y k-means. El silhouette de k-means es máximo en k = 6 (0,333), pero es casi igual para k = 2 a 5 (0,302 a 0,329) y cae en k = 7 (0,277). La línea punteada marca k = 6. Fuente: elaboración propia con UNSW-NB15.}
   \label{fig:cl-seleccion}
 \end{figure}
 
@@ -40,7 +40,7 @@ La elección de k = 6 es defendible pero no contundente. El silhouette de k-mean
 \begin{figure}[H]
   \centering
   \grafico[0.95\linewidth]{12_cluster_perfiles_variables.png}
-  \caption{Izquierda: medias estandarizadas de cada variable por cluster de k-means (rojo: por encima del promedio; azul: por debajo). Derecha: dendrograma Ward de las 12 variables, que separa tres bloques. Fuente: elaboración propia con UNSW-NB15.}
+  \caption[Perfiles por cluster y dendrograma de variables]{Izquierda: medias estandarizadas de cada variable por cluster de k-means (rojo: por encima del promedio; azul: por debajo). Derecha: dendrograma Ward de las 12 variables, que separa tres bloques. Fuente: elaboración propia con UNSW-NB15.}
   \label{fig:cl-perfiles}
 \end{figure}
 
