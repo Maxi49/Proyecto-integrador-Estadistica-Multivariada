@@ -1,0 +1,11 @@
+"variable","categoria","n_normal","n_ataque","pct_ataque"
+"proto_g","tcp",1217,1253,50.7287449392713
+"proto_g","otros",23,224,90.6882591093117
+"proto_g","udp",446,338,43.1122448979592
+"service_g","ninguno",1070,1047,49.456778460085
+"service_g","dns",251,120,32.3450134770889
+"service_g","http",159,443,73.5880398671096
+"service_g","otros",206,205,49.8783454987835
+"state_g","FIN",1182,1242,51.2376237623762
+"state_g","CON_otros",407,33,7.5
+"state_g","INT",97,540,84.7723704866562

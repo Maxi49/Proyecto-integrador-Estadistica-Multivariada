@@ -5,3 +5,15 @@ __pycache__/
 .Rproj.user/
 .vscode/
 *.Rcheck/
+# Archivos auxiliares de LaTeX (se regeneran al compilar)
+informe/*.aux
+informe/*.bbl
+informe/*.blg
+informe/*.fdb_latexmk
+informe/*.fls
+informe/*.lof
+informe/*.lot
+informe/*.log
+informe/*.out
+informe/*.toc
+informe/*.synctex.gz

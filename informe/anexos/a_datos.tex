@@ -1,0 +1,173 @@
+\subsection{Datos}
+\label{anexo:datos}
+
+\begin{table}[htbp]
+  \centering
+  \caption[Controles de calidad de la muestra]{Controles de calidad sobre la muestra de 5.000 flujos (cantidad de casos que incumplen cada control).}\label{tab:a-calidad}
+  \begin{tablacompacta}
+  \begin{tabular}{@{}lr@{\hspace{0.8cm}}lr@{}}
+  \toprule
+  Control & Casos & Control & Casos \\
+  \midrule
+  Valores NA & 0 & TTL fuera de 0 a 255 & 0 \\
+  Textos vacíos & 0 & Ventana TCP fuera de 0 a 65.535 & 0 \\
+  Filas duplicadas & 0 & \texttt{dur} = 0 con \texttt{spkts} > 1 & 0 \\
+  Identificadores repetidos & 0 & \texttt{sbytes} < \texttt{spkts} & 0 \\
+  Perfiles duplicados sin \texttt{id} & 0 & Indicadores binarios fuera de 0/1 & 0 \\
+  Celdas negativas & 0 & \texttt{is\_ftp\_login} fuera de 0/1 & 1 \\
+  Celdas no finitas & 0 & \texttt{label} fuera de normal/ataque & 0 \\
+  Conteos no enteros & 0 & \texttt{label} y \texttt{attack\_cat} inconsistentes & 0 \\
+  \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption[Atípicos de Tukey por variable]{Flujos fuera de los límites de Tukey ($1{,}5\times$ RIC) en cada variable de X\_num, sobre la escala logarítmica (n = 5.000). En \texttt{log\_ct\_dst\_sport\_ltm} el rango intercuartílico es nulo (el 90,7~\% de los flujos vale 1), de modo que cualquier valor mayor queda marcado.}\label{tab:a-atipicos}
+  \begin{tablacompacta}
+  \begin{tabular}{@{}lrr@{\hspace{1cm}}lrr@{}}
+  \toprule
+  Variable & Casos & \% & Variable & Casos & \% \\
+  \midrule
+  \texttt{log\_dur} & 189 & 3,8 & \texttt{log\_ct\_srv\_src} & 10 & 0,2 \\
+  \texttt{log\_spkts} & 19 & 0,4 & \texttt{log\_ct\_srv\_dst} & 10 & 0,2 \\
+  \texttt{log\_sbytes} & 256 & 5,1 & \texttt{log\_ct\_src\_ltm} & 127 & 2,5 \\
+  \texttt{log\_dbytes} & 1.056 & 21,1 & \texttt{log\_ct\_src\_dport\_ltm} & 581 & 11,6 \\
+  \texttt{log\_sinpkt} & 33 & 0,7 & \texttt{log\_ct\_dst\_sport\_ltm} & 466 & 9,3 \\
+  \texttt{log\_sjit} & 0 & 0,0 & \texttt{log\_synack} & 44 & 0,9 \\
+  \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.95\linewidth]{01_boxplots.png}
+  \caption[Diagramas de caja de X\_num]{Diagramas de caja de las 12 variables de X\_num en escala logarítmica, con los límites de Tukey ($\pm 1{,}5$ RIC). El título de cada panel indica la cantidad de flujos fuera de los límites. Se conservan todos los registros. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:a-boxplots}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.95\linewidth]{02_histogramas_log.png}
+  \caption[Histogramas en escala logarítmica]{Histogramas de las 12 variables de X\_num tras la transformación $\log(x+1)$. Varias distribuciones de volumen y de temporización son multimodales y las de repetición conservan una cola derecha. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:a-hist-log}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.95\linewidth]{03_histogramas_crudos.png}
+  \caption[Histogramas en escala original]{Histogramas de las variables en su escala original (incluida \texttt{dpkts}, excluida de X\_num). La concentración cerca de cero y las colas extremas justifican la transformación logarítmica. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:a-hist-crudos}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.95\linewidth]{05_frecuencias_categoricas.png}
+  \caption[Frecuencias de las variables de X\_cat]{Frecuencias relativas de las siete variables de X\_cat tras agrupar categorías y discretizar tres variables numéricas. Ninguna categoría queda por debajo del 5~\%. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:a-frecuencias}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.8\linewidth]{06_msa.png}
+  \caption[MSA por variable y KMO global]{Medida de adecuación muestral (MSA) por variable, con KMO global de 0,748. Todas superan el umbral de 0,50; la menor es \texttt{log\_spkts} (0,621). Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:a-msa}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.8\linewidth]{04_correlaciones.png}
+  \caption[Correlaciones entre las 12 variables de X\_num]{Correlaciones de Pearson entre las 12 variables de X\_num. Se distinguen tres bloques (temporización, volumen y repetición); el de repetición se asocia de forma negativa con los otros dos. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:correlaciones}
+\end{figure}
+
+\begingroup\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{3.6cm}>{\raggedright\arraybackslash}p{6.6cm}>{\raggedright\arraybackslash}p{2.8cm}>{\raggedright\arraybackslash}p{1.8cm}@{}}
+\caption[Diccionario de las variables usadas en el análisis]{Diccionario de las variables que usa el análisis: las 12 de X\_num, \texttt{dpkts} y \texttt{rate} (excluidas por redundancia, sección~\ref{sec:datos}), las categóricas de partida y de X\_cat, \texttt{attack\_cat}, \texttt{label} e \texttt{id}. Las variables de X\_num se analizan en escala $\log(x+1)$. El diccionario completo de las 68 columnas de la base está en la hoja \texttt{diccionario} del archivo Excel de resultados. Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-diccionario}\\
+\toprule
+Variable & Descripción & Unidad & Tipo \\
+\midrule
+\endfirsthead
+\toprule
+Variable & Descripción & Unidad & Tipo \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{id} & Identificador del registro; no identifica equipos & -- & categórica \\
+\texttt{dur} & Duración total del flujo & segundos & numérica \\
+\texttt{spkts} & Paquetes enviados del origen al destino & paquetes & numérica \\
+\texttt{dpkts} & Paquetes enviados del destino al origen & paquetes & numérica \\
+\texttt{sbytes} & Bytes enviados del origen al destino & bytes & numérica \\
+\texttt{dbytes} & Bytes enviados del destino al origen & bytes & numérica \\
+\texttt{rate} & Tasa de paquetes del flujo & paquetes/segundo & numérica \\
+\texttt{sinpkt} & Tiempo entre paquetes del origen & milisegundos & numérica \\
+\texttt{sjit} & Jitter del origen & milisegundos & numérica \\
+\texttt{synack} & Tiempo entre SYN y SYN-ACK (0 si no es TCP) & segundos & numérica \\
+\texttt{ct\_srv\_src} & Conexiones con igual servicio y origen en las últimas 100 & conexiones & numérica \\
+\texttt{ct\_srv\_dst} & Conexiones con igual servicio y destino en las últimas 100 & conexiones & numérica \\
+\texttt{ct\_src\_ltm} & Conexiones con igual origen en las últimas 100 & conexiones & numérica \\
+\texttt{ct\_src\_dport\_ltm} & Conexiones con igual origen y puerto destino en las últimas 100 & conexiones & numérica \\
+\texttt{ct\_dst\_sport\_ltm} & Conexiones con igual destino y puerto origen en las últimas 100 & conexiones & numérica \\
+\texttt{proto} & Protocolo de transporte o de red & -- & categórica \\
+\texttt{service} & Servicio identificado (``ninguno'' si no se identifica) & -- & categórica \\
+\texttt{state} & Estado de la conexión & -- & categórica \\
+\texttt{tipo\_trafico} & Normal, Exploits, Fuzzers, Reconnaissance u Otros ataques (Generic, DoS, Analysis, Backdoor, Shellcode, Worms) & -- & categórica \\
+\texttt{proto\_g} & Protocolo agrupado: tcp, udp, otros & -- & categórica \\
+\texttt{service\_g} & Servicio agrupado: ninguno, http, dns, otros & -- & categórica \\
+\texttt{state\_g} & Estado agrupado: FIN, INT, CON\_otros & -- & categórica \\
+\texttt{respuesta\_destino} & Con o sin respuesta del destino (sin respuesta: \texttt{dpkts} = 0) & -- & categórica \\
+\texttt{duracion\_banda} & Duración en terciles: corta, media, larga (cortes en 0,0185 s y 0,709 s) & -- & categórica \\
+\texttt{bytes\_origen\_banda} & Bytes del origen en terciles: bajos, medios, altos (cortes en 564 y 1.580 bytes) & -- & categórica \\
+\texttt{attack\_cat} & Clase original: Normal o uno de nueve ataques & -- & categórica \\
+\texttt{label} & Etiqueta binaria: 0 normal, 1 ataque & -- & categórica \\
+\end{longtable}
+\endgroup
+
+\begin{table}[htbp]
+  \centering
+  \caption[Resumen numérico de las 12 variables de X\_num]{Resumen numérico de las 12 variables de X\_num ($n$ = 5.000): arriba, en la unidad original; abajo, en la escala $\log(x+1)$ con la que se analizan. Q1 y Q3 son el primer y el tercer cuartil. Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-resumen}
+  \begin{tablacompacta}
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lrrrrrrr@{}}
+  \toprule
+  Variable & Media & Desvío & Mínimo & Q1 & Mediana & Q3 & Máximo \\
+  \midrule
+  \multicolumn{8}{@{}l}{\emph{Unidad original}} \\
+  \texttt{dur} & 1,34 & 5,52 & 0 & 0,00164 & 0,297 & 0,973 & 60 \\
+  \texttt{spkts} & 32,4 & 227 & 1 & 2 & 10 & 22 & 9.616 \\
+  \texttt{sbytes} & 16.918 & 296.287 & 46 & 504 & 918 & 2.476 & 12.965.233 \\
+  \texttt{dbytes} & 26.437 & 234.484 & 0 & 178 & 354 & 2.976 & 12.422.665 \\
+  \texttt{sinpkt} & 484 & 4.778 & 0 & 0,237 & 19,9 & 73,9 & 60.001 \\
+  \texttt{sjit} & 5.636 & 39.960 & 0 & 0 & 1.186 & 4.208 & 934.346 \\
+  \texttt{synack} & 0,0318 & 0,0455 & 0 & 0 & 0,000588 & 0,063 & 0,731 \\
+  \texttt{ct\_srv\_src} & 5,09 & 6,33 & 1 & 1 & 3 & 6 & 63 \\
+  \texttt{ct\_srv\_dst} & 4,76 & 6,25 & 1 & 1 & 3 & 6 & 62 \\
+  \texttt{ct\_src\_ltm} & 3,81 & 4,81 & 1 & 1 & 2 & 4 & 50 \\
+  \texttt{ct\_src\_dport\_ltm} & 1,95 & 3,34 & 1 & 1 & 1 & 1,25 & 50 \\
+  \texttt{ct\_dst\_sport\_ltm} & 1,42 & 2,04 & 1 & 1 & 1 & 1 & 28 \\
+  \midrule
+  \multicolumn{8}{@{}l}{\emph{Escala logarítmica}} \\
+  \texttt{log\_dur} & 0,447 & 0,62 & 0 & 0,00164 & 0,26 & 0,679 & 4,11 \\
+  \texttt{log\_spkts} & 2,49 & 1,14 & 0,693 & 1,1 & 2,4 & 3,14 & 9,17 \\
+  \texttt{log\_sbytes} & 6,99 & 1,62 & 3,85 & 6,22 & 6,82 & 7,81 & 16,4 \\
+  \texttt{log\_dbytes} & 5,99 & 3,44 & 0 & 5,19 & 5,87 & 8 & 16,3 \\
+  \texttt{log\_sinpkt} & 2,54 & 2,19 & 0 & 0,212 & 3,04 & 4,32 & 11 \\
+  \texttt{log\_sjit} & 5,21 & 3,69 & 0 & 0 & 7,08 & 8,34 & 13,7 \\
+  \texttt{log\_synack} & 0,0304 & 0,0424 & 0 & 0 & 0,000588 & 0,0611 & 0,548 \\
+  \texttt{log\_ct\_srv\_src} & 1,5 & 0,726 & 0,693 & 0,693 & 1,39 & 1,95 & 4,16 \\
+  \texttt{log\_ct\_srv\_dst} & 1,43 & 0,724 & 0,693 & 0,693 & 1,39 & 1,95 & 4,14 \\
+  \texttt{log\_ct\_src\_ltm} & 1,31 & 0,639 & 0,693 & 0,693 & 1,1 & 1,61 & 3,93 \\
+  \texttt{log\_ct\_src\_dport\_ltm} & 0,897 & 0,465 & 0,693 & 0,693 & 0,693 & 0,795 & 3,93 \\
+  \texttt{log\_ct\_dst\_sport\_ltm} & 0,78 & 0,335 & 0,693 & 0,693 & 0,693 & 0,693 & 3,37 \\
+  \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+
+\FloatBarrier

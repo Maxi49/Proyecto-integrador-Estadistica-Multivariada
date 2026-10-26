@@ -1,0 +1,102 @@
+\subsection{Análisis de correspondencias}
+
+\begin{table}[htbp]
+  \centering
+  \caption[Variables y categorías de X\_cat]{X\_cat: variables y categorías finales (\% de 5.000 flujos). Fuente: elaboración propia con UNSW-NB15.}\label{tab:xcat}
+  \begin{tablacompacta}
+  \begin{tabularx}{\linewidth}{@{}lX@{}}
+    \toprule
+    Variable & Categorías (\%) \\
+    \midrule
+    \texttt{tipo\_trafico} & Normal 48,2 · Exploits 18,4 · Fuzzers 15,0 · Otros ataques 11,5 · Reconnaissance 7,0 \\
+    \texttt{proto\_g} & tcp 70,8 · udp 21,9 · otros 7,3 \\
+    \texttt{service\_g} & ninguno 60,0 · http 17,4 · otros 12,3 · dns 10,3 \\
+    \texttt{state\_g} & FIN 69,3 · INT 18,3 · CON\_otros 12,4 \\
+    \texttt{respuesta\_destino} & con\_respuesta 81,1 · sin\_respuesta 18,9 \\
+    \texttt{duracion\_banda} & corta 33,3 · media 33,3 · larga 33,3 \\
+    \texttt{bytes\_origen\_banda} & bajos 33,8 · medios 33,6 · altos 32,6 \\
+    \bottomrule
+  \end{tabularx}
+  \end{tablacompacta}
+\end{table}
+
+
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.95\linewidth]{14_acm_inercia.png}
+  \caption[Inercia del ACM: autovalores y porcentaje ajustado]{Izquierda: autovalores crudos del ACM y umbral $1/Q = 0{,}143$ (línea punteada); seis superan el umbral. Derecha: porcentaje de inercia ajustada (Greenacre) por dimensión, con 77,0\,\% y 10,4\,\% en las dos primeras. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:a-acm-inercia}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.95\linewidth]{16_acm_clusters_eta.png}
+  \caption[Clusters suplementarios y eta$^2$ del ACM]{Izquierda: clusters de la Etapa 3 proyectados como suplementarios (rombos) sobre las observaciones; los clusters 1, 2 y 4 se superponen (Dim 1 entre $-0{,}62$ y $-0{,}55$). Derecha: eta$^2$ por variable en Dim 1 y Dim 2; \texttt{state\_g} y \texttt{proto\_g} dominan la Dim 1. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:a-acm-clusters}
+\end{figure}
+
+\begin{table}[htbp]
+  \centering
+  \caption[Contribuciones y cos2 de las categorías del ACM]{Categorías con mayor contribución (\%) y cos2 en las tres primeras dimensiones. La Dim 3 opone \texttt{http} (coordenada $+1{,}55$) y bytes de origen medios ($+0{,}84$) a bytes altos ($-0{,}85$). Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-acm-contrib}
+  \begin{tablacompacta}
+  \begin{tabular}{lrrrrrr}
+    \toprule
+    Categoría & Ctr 1 & Ctr 2 & Ctr 3 & cos2 1 & cos2 2 & cos2 3 \\
+    \midrule
+    \texttt{state\_g}: INT & 12,1 & 9,2 & 0,0 & 0,651 & 0,252 & 0,000 \\
+    \texttt{respuesta\_destino}: sin\_respuesta & 12,1 & 8,7 & 0,0 & 0,656 & 0,242 & 0,000 \\
+    \texttt{duracion\_banda}: corta & 11,0 & 0,5 & 0,0 & 0,726 & 0,018 & 0,000 \\
+    \texttt{proto\_g}: udp & 9,7 & 6,9 & 1,0 & 0,545 & 0,199 & 0,020 \\
+    \texttt{bytes\_origen\_banda}: bajos & 7,8 & 0,4 & 0,0 & 0,520 & 0,015 & 0,000 \\
+    \texttt{state\_g}: FIN & 6,1 & 0,2 & 0,1 & 0,866 & 0,016 & 0,007 \\
+    \texttt{proto\_g}: tcp & 5,9 & 0,1 & 0,1 & 0,886 & 0,010 & 0,008 \\
+    \texttt{service\_g}: dns & 5,7 & 15,2 & 3,4 & 0,277 & 0,381 & 0,057 \\
+    \texttt{state\_g}: CON\_otros & 2,5 & 22,8 & 0,9 & 0,127 & 0,585 & 0,016 \\
+    \texttt{proto\_g}: otros & 4,7 & 12,0 & 0,3 & 0,223 & 0,291 & 0,005 \\
+    \texttt{tipo\_trafico}: Normal & 0,1 & 8,9 & 6,2 & 0,004 & 0,384 & 0,181 \\
+    \texttt{service\_g}: http & 2,7 & 0,5 & 27,5 & 0,146 & 0,015 & 0,503 \\
+    \texttt{bytes\_origen\_banda}: altos & 2,4 & 0,0 & 15,7 & 0,158 & 0,000 & 0,352 \\
+    \texttt{bytes\_origen\_banda}: medios & 1,6 & 0,5 & 15,5 & 0,107 & 0,018 & 0,354 \\
+    \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption[Eta$^2$ de cada variable del ACM]{Razón de correlación $\eta^2$ de cada variable con las dos dimensiones retenidas. Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-acm-eta}
+  \begin{tablacompacta}
+  \begin{tabular}{lrr}
+    \toprule
+    Variable & Dim 1 & Dim 2 \\
+    \midrule
+    \texttt{state\_g} & 0,909 & 0,723 \\
+    \texttt{proto\_g} & 0,891 & 0,428 \\
+    \texttt{duracion\_banda} & 0,726 & 0,035 \\
+    \texttt{respuesta\_destino} & 0,656 & 0,242 \\
+    \texttt{bytes\_origen\_banda} & 0,522 & 0,022 \\
+    \texttt{service\_g} & 0,442 & 0,396 \\
+    \texttt{tipo\_trafico} & 0,242 & 0,398 \\
+    \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \caption[Perfiles fila del ACS]{ACS: perfiles fila de \texttt{tipo\_trafico} según \texttt{state\_g} (\%). Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-acs-perfiles}
+  \begin{tablacompacta}
+  \begin{tabular}{lrrr}
+    \toprule
+    Tipo de tráfico & CON\_otros & FIN & INT \\
+    \midrule
+    Exploits & 1,4 & 90,4 & 8,1 \\
+    Fuzzers & 0,3 & 66,8 & 33,0 \\
+    Normal & 24,0 & 70,0 & 5,9 \\
+    Otros ataques & 3,8 & 33,9 & 62,3 \\
+    Reconnaissance & 1,1 & 72,8 & 26,1 \\
+    \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+\FloatBarrier

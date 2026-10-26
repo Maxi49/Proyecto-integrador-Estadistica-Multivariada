@@ -1,0 +1,49 @@
+\subsection{Análisis factorial}
+\label{anexo:af}
+
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.85\linewidth]{09_af_paralelo.png}
+  \caption[Análisis paralelo del AF]{Análisis paralelo: tres autovalores quedan muy por encima de la referencia aleatoria; el cuarto (0,127) apenas la supera (corte sugerido por el análisis paralelo). Retenemos tres (Kaiser reducido). Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:af-paralelo}
+\end{figure}
+\begin{table}[htbp]
+  \centering
+  \caption[Diagnóstico de soluciones factoriales]{Diagnóstico de soluciones factoriales (rotación varimax; la oblimin da los mismos valores de comunalidad). ``Heywood'' indica comunalidad $\ge 0{,}995$ (unicidad $\le 0{,}005$) en alguna variable. Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-af-diagnostico}
+  \begin{tablacompacta}
+  \begin{tabular}{@{}rlcrrrrr@{}}
+  \toprule
+  Factores & Estimador & Heywood & Com. máx. & RMSR & TLI & RMSEA & \% var. \\
+  \midrule
+  3 & Minres & Sí & 1,025 & 0,045 & 0,687 & 0,214 & 67,4 \\
+  3 & Ejes principales & Sí & 1,095 & 0,045 & 0,684 & 0,215 & 67,7 \\
+  3 & Máx. verosimilitud & Sí (límite) & 0,995 & 0,059 & 0,716 & 0,204 & 67,0 \\
+  \textbf{3} & \textbf{GLS} & \textbf{No} & \textbf{0,897} & 0,051 & 0,609 & 0,239 & 68,6 \\
+  4 & Minres & Sí & 1,029 & 0,026 & 0,777 & 0,180 & 73,0 \\
+  4 & Máx. verosimilitud & Sí (límite) & 0,995 & 0,032 & 0,793 & 0,174 & 73,6 \\
+  4 & GLS & Sí & 1,011 & 0,028 & 0,778 & 0,180 & 73,6 \\
+  \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+
+En todas las soluciones ninguna variable queda sin carga mayor o igual que 0,40 y no hay cargas cruzadas con diferencia menor que 0,20. Con cuatro factores el bloque de repetición de conexiones se divide en dos. La Tabla~\ref{tab:a-af-autovalores} reúne los autovalores que respaldan la decisión de retener tres factores.
+
+\begin{table}[htbp]
+  \centering
+  \caption[Autovalores observados y simulados]{Autovalores de la matriz de correlaciones y de la matriz reducida (comunalidades iniciales en la diagonal), y autovalores factoriales observados y simulados del análisis paralelo; estos últimos son los de la simulación que dibuja la Figura~\ref{fig:af-paralelo} y difieren levemente de los de una corrida independiente. Fuente: elaboración propia con UNSW-NB15.}\label{tab:a-af-autovalores}
+  \begin{tablacompacta}
+  \begin{tabular}{@{}rrrrr@{}}
+  \toprule
+  Factor & Autovalor de $R$ & Matriz reducida & Observado (paralelo) & Simulado (paralelo) \\
+  \midrule
+  1 & 5,195 & 4,932 & 4,606 & 0,288 \\
+  2 & 2,026 & 1,783 & 1,398 & 0,066 \\
+  3 & 1,721 & 1,441 & 1,106 & 0,051 \\
+  4 & 0,759 & 0,431 & 0,127 & 0,036 \\
+  5 & 0,607 & 0,269 & $-0{,}041$ & 0,024 \\
+  \bottomrule
+  \end{tabular}
+  \end{tablacompacta}
+\end{table}
+\FloatBarrier
