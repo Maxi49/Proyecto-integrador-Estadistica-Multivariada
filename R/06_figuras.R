@@ -81,23 +81,35 @@ f4 <- ggplot(av, aes(componente, autovalor)) + geom_hline(yintercept = 1, colour
   scale_x_continuous(breaks = 1:12) + labs(x = "Componente", y = "Autovalor")
 guardar_fig(f4, "fig04_codo_acp", 6.5)
 
-# Figura 5. Biplot CP1-CP2: flujos en gris, centro de cada tipo de tráfico y flechas de variables.
+# Figura 5. Biplot CP1-CP2: flujos de fondo muy tenues, flechas de variables con nombre en la punta
+# y el centro de cada tipo de tráfico. Se recorta la vista a la zona central.
 pt <- data.frame(acp$puntajes[, 1:2]); names(pt) <- c("CP1", "CP2"); pt$tipo <- base$tipo_trafico
 centros <- aggregate(cbind(CP1, CP2) ~ tipo, pt, mean)
 carg <- tabla("acp_correlaciones"); carg$etq <- sub(" \\(.*", "", etiquetas[sub("^log_", "", carg$variable)])
-escala <- 5
-etiq5 <- rbind(data.frame(x = escala * carg$PC1, y = escala * carg$PC2, texto = carg$etq, rol = "variable", cara = "plain"),
-  data.frame(x = centros$CP1, y = centros$CP2, texto = as.character(centros$tipo), rol = "tipo", cara = "bold"))
+escala <- 3.6
+carg$x <- escala * carg$PC1; carg$y <- escala * carg$PC2
 f5 <- ggplot(pt, aes(CP1, CP2)) + geom_hline(yintercept = 0, colour = grilla) + geom_vline(xintercept = 0, colour = grilla) +
-  geom_point(colour = gris_puntos, size = .35, alpha = .5) +
-  geom_segment(data = carg, aes(x = 0, y = 0, xend = escala * PC1, yend = escala * PC2), colour = tinta_2,
-    linewidth = .3, arrow = arrow(length = unit(1.2, "mm"))) +
-  geom_point(data = centros, colour = naranja, size = 3) +
-  geom_text_repel(data = etiq5, aes(x, y, label = texto, colour = rol, fontface = cara), family = "Carlito",
-    size = 2.6, box.padding = .45, point.padding = .3, max.overlaps = 50, min.segment.length = .1,
-    segment.colour = gris_puntos, show.legend = FALSE, seed = 42) +
-  scale_colour_manual(values = c(variable = tinta_2, tipo = tinta)) +
-  labs(x = "CP1: conversación larga frente a conexiones repetidas (43,3 %)", y = "CP2: actividad (16,9 %)")
+  geom_point(colour = gris_puntos, size = .3, alpha = .12) +
+  geom_segment(data = carg, aes(x = 0, y = 0, xend = x, yend = y), colour = tinta_2,
+    linewidth = .35, arrow = arrow(length = unit(1.3, "mm"))) +
+  geom_text_repel(data = carg[carg$PC1 < 0, ], aes(x, y, label = etq), family = "Carlito", size = 2.5,
+    colour = tinta_2, xlim = c(-Inf, -2.75), hjust = 1, direction = "y", box.padding = .12,
+    min.segment.length = 0, segment.colour = gris_puntos, segment.size = .25, seed = 42) +
+  geom_text_repel(data = carg[carg$PC1 > 0, ], aes(x, y, label = etq), family = "Carlito", size = 2.5,
+    colour = tinta_2, xlim = c(3.2, Inf), hjust = 0, direction = "y", box.padding = .12,
+    min.segment.length = 0, segment.colour = gris_puntos, segment.size = .25, seed = 42) +
+  geom_point(data = centros, colour = naranja, size = 3.2) +
+  geom_label(data = centros, aes(CP1 + c(0, .35, -.45, 0, 0), CP2 + c(-.42, -.32, .32, -.32, -.32), label = tipo),
+    family = "Carlito", fontface = "bold", size = 3, colour = tinta, fill = "white", label.size = 0,
+    label.padding = unit(.08, "lines")) +
+  annotate("text", x = -5.8, y = -2.4, label = "← más conexiones repetidas", hjust = 0, family = "Carlito",
+    size = 3, colour = azul, fontface = "bold") +
+  annotate("text", x = 5.3, y = -2.4, label = "conversaciones más largas y cargadas →", hjust = 1,
+    family = "Carlito", size = 3, colour = azul, fontface = "bold") +
+  annotate("text", x = -5.8, y = 3.6, label = "↑ más actividad (paquetes y bytes)", hjust = 0,
+    family = "Carlito", size = 3, colour = azul, fontface = "bold") +
+  coord_cartesian(xlim = c(-5.8, 5.3), ylim = c(-2.5, 3.7)) +
+  labs(x = "CP1 (43,3 % de la varianza)", y = "CP2 (16,9 %)")
 guardar_fig(f5, "fig05_biplot", 11)
 
 # Figura 6. Análisis paralelo de factores.
