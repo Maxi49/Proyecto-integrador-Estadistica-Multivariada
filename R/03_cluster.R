@@ -30,9 +30,13 @@ for (k in 2:8) {
 }
 guardar(metricas, "cluster_metricas")
 
-# Mayor silhouette de k-means entre los candidatos; el informe contrasta con el codo y Ward.
-k_elegido <- metricas$k[which.max(metricas$silhouette_kmeans)]
+# El silhouette casi empata entre k = 2, 4 y 6 (0,328; 0,327; 0,333). k = 2 no separa normal de
+# ataque y k = 6 deja dos grupos con silhouette menor a 0,15. El codo se quiebra en 4 y esa
+# partición se mantiene al repetirla con los puntajes del ACP. Se retiene k = 4 (decisión del grupo, 27/10).
+k_elegido <- 4
 km <- modelos_km[[as.character(k_elegido)]]
+guardar(data.frame(cluster = 1:k_elegido,
+  silhouette = summary(silhouette(km$cluster, distancias))$clus.avg.widths), "cluster_silhouette")
 ward <- cutree(jerarquico, k_elegido)
 guardar(as.data.frame.matrix(table(Ward = ward, Kmeans = km$cluster)), "cluster_cruce_ward_kmeans")
 

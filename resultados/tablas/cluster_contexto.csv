@@ -1,31 +1,21 @@
 "cluster","tipo_trafico","Freq"
-"1","Exploits",5
-"2","Exploits",179
-"3","Exploits",1
-"4","Exploits",659
-"5","Exploits",73
-"6","Exploits",4
-"1","Fuzzers",6
-"2","Fuzzers",78
-"3","Fuzzers",2
-"4","Fuzzers",416
-"5","Fuzzers",185
-"6","Fuzzers",62
-"1","Normal",885
-"2","Normal",111
-"3","Normal",0
-"4","Normal",617
-"5","Normal",610
-"6","Normal",185
-"1","Otros ataques",2
-"2","Otros ataques",33
-"3","Otros ataques",142
-"4","Otros ataques",184
-"5","Otros ataques",183
-"6","Otros ataques",29
-"1","Reconnaissance",0
-"2","Reconnaissance",4
-"3","Reconnaissance",2
-"4","Reconnaissance",255
-"5","Reconnaissance",84
-"6","Reconnaissance",4
+"1","Exploits",74
+"2","Exploits",822
+"3","Exploits",22
+"4","Exploits",3
+"1","Fuzzers",209
+"2","Fuzzers",486
+"3","Fuzzers",28
+"4","Fuzzers",26
+"1","Normal",660
+"2","Normal",662
+"3","Normal",1066
+"4","Normal",20
+"1","Otros ataques",191
+"2","Otros ataques",216
+"3","Otros ataques",4
+"4","Otros ataques",162
+"1","Reconnaissance",86
+"2","Reconnaissance",258
+"3","Reconnaissance",1
+"4","Reconnaissance",4

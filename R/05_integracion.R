@@ -28,7 +28,7 @@ integracion <- data.frame(
     "Plano de dos dimensiones; 87,40% de inercia ajustada"),
   interpretacion = c("Ejes mixtos: complejidad frente a repetición; volumen y actividad",
     "Repetición, ritmo y volumen: reproduce los tres bloques",
-    "AF reconoce los bloques; ARI Ward/KM = 0,813 y silhouette = 0,333; las CP cambian fronteras",
+    "Bloques de variables iguales a los factores; un grupo mayormente normal y dos mayormente ataque",
     "Normal-CON_otros y Exploits-FIN coinciden con asociaciones del ACM",
     "Respuesta/protocolo/estado y oposición entre estados y tipos de servicio")
 )
