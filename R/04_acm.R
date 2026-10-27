@@ -29,13 +29,17 @@ guardar(data.frame(categoria = rownames(tabla),
 guardar(data.frame(categoria = colnames(tabla),
   sweep(acs$colcoord[, 1:2, drop = FALSE], 2, acs$sv[1:2], "*")), "acs_columnas")
 
-# Cluster es suplementario: no interviene en la construcción de los ejes.
-datos_acm <- data.frame(X_cat, cluster = base$cluster)
-Q <- ncol(X_cat)
-J <- sum(sapply(X_cat, nlevels))
-acm <- FactoMineR::MCA(datos_acm, quali.sup = ncol(datos_acm), ncp = J - Q, graph = FALSE)
-ajustado <- ca::mjca(X_cat, nd = NA, lambda = "adjusted")
-indicador <- ca::mjca(X_cat, nd = NA, lambda = "indicator")
+# El tipo de tráfico, la etiqueta y el cluster son suplementarios: no intervienen en los ejes.
+# Así el mapa describe solo cómo es la conexión, y después se ve dónde caen los ataques (H3).
+activas <- X_cat[, names(X_cat) != "tipo_trafico"]
+datos_acm <- data.frame(activas, tipo_trafico = X_cat$tipo_trafico, label = base$label,
+  cluster = base$cluster)
+Q <- ncol(activas)
+J <- sum(sapply(activas, nlevels))
+suplementarias <- (Q + 1):ncol(datos_acm)
+acm <- FactoMineR::MCA(datos_acm, quali.sup = suplementarias, ncp = J - Q, graph = FALSE)
+ajustado <- ca::mjca(activas, nd = NA, lambda = "adjusted")
+indicador <- ca::mjca(activas, nd = NA, lambda = "indicator")
 # ca 0.72 entrega valores singulares: al cuadrarlos se obtienen los autovalores.
 stopifnot(max(abs(indicador$sv^2 - acm$eig[, 1])) < 1e-8)
 autovalores <- data.frame(dimension = seq_len(nrow(acm$eig)), autovalor = acm$eig[, 1],
@@ -60,8 +64,9 @@ guardar(coord, "acm_categorias_coordenadas")
 guardar(contrib, "acm_categorias_contribuciones")
 guardar(cos2, "acm_categorias_cos2")
 guardar(data.frame(variable = rownames(acm$var$eta2), acm$var$eta2), "acm_eta2")
-guardar(data.frame(cluster = levels(base$cluster), acm$quali.sup$coord), "acm_cluster_suplementario")
-guardar(data.frame(cluster = levels(base$cluster), acm$quali.sup$cos2), "acm_cluster_cos2")
+guardar(data.frame(categoria = rownames(acm$quali.sup$coord), acm$quali.sup$coord), "acm_suplementarias_coordenadas")
+guardar(data.frame(categoria = rownames(acm$quali.sup$cos2), acm$quali.sup$cos2), "acm_suplementarias_cos2")
+guardar(data.frame(variable = rownames(acm$quali.sup$eta2), acm$quali.sup$eta2), "acm_suplementarias_eta2")
 guardar(data.frame(id = base$id, cluster = base$cluster, acm$ind$coord[, 1:2]), "acm_individuos")
 
 # Cruces para interpretar tres asociaciones con frecuencias observadas, sin causalidad.

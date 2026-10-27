@@ -3,4 +3,4 @@
 "AF","3 factores; solución ML con unicidad en el límite","Repetición, ritmo y volumen: reproduce los tres bloques"
 "Clustering","Tres bloques de variables y 4 grupos de observaciones","Bloques de variables iguales a los factores; un grupo mayormente normal y dos mayormente ataque"
 "ACS","Tipo de tráfico por estado; V de Cramér = 0,405","Normal-CON_otros y Exploits-FIN coinciden con asociaciones del ACM"
-"ACM","Plano de dos dimensiones; 87,40% de inercia ajustada","Respuesta/protocolo/estado y oposición entre estados y tipos de servicio"
+"ACM","Plano de dos dimensiones; 91,7% de inercia ajustada","Conversación a medias frente a completa; los ataques caen del lado incompleto salvo Exploits"

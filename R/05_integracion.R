@@ -25,12 +25,12 @@ integracion <- data.frame(
     paste(af$n_factores, "factores; solución ML con unicidad en el límite"),
     paste("Tres bloques de variables y", km$k, "grupos de observaciones"),
     "Tipo de tráfico por estado; V de Cramér = 0,405",
-    "Plano de dos dimensiones; 87,40% de inercia ajustada"),
+    "Plano de dos dimensiones; 91,7% de inercia ajustada"),
   interpretacion = c("Ejes mixtos: complejidad frente a repetición; volumen y actividad",
     "Repetición, ritmo y volumen: reproduce los tres bloques",
     "Bloques de variables iguales a los factores; un grupo mayormente normal y dos mayormente ataque",
     "Normal-CON_otros y Exploits-FIN coinciden con asociaciones del ACM",
-    "Respuesta/protocolo/estado y oposición entre estados y tipos de servicio")
+    "Conversación a medias frente a completa; los ataques caen del lado incompleto salvo Exploits")
 )
 guardar(integracion, "integracion_tecnicas")
 print(integracion)
