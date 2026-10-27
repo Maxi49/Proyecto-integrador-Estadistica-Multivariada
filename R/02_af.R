@@ -19,8 +19,10 @@ guardar(data.frame(dimension = seq_along(paralelo$fa.values),
   factor_observado = paralelo$fa.values, factor_simulado = paralelo$fa.sim,
   componente_observado = paralelo$pc.values, componente_simulado = paralelo$pc.sim), "af_paralelo")
 
-# Se retienen los factores sugeridos por el análisis paralelo y se revisa su interpretación.
-n_factores <- paralelo$nfact
+# El análisis paralelo sugiere 4 factores, pero el cuarto autovalor (0,13) apenas supera al azar
+# y solo parte en dos el bloque de repetición. Kaiser y el paralelo de componentes indican 3.
+# Se retienen 3 factores por simplicidad e interpretabilidad (decisión del grupo, 27/10).
+n_factores <- 3
 minres <- fa(X_num, nfactors = n_factores, fm = "minres", rotate = "varimax", scores = "regression")
 guardar(data.frame(metodo = "minres", n_factores = n_factores,
   comunalidad_max = max(minres$communality), unicidad_min = min(minres$uniquenesses),

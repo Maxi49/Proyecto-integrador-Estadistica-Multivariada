@@ -27,7 +27,7 @@ integracion <- data.frame(
     "Tipo de tráfico por estado; V de Cramér = 0,405",
     "Plano de dos dimensiones; 87,40% de inercia ajustada"),
   interpretacion = c("Ejes mixtos: complejidad frente a repetición; volumen y actividad",
-    "Tiempo, volumen, repetición por puertos y repetición por servicio",
+    "Repetición, ritmo y volumen: reproduce los tres bloques",
     "AF reconoce los bloques; ARI Ward/KM = 0,813 y silhouette = 0,333; las CP cambian fronteras",
     "Normal-CON_otros y Exploits-FIN coinciden con asociaciones del ACM",
     "Respuesta/protocolo/estado y oposición entre estados y tipos de servicio")
