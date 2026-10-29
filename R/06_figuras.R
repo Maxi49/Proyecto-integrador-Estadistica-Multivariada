@@ -43,9 +43,30 @@ largo <- data.frame(variable = rep(corto, each = nrow(Z)), valor = unlist(Z, use
 largo$variable <- factor(largo$variable, levels = rev(orden), labels = rev(etiquetas[orden]))
 largo$bloque <- factor(bloque[as.character(sub(".*\\((.*)\\)$", "\\1", largo$variable))],
   levels = c("Volumen", "Ritmo", "Repetición"))
-f1 <- ggplot(largo, aes(valor, variable)) +
-  geom_boxplot(width = .55, linewidth = .35, colour = tinta_2, fill = neutro,
-    outlier.size = .4, outlier.alpha = .35, outlier.colour = azul) +
+# Las cajas y los atípicos usan las bisagras de Tukey (fivenum), igual que 00_datos.R, para que la
+# figura cuente los mismos flujos que el texto. geom_boxplot calcularía cuartiles con quantile().
+resumen <- do.call(rbind, lapply(corto, function(v) {
+  x <- Z[[v]]; f <- fivenum(x); ric <- f[4] - f[2]
+  inf <- f[2] - 1.5 * ric; sup <- f[4] + 1.5 * ric
+  data.frame(nombre = v, minimo = min(x[x >= inf]), q1 = f[2], mediana = f[3], q3 = f[4], maximo = max(x[x <= sup]),
+    inf = inf, sup = sup)
+}))
+fuera <- do.call(rbind, lapply(corto, function(v) {
+  r <- resumen[resumen$nombre == v, ]; x <- Z[[v]]; o <- x[x < r$inf | x > r$sup]
+  if (length(o)) data.frame(nombre = v, valor = o)
+}))
+stopifnot(sum(rowSums(sapply(corto, function(v) {
+  r <- resumen[resumen$nombre == v, ]; Z[[v]] < r$inf | Z[[v]] > r$sup
+})) > 0) == 1715)
+etiquetar <- function(d) {
+  d$variable <- factor(d$nombre, levels = rev(orden), labels = rev(etiquetas[orden]))
+  d$bloque <- factor(bloque[d$nombre], levels = c("Volumen", "Ritmo", "Repetición")); d
+}
+resumen <- etiquetar(resumen); fuera <- etiquetar(fuera)
+f1 <- ggplot(resumen, aes(y = variable)) +
+  geom_point(data = fuera, aes(x = valor), colour = azul, size = .4, alpha = .35) +
+  geom_boxplot(aes(xmin = minimo, xlower = q1, xmiddle = mediana, xupper = q3, xmax = maximo),
+    stat = "identity", orientation = "y", width = .55, linewidth = .35, colour = tinta_2, fill = neutro) +
   facet_grid(bloque ~ ., scales = "free_y", space = "free_y") +
   labs(x = "Valor estandarizado de log(x + 1)", y = NULL)
 guardar_fig(f1, "fig01_boxplots", 11)
@@ -86,31 +107,29 @@ guardar_fig(f4, "fig04_codo_acp", 6.5)
 pt <- data.frame(acp$puntajes[, 1:2]); names(pt) <- c("CP1", "CP2"); pt$tipo <- base$tipo_trafico
 centros <- aggregate(cbind(CP1, CP2) ~ tipo, pt, mean)
 carg <- tabla("acp_correlaciones"); carg$etq <- sub(" \\(.*", "", etiquetas[sub("^log_", "", carg$variable)])
-escala <- 3.6
+escala <- 4.5
 carg$x <- escala * carg$PC1; carg$y <- escala * carg$PC2
+extremos <- pt[match(c(127446, 97189, 44648), base$id), ]
+extremos$etq <- paste("Flujo", c(127446, 97189, 44648))
+colores_tipo <- c(Normal = azul, Exploits = naranja, Fuzzers = "#3a9a5b", Reconnaissance = "#8b5cc7",
+  "Otros ataques" = rojo)
 f5 <- ggplot(pt, aes(CP1, CP2)) + geom_hline(yintercept = 0, colour = grilla) + geom_vline(xintercept = 0, colour = grilla) +
-  geom_point(colour = gris_puntos, size = .3, alpha = .12) +
-  geom_segment(data = carg, aes(x = 0, y = 0, xend = x, yend = y), colour = tinta_2,
-    linewidth = .35, arrow = arrow(length = unit(1.3, "mm"))) +
-  geom_text_repel(data = carg[carg$PC1 < 0, ], aes(x, y, label = etq), family = "Carlito", size = 2.5,
-    colour = tinta_2, xlim = c(-Inf, -2.75), hjust = 1, direction = "y", box.padding = .12,
-    min.segment.length = 0, segment.colour = gris_puntos, segment.size = .25, seed = 42) +
-  geom_text_repel(data = carg[carg$PC1 > 0, ], aes(x, y, label = etq), family = "Carlito", size = 2.5,
-    colour = tinta_2, xlim = c(3.2, Inf), hjust = 0, direction = "y", box.padding = .12,
-    min.segment.length = 0, segment.colour = gris_puntos, segment.size = .25, seed = 42) +
-  geom_point(data = centros, colour = naranja, size = 3.2) +
-  geom_label(data = centros, aes(CP1 + c(0, .35, -.45, 0, 0), CP2 + c(-.42, -.32, .32, -.32, -.32), label = tipo),
-    family = "Carlito", fontface = "bold", size = 3, colour = tinta, fill = "white", label.size = 0,
-    label.padding = unit(.08, "lines")) +
-  annotate("text", x = -5.8, y = -2.4, label = "← más conexiones repetidas", hjust = 0, family = "Carlito",
-    size = 3, colour = azul, fontface = "bold") +
-  annotate("text", x = 5.3, y = -2.4, label = "conversaciones más largas y cargadas →", hjust = 1,
-    family = "Carlito", size = 3, colour = azul, fontface = "bold") +
-  annotate("text", x = -5.8, y = 3.6, label = "↑ más actividad (paquetes y bytes)", hjust = 0,
-    family = "Carlito", size = 3, colour = azul, fontface = "bold") +
-  coord_cartesian(xlim = c(-5.8, 5.3), ylim = c(-2.5, 3.7)) +
-  labs(x = "CP1 (43,3 % de la varianza)", y = "CP2 (16,9 %)")
-guardar_fig(f5, "fig05_biplot", 11)
+  geom_point(aes(colour = tipo), size = .35, alpha = .25) +
+  geom_segment(data = carg, aes(x = 0, y = 0, xend = x, yend = y), colour = tinta,
+    linewidth = .4, arrow = arrow(length = unit(1.3, "mm"))) +
+  geom_text_repel(data = carg, aes(x, y, label = etq), family = "Carlito", size = 2.4, colour = tinta,
+    box.padding = .15, min.segment.length = 0, segment.colour = tinta_2, segment.size = .2,
+    max.overlaps = 30, seed = 42, bg.colour = "white", bg.r = .12) +
+  geom_point(data = centros, aes(fill = tipo), shape = 21, colour = tinta, size = 3.4, stroke = .5) +
+  geom_point(data = extremos, shape = 21, colour = tinta, fill = NA, size = 3.6, stroke = .7) +
+  geom_text_repel(data = extremos, aes(label = etq), family = "Carlito", size = 2.7, fontface = "bold",
+    colour = tinta, box.padding = .5, seed = 42) +
+  scale_colour_manual(values = colores_tipo, guide = guide_legend(override.aes = list(size = 2.5, alpha = 1))) +
+  scale_fill_manual(values = colores_tipo, guide = "none") +
+  coord_equal() +
+  labs(x = "CP1 (43,3 %): conexiones repetidas ← → conversaciones largas y cargadas",
+    y = "CP2 (16,9 %): más actividad ↑")
+guardar_fig(f5, "fig05_biplot", 11.5)
 
 # Figura 6. Análisis paralelo de factores.
 par_af <- tabla("af_paralelo")[1:8, ]
@@ -172,7 +191,8 @@ f10 <- ggplot(acs, aes(Dim1, Dim2, colour = rol)) + geom_hline(yintercept = 0, c
   scale_shape_manual(values = c("Tipo de tráfico" = 16, "Estado de la conexión" = 17)) +
   labs(x = paste0("Dimensión 1 (", format(round(inercia[1], 1), decimal.mark = ","), " %)"), y = paste0("Dimensión 2 (", format(round(inercia[2], 1), decimal.mark = ","), " %)"))
 f10 <- f10 + scale_x_continuous(labels = function(x) format(x, decimal.mark = ",")) +
-  scale_y_continuous(labels = function(x) format(x, decimal.mark = ","))
+  scale_y_continuous(labels = function(x) format(x, decimal.mark = ",")) +
+  coord_equal()  # misma escala en los dos ejes: las distancias del mapa no se deforman
 guardar_fig(f10, "fig10_mapa_acs", 8)
 
 # Figura 11. Mapa del ACM: categorías activas en gris, suplementarias en color.
@@ -202,8 +222,9 @@ f11 <- ggplot(mapa, aes(Dim.1, Dim.2, colour = rol, shape = rol)) + geom_hline(y
   scale_colour_manual(values = c("Categorías activas" = tinta_2, "Tipo de tráfico (suplementaria)" = azul,
     "Grupos del clustering (suplementaria)" = naranja)) +
   scale_shape_manual(values = c(1, 16, 17)) +
-  guides(colour = guide_legend(nrow = 1)) +
-  labs(x = paste0("Dim 1: conversación completa ← → conversación a medias (", format(round(aut[1], 1), decimal.mark = ","), " %)"),
-    y = paste0("Dim 2: consulta que se completa (arriba) frente a envío sin respuesta (", format(round(aut[2], 1), decimal.mark = ","), " %)"))
-guardar_fig(f11, "fig11_mapa_acm", 12)
+  coord_equal() +  # misma escala en los dos ejes: las distancias del mapa no se deforman
+  theme(legend.position = "right") + guides(colour = guide_legend(ncol = 1)) +
+  labs(x = paste0("Dim 1 (", format(round(aut[1], 1), decimal.mark = ","), " %): completa ← → a medias"),
+    y = paste0("Dim 2 (", format(round(aut[2], 1), decimal.mark = ","), " %)"))
+guardar_fig(f11, "fig11_mapa_acm", 14)
 cat("Figuras guardadas en resultados/figuras_informe/\n")
