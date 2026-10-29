@@ -4,7 +4,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MaxNLocator, FuncFormatter, ScalarFormatter
 import numpy as np
 import pandas as pd
 
@@ -24,38 +24,103 @@ plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 13,
     "axes.spines.top": False, "axes.spines.right": False, "axes.titlesize": 13,
     "text.color": DARK, "axes.labelcolor": DARK, "figure.facecolor": "white"})
 
+def coma_decimal(fig):
+    """Usar coma decimal en los ejes numéricos, como en el resto del informe."""
+    for ax in fig.axes:
+        for eje in (ax.xaxis, ax.yaxis):
+            if isinstance(eje.get_major_formatter(), ScalarFormatter):
+                eje.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}".replace(".", ",")))
+
 def guardar(fig, nombre):
+    coma_decimal(fig)
     fig.savefig(F / f"{nombre}.png", dpi=220, bbox_inches="tight", facecolor="white")
     plt.close(fig)
+
+def fuente(base):
+    """Tamaño de letra base (pt) de la figura: textos, ejes, ticks y leyendas."""
+    plt.rcParams.update({"font.size": base, "axes.titlesize": base, "axes.labelsize": base,
+        "xtick.labelsize": base, "ytick.labelsize": base, "legend.fontsize": base})
+
+def oscurecer(c, f=.3):
+    """Mezcla el color con el gris oscuro del repo para ganar contraste sin cambiar el tono."""
+    from matplotlib.colors import to_rgb
+    return tuple((1 - f) * np.array(to_rgb(c)) + f * np.array(to_rgb(DARK)))
 
 def origen(ax):
     ax.axhline(0, color="#D0D6DB", lw=.7)
     ax.axvline(0, color="#D0D6DB", lw=.7)
 
-def adjust_text(texts, ax, expand=None, arrowprops=None):
-    """Colocar etiquetas sin solaparlas, usando solo Matplotlib."""
+def adjust_text(texts, ax, expand=None, arrowprops=None, puntos=None, pad=7, peso=3):
+    """Colocar etiquetas sin solaparlas (solo Matplotlib).
+
+    Búsqueda por descenso de coordenadas: cada etiqueta prueba posiciones en anillos
+    alrededor de su punto y se queda con la de menor costo (solapes con otras etiquetas,
+    con marcadores y con líneas guía ajenas, más la distancia al punto).
+    `puntos`: coordenadas de datos de obstáculos adicionales (cajas de lado 2*pad px).
+    """
     ax.set_autoscale_on(False)
     ax.figure.canvas.draw()
-    renderer = ax.figure.canvas.get_renderer()
+    rend = ax.figure.canvas.get_renderer()
+    ab = ax.bbox
+    anclas = [np.array(ax.transData.transform(t.get_position())) for t in texts]
+    obst = np.array(ax.transData.transform(np.asarray(puntos))) if puntos is not None else np.empty((0, 2))
+    ang = np.deg2rad(np.arange(0, 360, 15))
+    cands = [(0, 0)] + [(r * np.cos(a), r * np.sin(a)) for r in (12, 20, 30, 42, 56, 72, 92, 115, 140) for a in ang]
+    def caja(t, i, dx, dy):
+        h = "left" if dx > 3 else "right" if dx < -3 else "center"
+        v = "bottom" if dy > 3 else "top" if dy < -3 else "center"
+        t.set_ha(h); t.set_va(v)
+        t.set_position(ax.transData.inverted().transform(anclas[i] + [dx, dy]))
+        return t.get_window_extent(rend).expanded(1.08, 1.2)
+    def guia(bb, p):
+        q = np.array([min(max(p[0], bb.x0), bb.x1), min(max(p[1], bb.y0), bb.y1)])
+        return (p, q) if np.hypot(*(q - p)) > 9 else None
+    def cruza(a, b, c, d):
+        o = lambda p, q, r: (q[0]-p[0])*(r[1]-p[1]) - (q[1]-p[1])*(r[0]-p[0])
+        return o(a, b, c) * o(a, b, d) < 0 and o(c, d, a) * o(c, d, b) < 0
+    def seg_en_caja(g, bb):
+        return any(bb.x0 < x < bb.x1 and bb.y0 < y < bb.y1 for x, y in (g[0] + (g[1] - g[0]) * u for u in np.linspace(0, 1, 14)))
+    def solape(a, b):
+        w = min(a.x1, b.x1) - max(a.x0, b.x0); h = min(a.y1, b.y1) - max(a.y0, b.y0)
+        return w * h if w > 0 and h > 0 else 0
+    todos = np.vstack([obst, np.array(anclas)]) if len(obst) else np.array(anclas)
+    OB = np.column_stack([todos[:, 0] - pad, todos[:, 1] - pad, todos[:, 0] + pad, todos[:, 1] + pad])
+    n = len(texts)
+    elec = [(0, 0)] * n
+    cajas = [caja(t, i, 0, 0) for i, t in enumerate(texts)]
+    def costo(i, c):
+        bb = caja(texts[i], i, *c)
+        if bb.x0 < ab.x0 or bb.x1 > ab.x1 or bb.y0 < ab.y0 or bb.y1 > ab.y1: return 1e9
+        k = peso * np.hypot(*c)
+        for j in range(n):
+            if j != i: k += 120 * solape(bb, cajas[j])
+        W = np.clip(np.minimum(bb.x1, OB[:, 2]) - np.maximum(bb.x0, OB[:, 0]), 0, None)
+        H = np.clip(np.minimum(bb.y1, OB[:, 3]) - np.maximum(bb.y0, OB[:, 1]), 0, None)
+        k += 80 * float(np.sum(W * H))
+        g = guia(bb, anclas[i])
+        if g is not None:
+            for j in range(n):
+                if j == i: continue
+                if seg_en_caja(g, cajas[j]): k += 1500
+                gj = guia(cajas[j], anclas[j])
+                if gj is not None and cruza(*g, *gj): k += 1500
+            if len(obst):
+                P = g[0] + (g[1] - g[0]) * np.linspace(0, 1, 14)[:, None]
+                d = np.min(np.hypot(P[:, None, 0] - obst[None, :, 0], P[:, None, 1] - obst[None, :, 1]), axis=1)
+                k += 150 * float(np.sum(d < 4))
+        return k
+    orden = sorted(range(n), key=lambda i: np.sum(np.hypot(*(np.array(anclas) - anclas[i]).T) < 60), reverse=True)
+    for _ in range(8):
+        for i in orden:
+            mejor = min(cands, key=lambda c: costo(i, c))
+            elec[i] = mejor; cajas[i] = caja(texts[i], i, *mejor)
     inv = ax.transData.inverted()
-    ocupados = []
-    offsets = sorted([(dx,dy) for dx in [0,-20,20,-45,45,-80,80,-130,130,-180,180] for dy in range(-160,161,14)], key=lambda z:z[0]**2+z[1]**2)
-    for text in sorted(texts, key=lambda t:t.get_position()[1]):
-        original = text.get_position()
-        origen = ax.transData.transform(original)
-        mejor = None
-        for dx,dy in [(0,0)]+offsets:
-            text.set_position(inv.transform(origen + [dx,dy]))
-            bb = text.get_window_extent(renderer).expanded(1.12,1.3)
-            if bb.x0 < ax.bbox.x0 or bb.x1 > ax.bbox.x1 or bb.y0 < ax.bbox.y0 or bb.y1 > ax.bbox.y1: continue
-            if any(bb.overlaps(o) for o in ocupados): continue
-            mejor = bb; break
-        if mejor is None:
-            text.set_position(original)
-            mejor = text.get_window_extent(renderer)
-        ocupados.append(mejor)
-        if np.linalg.norm(ax.transData.transform(text.get_position())-origen)>5:
-            ax.plot([original[0],text.get_position()[0]],[original[1],text.get_position()[1]],color="#AAB2B9",linewidth=.45)
+    for i, t in enumerate(texts):
+        cajas[i] = caja(t, i, *elec[i])
+        g = guia(cajas[i], anclas[i])
+        if g is not None:
+            (x0, y0), (x1, y1) = inv.transform(g[0]), inv.transform(g[1])
+            ax.plot([x0, x1], [y0, y1], color="#7F8A92", linewidth=.5, zorder=1)
 
 def dendrogram(link, ax, labels=None, truncate_mode=None, p=25, orientation="top", **kwargs):
     """Dibujar con Matplotlib el árbol Ward ya calculado en R, sin recalcularlo."""
@@ -79,74 +144,114 @@ def dendrogram(link, ax, labels=None, truncate_mode=None, p=25, orientation="top
         return (a + b) / 2, row[2]
     trazar(2 * n - 2)
     nombres = [(labels[node] if labels else str(node + 1)) if node < n else f"({int(link[node - n, 3])})" for node in hojas]
-    if orientation == "right": ax.set_yticks(range(len(hojas)), nombres, fontsize=12)
-    else: ax.set_xticks(range(len(hojas)), nombres, fontsize=11)
+    if orientation == "right": ax.set_yticks(range(len(hojas)), nombres)
+    else: ax.set_xticks(range(len(hojas)), nombres)
 
-# Resumen gráfico de datos para el informe; las figuras completas de Etapa 0 se conservan.
-fig = plt.figure(figsize=(10, 4.2), layout="constrained")
-rejilla = fig.add_gridspec(2, 4, width_ratios=[1, 1, 1.25, 1.25])
-axs = np.array([[fig.add_subplot(rejilla[0, 0]), fig.add_subplot(rejilla[0, 1])],
-    [fig.add_subplot(rejilla[1, :2]), fig.add_subplot(rejilla[:, 2:])]])
-for ax, v, unidad in [(axs[0, 0], "dur", "segundos"), (axs[0, 1], "log_dur", "log(segundos + 1)")]:
-    ax.hist(base[v], bins=40, color=COL[0], edgecolor=DARK, lw=.3)
-    ax.set(title=v, xlabel=unidad, ylabel="Flujos")
+# Resumen gráfico de datos para el informe (Etapa 0): mapa de calor de correlaciones con
+# valores, diagramas de caja de las 12 variables con los límites de Tukey y MSA por variable,
+# alineados fila a fila. Ancho 11,5 pulgadas -> impreso a 16 cm (factor 0,55): letra de 14 pt
+# = 7,7 pt impresos. Todo se lee de resultados/tablas; las figuras completas se conservan.
+fuente(14)
 lim = leer("atipicos_limites").set_index("variable")
-seleccion = ["log_spkts", "log_sbytes", "log_dbytes"]
+corr = leer("correlaciones").set_index("variable").loc[vars_num, vars_num]
+msa = leer("msa_por_variable").set_index("variable").loc[vars_num, "msa"]
+piloto = leer("piloto_supuestos").iloc[0]
+fig = plt.figure(figsize=(11.5, 5.0), layout="constrained")
+rej = fig.add_gridspec(1, 3, width_ratios=[6.1, 2.6, 1.9])
+ax1, ax2, ax3 = (fig.add_subplot(rej[0, i]) for i in range(3))
+im = ax1.imshow(corr.to_numpy(), cmap=CMAP, vmin=-1, vmax=1, aspect="auto")
+ax1.set_xticks(range(12), ABR, rotation=60, ha="right")
+ax1.set_yticks(range(12), ABR)
+ax1.spines[:].set_visible(False)
+for i in range(12):
+    for j in range(12):
+        ax1.text(j, i, f"{corr.iloc[i, j]:.1f}".replace(".", ","), ha="center", va="center", fontsize=14)
+ax1.set_title("Correlaciones de Pearson")
 stats = []
-for v in seleccion:
+for v in vars_num:
     r = lim.loc[v]; x = base[v]
-    stats.append(dict(label=v.removeprefix("log_"), med=r.mediana, q1=r.q1_tukey,
-        q3=r.q3_tukey, whislo=r.bigote_inferior, whishi=r.bigote_superior,
-        fliers=x[(x < r.limite_inferior) | (x > r.limite_superior)].to_numpy()))
-axs[1, 0].bxp(stats, patch_artist=True, boxprops=dict(facecolor=COL[1], edgecolor=DARK),
-    medianprops=dict(color=DARK), flierprops=dict(marker=".", markersize=2, alpha=.2))
-axs[1, 0].set(title="Atípicos de volumen", ylabel="log(x + 1)")
-corr = leer("correlaciones").set_index("variable")
-im = axs[1, 1].imshow(corr, cmap=CMAP, vmin=-1, vmax=1)
-axs[1, 1].set_xticks(range(12), ABR, rotation=55, ha="right", fontsize=11)
-axs[1, 1].set_yticks(range(12), ABR, fontsize=11)
-axs[1, 1].set_title("Correlaciones (12 log_)")
-fig.colorbar(im, ax=axs[1, 1], shrink=.7)
+    stats.append(dict(med=r.mediana, q1=r.q1_tukey, q3=r.q3_tukey, whislo=r.bigote_inferior,
+        whishi=r.bigote_superior, fliers=x[(x < r.limite_inferior) | (x > r.limite_superior)].to_numpy()))
+ax2.bxp(stats, positions=range(12), vert=False, widths=.6, patch_artist=True, manage_ticks=False,
+    boxprops=dict(facecolor=COL[1], edgecolor=DARK), medianprops=dict(color=DARK, lw=1.5),
+    whiskerprops=dict(color=DARK), capprops=dict(color=DARK),
+    flierprops=dict(marker=".", markersize=2.5, alpha=.25, markeredgecolor=DARK, markerfacecolor=DARK))
+ax2.set_ylim(11.5, -.5); ax2.set_yticks([]); ax2.set_xlim(-.5, 17)
+ax2.set_xticks([0, 5, 10, 15]); ax2.set_xlabel("log(x + 1)")
+ax2.set_title("Cajas (Tukey)")
+for i, v in enumerate(vars_num):
+    ax2.text(1.03, i, f"{int(lim.loc[v, 'n_atipicos']):,}".replace(",", "."), transform=ax2.get_yaxis_transform(),
+        va="center", ha="left", fontsize=13)
+ax3.barh(range(12), msa.to_numpy(), color=COL[0], edgecolor=DARK, lw=.5)
+ax3.axvline(.5, color="#7C5363", ls="--", lw=1.2)
+ax3.set_ylim(11.5, -.5); ax3.set_yticks([]); ax3.set_xlim(0, 1.3); ax3.set_xticks([0, .5, 1])
+for i, m in enumerate(msa):
+    ax3.text(m + .03, i, f"{m:.2f}".replace(".", ","), va="center", fontsize=13)
+ax3.set_xlabel("MSA")
+ax3.set_title(f"MSA (KMO {piloto.kmo_global:.3f})".replace(".", ","))
 guardar(fig, "07_datos_resumen")
+
+# Histogramas de seis variables de X_num (dos por bloque, escala log), compactos para el cuerpo del informe;
+# los de las 12 variables están en 02_histogramas_log.png.
+sel = ["log_spkts", "log_dbytes", "log_dur", "log_sjit", "log_ct_srv_src", "log_ct_dst_sport_ltm"]
+fig, axes = plt.subplots(2, 3, figsize=(11.5, 3.9), layout="constrained")
+for ax, v in zip(axes.flat, sel):
+    ax.hist(base[v], bins=30, color=COL[1], edgecolor=DARK, lw=.3)
+    ax.set_title(ABR[vars_num.index(v)])
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=4))
+    ax.yaxis.set_major_locator(MaxNLocator(nbins=3))
+for ax in axes[:, 0]: ax.set_ylabel("Flujos")
+guardar(fig, "07b_histogramas_log")
+fuente(13)
 
 # ACP: el biplot usa escalas recíprocas, conservando el producto fila-columna.
 eig = leer("acp_autovalores")
 scores = leer("acp_puntajes")
 r = leer("acp_correlaciones").set_index("variable")
-fig, axs = plt.subplots(1, 2, figsize=(9, 3.6), layout="constrained", gridspec_kw={"width_ratios": [1, 1.6]})
+fuente(10.5)  # figura de 7,0 in -> impresa a 13,6 cm (x0,76): letra impresa ~8 pt
+fig, axs = plt.subplots(1, 2, figsize=(7.0, 3.1), layout="constrained", gridspec_kw={"width_ratios": [1, 1.7]})
 axs[0].plot(eig.componente, eig.autovalor, "o-", color="#8AABC5", markeredgecolor=DARK)
 axs[0].axhline(1, color=DARK, ls="--", lw=.8)
-axs[0].set(title="Codo del ACP", xlabel="Componente", ylabel="Autovalor", xticks=range(1, 13))
+axs[0].set(title="Codo del ACP", xlabel="Componente", ylabel="Autovalor", xticks=[1, 2, 3, 4, 6, 8, 10, 12])
 ax = axs[1]
 sx = np.sqrt(eig.autovalor.iloc[:2].to_numpy())
 xy = .5 * scores[["PC1", "PC2"]].to_numpy() / sx
 for cat, color in TRAFICO.items():
     sel = scores.tipo_trafico.eq(cat)
-    ax.scatter(xy[sel, 0], xy[sel, 1], s=6, color=color, alpha=.4, label=cat, rasterized=True)
+    ax.scatter(xy[sel, 0], xy[sel, 1], s=5, color=oscurecer(color, .3), alpha=.6, linewidths=0, label=cat, rasterized=True)
 texts = []
 ax.set_xlim(-2.35, 2.35)
 ax.set_ylim(-1.5, 2.1)
 for i, v in enumerate(vars_num):
     arrow = 2 * r.loc[v, ["PC1", "PC2"]].to_numpy()
     ax.annotate("", xy=arrow, xytext=(0, 0), arrowprops=dict(arrowstyle="->", color=DARK, lw=.8))
-    texts.append(ax.text(arrow[0], arrow[1], ABR[i], fontsize=11))
+    texts.append(ax.text(arrow[0], arrow[1], ABR[i], bbox=dict(boxstyle="round,pad=.1", fc="white", ec="none", alpha=.7), zorder=5))
 ext = leer("acp_extremos")
 for row in ext.itertuples():
     j = scores.index[scores.id.eq(row.id)][0]
-    texts.append(ax.text(*xy[j], str(row.id), fontsize=11, fontweight="bold"))
+    ax.scatter(*xy[j], s=26, facecolor="none", edgecolor=DARK, linewidth=.9, zorder=4)
+    texts.append(ax.text(*xy[j], str(row.id), fontweight="bold", bbox=dict(boxstyle="round,pad=.12", fc="white", ec="none", alpha=.8)))
 origen(ax)
-ax.set(title="Biplot de individuos y variables", xlabel="CP1 (43,29%)", ylabel="CP2 (16,88%)")
-fig.legend(*ax.get_legend_handles_labels(), fontsize=10, loc="outside lower center", ncol=5, markerscale=2)
-adjust_text(texts, ax=ax, arrowprops=dict(arrowstyle="-", color="#929BA2", lw=.4))
+pct = eig.porcentaje.iloc[:2].round(2).map(lambda v: f"{v:.2f}".replace(".", ","))
+ax.set(title="Biplot de individuos y variables", xlabel=f"CP1 ({pct.iloc[0]}%)", ylabel=f"CP2 ({pct.iloc[1]}%)")
+from matplotlib.lines import Line2D
+handles = [Line2D([], [], marker="o", ls="", markersize=7, markerfacecolor=oscurecer(c, .3), markeredgecolor=DARK, markeredgewidth=.5) for c in TRAFICO.values()]
+fig.legend(handles, list(TRAFICO), loc="outside lower center", ncol=5, columnspacing=1.0, handletextpad=.2)
+adjust_text(texts, ax=ax, arrowprops=dict(arrowstyle="-", color="#929BA2", lw=.4),
+    puntos=np.vstack([u * 2 * r.loc[v, ["PC1", "PC2"]].to_numpy() for v in vars_num for u in np.linspace(.35, 1, 24)]
+        + [xy[scores.index[scores.id.eq(i)][0]][None] for i in ext.id]), pad=2, peso=25)
 guardar(fig, "08_acp_codo_biplot")
 
 par = leer("af_paralelo")
-fig, ax = plt.subplots(figsize=(9, 2.0), layout="constrained")
+fuente(10)  # 6,5 in -> 13,6 cm (x0,82): ~8,2 pt
+fig, ax = plt.subplots(figsize=(6.5, 2.3), layout="constrained")
 ax.plot(par.dimension, par.factor_observado, "o-", color="#8AABC5", label="Factores observados")
 ax.plot(par.dimension, par.factor_simulado, "s--", color="#B7A4C9", label="Referencia aleatoria")
-ax.axvline(4.5, color=DARK, ls=":", lw=.8)
-ax.set(xlabel="Número de factor", ylabel="Autovalor reducido", title="Análisis paralelo de factores · 100 repeticiones", xticks=range(1, 13))
-ax.legend(fontsize=12)
+ax.axvline(3.5, color=DARK, ls=":", lw=1, label="Factores retenidos (3, Kaiser reducido)")
+ax.axvline(4.5, color="#929BA2", ls="--", lw=.8, label="Corte del análisis paralelo (4)")
+ax.set(xlabel="Número de factor", ylabel="Autovalor reducido", title="Análisis paralelo · 100 repeticiones", xticks=range(1, 13))
+ax.set_ylim(-0.8, 7.6)
+ax.legend(ncol=2, loc="upper right", columnspacing=1.0, handlelength=1.6)
 guardar(fig, "09_af_paralelo")
 
 def linkage_r(nombre, n):
@@ -161,16 +266,18 @@ def linkage_r(nombre, n):
 
 metricas = leer("cluster_metricas")
 k = int(leer("cluster_comparaciones").iloc[0].k)
-fig, axs = plt.subplots(1, 2, figsize=(10, 2.8), layout="constrained")
+fuente(10.5)  # 6,5 in -> 12,8 cm (x0,775): ~8,1 pt
+fig, axs = plt.subplots(1, 2, figsize=(6.5, 2.0), layout="constrained")
 for ax, pref, titulo, ylabel in [(axs[0], "wss", "Codo", "Suma de cuadrados interna"),
     (axs[1], "silhouette", "Silhouette promedio", "Silhouette")]:
     ax.plot(metricas.k, metricas[f"{pref}_ward"], "s--", color="#B7A4C9", label="Ward")
     ax.plot(metricas.k, metricas[f"{pref}_kmeans"], "o-", color="#8AABC5", label="K-means")
     ax.axvline(k, color=DARK, lw=.7, ls=":")
     ax.set(title=titulo, xlabel="k", ylabel=ylabel, xticks=range(2, 9))
-    ax.legend(fontsize=12)
+axs[0].legend(loc="upper right")
 guardar(fig, "10_cluster_seleccion")
 
+fuente(13)
 fig, ax = plt.subplots(figsize=(10, 2.6), layout="constrained")
 link = linkage_r("cluster_dendrograma", len(base))
 dendrogram(link, truncate_mode="lastp", p=15, ax=ax, link_color_func=lambda _: "#8EA9BE", leaf_font_size=8)
@@ -178,21 +285,23 @@ ax.axhline((link[-k, 2] + link[-k + 1, 2]) / 2, color=DARK, ls="--", lw=.8)
 ax.set(title="Ward.D2 · últimos 15 nodos del árbol de 5.000 flujos", xlabel="Nodos agregados (tamaño entre paréntesis)", ylabel="Altura")
 guardar(fig, "11_cluster_dendrograma")
 
-fig, axs = plt.subplots(1, 2, figsize=(10, 3.8), layout="constrained", gridspec_kw={"width_ratios": [1.35, 1]})
+fuente(11)  # 8,0 in -> 14,1 cm (x0,69): ~7,6 pt
+fig, axs = plt.subplots(1, 2, figsize=(8.0, 2.9), layout="constrained", gridspec_kw={"width_ratios": [2.0, 1]})
 perfil = leer("cluster_medias_estandarizadas").set_index("cluster")
 im = axs[0].imshow(perfil, cmap=CMAP, vmin=-3, vmax=3, aspect="auto")
-axs[0].set_xticks(range(12), ABR, rotation=55, ha="right", fontsize=11)
+axs[0].set_xticks(range(12), ABR, rotation=55, ha="right")
 axs[0].set_yticks(range(k), [f"C{i}" for i in range(1, k + 1)])
 axs[0].set_title("Medias z por cluster")
 for i in range(k):
-    for j in range(12): axs[0].text(j, i, f"{perfil.iloc[i,j]:.1f}", ha="center", va="center", fontsize=12)
-fig.colorbar(im, ax=axs[0], shrink=.65, label="z (colores saturan en ±3)")
+    for j in range(12): axs[0].text(j, i, f"{perfil.iloc[i,j]:.1f}".replace(".", ","), ha="center", va="center", fontsize=11)
+fig.colorbar(im, ax=axs[0], shrink=.65, label="z (satura en ±3)")
 dendrogram(linkage_r("cluster_dendrograma_variables", 12), labels=ABR, orientation="right",
-    ax=axs[1], link_color_func=lambda _: "#8EA9BE", leaf_font_size=9)
+    ax=axs[1], link_color_func=lambda _: "#8EA9BE", leaf_font_size=10)
 axs[1].set(title="Ward de variables", xlabel="Distancia")
 guardar(fig, "12_cluster_perfiles_variables")
 
-fig, ax = plt.subplots(figsize=(8, 3.1), layout="constrained")
+fuente(11.5)  # 5,2 in -> 8,8 cm (x0,67): ~7,7 pt
+fig, ax = plt.subplots(figsize=(5.2, 2.15), layout="constrained")  # compacta: va a media página
 texts = []
 coords_acs = []
 for name, color, marker in [("acs_filas", COL[0], "o"), ("acs_columnas", COL[4], "s")]:
@@ -200,30 +309,41 @@ for name, color, marker in [("acs_filas", COL[0], "o"), ("acs_columnas", COL[4],
     coords_acs.append(d.iloc[:, 1:3].to_numpy())
     ax.scatter(d.iloc[:,1], d.iloc[:,2], color=color, edgecolor=DARK, s=50, marker=marker,
         label="Tipo de tráfico" if name.endswith("filas") else "Estado")
-    texts.extend(ax.text(row.iloc[1], row.iloc[2], row.iloc[0], fontsize=12) for _, row in d.iterrows())
+    # Con solo ocho puntos, cada etiqueta se ubica con un desplazamiento fijo
+    # (en puntos) para que no tape su marcador ni a sus vecinas.
+    lugar = {"Otros ataques": (0, 7, "center"), "INT": (0, -13, "center"),
+             "Fuzzers": (0, 7, "center"), "Reconnaissance": (0, -13, "center"),
+             "FIN": (8, 0, "left"), "Exploits": (8, 0, "left"),
+             "Normal": (8, 0, "left"), "CON_otros": (0, -13, "center")}
+    for _, row in d.iterrows():
+        dx, dy, ha = lugar.get(row.iloc[0], (6, 6, "left"))
+        ax.annotate(row.iloc[0], (row.iloc[1], row.iloc[2]), xytext=(dx, dy),
+                    textcoords="offset points", ha=ha, va="center")
 coords_acs = np.vstack(coords_acs)
-ax.set_xlim(coords_acs[:, 0].min() - .2, coords_acs[:, 0].max() + .2)
-ax.set_ylim(coords_acs[:, 1].min() - .2, coords_acs[:, 1].max() + .2)
+ax.set_xlim(coords_acs[:, 0].min() - .4, coords_acs[:, 0].max() + .25)
+ax.set_ylim(coords_acs[:, 1].min() - .2, coords_acs[:, 1].max() + .45)
 origen(ax)
 ax.set(xlabel="Dimensión 1", ylabel="Dimensión 2", title="ACS · tipo de tráfico y estado")
-ax.legend(fontsize=12)
-adjust_text(texts, ax=ax, arrowprops=dict(arrowstyle="-", color="#AAB2B9", lw=.5))
+ax.legend(loc="upper center", bbox_to_anchor=(0.4, 1), ncol=2, columnspacing=1.0, handletextpad=.2)
 guardar(fig, "13_acs_mapa")
 
 e = leer("acm_autovalores")
-fig, axs = plt.subplots(1, 2, figsize=(10, 2.1), layout="constrained")
+fuente(10)  # 6,5 in -> ~13,6 cm (x0,82): ~8,2 pt
+fig, axs = plt.subplots(1, 2, figsize=(6.5, 1.9), layout="constrained")
 axs[0].plot(e.dimension, e.autovalor, "o-", color="#8AABC5")
-axs[0].axhline(1/7, color=DARK, ls="--", lw=.8)
-axs[0].set(title="Autovalores crudos del ACM", xlabel="Dimensión", ylabel="Autovalor")
+axs[0].axhline(1/leer("acm_resumen").Q.iloc[0], color=DARK, ls="--", lw=.8)
+axs[0].set(title="Autovalores crudos", xlabel="Dimensión", ylabel="Autovalor")
+axs[0].xaxis.set_major_locator(MaxNLocator(integer=True))
 axs[1].bar(e.dimension.iloc[:6], e.porcentaje_ajustado.iloc[:6], color=COL[1], edgecolor=DARK, linewidth=.5)
-axs[1].set(title="Inercia ajustada (ca::mjca)", xlabel="Dimensión", ylabel="Porcentaje ajustado")
+axs[1].set(title="Inercia ajustada", xlabel="Dimensión", ylabel="Porcentaje")
 guardar(fig, "14_acm_inercia")
 
 co = leer("acm_categorias_coordenadas")
 variables_cat = co.categoria.str.split(":").str[0].unique().tolist()
 prefijos = dict(zip(variables_cat, ["Tr", "Pr", "Sv", "Es", "Rp", "Du", "By"]))
 marcas = ["o", "s", "^", "D", "v", "P", "X"]
-fig, ax = plt.subplots(figsize=(9, 4.9), layout="constrained")
+fuente(11.5)  # 6,5 in -> 10,9 cm (x0,66): ~7,6 pt
+fig, ax = plt.subplots(figsize=(6.5, 3.9), layout="constrained")
 texts = []
 for i, var in enumerate(variables_cat):
     d = co[co.categoria.str.startswith(var + ":")]
@@ -231,15 +351,17 @@ for i, var in enumerate(variables_cat):
         marker=marcas[i], s=45, label=f"{prefijos[var]}: {var}")
     for row in d.itertuples(index=False, name=None):
         lab = row[0].split(":", 1)[1].replace("Otros ataques", "Otros at.").replace("Reconnaissance", "Recon.")
-        texts.append(ax.text(row[1], row[2], prefijos[var] + ":" + lab, fontsize=12))
+        texts.append(ax.text(row[1], row[2], prefijos[var] + ":" + lab))
 ax.margins(.22)
 origen(ax)
 ax.set(title="ACM · categorías activas", xlabel="Dimensión 1 · 27,42% cruda", ylabel="Dimensión 2 · 14,03% cruda")
-fig.supxlabel("Tr tráfico · Pr protocolo · Sv servicio · Es estado · Rp respuesta · Du duración · By bytes", fontsize=10)
-adjust_text(texts, ax=ax, expand=(1.1, 1.2), arrowprops=dict(arrowstyle="-", color="#AAB2B9", lw=.5))
+fig.supxlabel("Tr tráfico · Pr protocolo · Sv servicio · Es estado\nRp respuesta · Du duración · By bytes", fontsize=11.5)
+adjust_text(texts, ax=ax, expand=(1.1, 1.2), arrowprops=dict(arrowstyle="-", color="#AAB2B9", lw=.5),
+    puntos=co[["Dim.1", "Dim.2"]].to_numpy(), pad=6, peso=8)
 guardar(fig, "15_acm_categorias")
 
-fig, axs = plt.subplots(1, 2, figsize=(10, 3.5), layout="constrained")
+fuente(10)  # 6,5 in -> ~13,6 cm (x0,82): ~8,2 pt
+fig, axs = plt.subplots(1, 2, figsize=(6.5, 2.6), layout="constrained")
 ind = leer("acm_individuos")
 su = leer("acm_cluster_suplementario")
 for i in range(1, k + 1):
@@ -247,15 +369,16 @@ for i in range(1, k + 1):
     axs[0].scatter(d["Dim.1"], d["Dim.2"], s=5, alpha=.15, color=COL[i - 1], rasterized=True)
     r = su[su.cluster.eq(i)].iloc[0]
     axs[0].scatter(r["Dim.1"], r["Dim.2"], color=COL[i - 1], edgecolor=DARK, marker="D", s=65)
-    axs[0].annotate(f"C{i}", (r["Dim.1"], r["Dim.2"]), xytext=(5, 4), textcoords="offset points", fontsize=12)
+    axs[0].annotate(f"C{i}", (r["Dim.1"], r["Dim.2"]), xytext={2: (0, 11), 4: (10, -3)}.get(i, (6, 4)), ha="center" if i == 2 else "left", va="center" if i == 4 else "baseline", textcoords="offset points")
 origen(axs[0])
 axs[0].set(title="Clusters suplementarios", xlabel="Dimensión 1", ylabel="Dimensión 2")
 eta = leer("acm_eta2")
 y = np.arange(len(eta))
 axs[1].barh(y - .18, eta["Dim.1"], height=.35, color=COL[0], edgecolor=DARK, lw=.4, label="Dim 1")
 axs[1].barh(y + .18, eta["Dim.2"], height=.35, color=COL[1], edgecolor=DARK, lw=.4, label="Dim 2")
-axs[1].set_yticks(y, eta.variable, fontsize=12)
+axs[1].set_yticks(y, eta.variable)
 axs[1].set(xlim=(0, 1), xlabel="eta²", title="Discriminación por variable")
-axs[1].legend(fontsize=12)
+axs[1].set_ylim(-.6, len(eta) + .45)
+axs[1].legend(loc="upper right", ncol=2, columnspacing=1.0, handlelength=1.2)
 guardar(fig, "16_acm_clusters_eta")
 print("Figuras 07 a 16 generadas con Matplotlib.")

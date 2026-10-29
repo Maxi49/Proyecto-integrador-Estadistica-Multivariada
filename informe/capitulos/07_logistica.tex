@@ -1,0 +1,19 @@
+\section{Regresión logística}
+\label{sec:logistica}
+
+\textbf{Diseño.} Modelamos la probabilidad de que un flujo sea ataque (\texttt{label} = 1) con regresión logística \citep{hosmer2013} para contrastar H4. Partimos la muestra 70/30 en 3.501 flujos de entrenamiento y 1.499 de prueba (51,8\,\% de ataques en ambos), estratificando por \texttt{attack\_cat} (semilla 42; partición en \texttt{muestra\_particion\_70\_30.xlsx}); el testing set original no está en el repositorio. Reajustamos el ACP solo con el entrenamiento para evitar fuga (cargas casi idénticas a las de la sección~\ref{sec:acp}). Los predictores son CP1 a CP3 y \texttt{proto\_g} (referencia tcp), \texttt{service\_g} (ninguno) y \texttt{state\_g} (FIN). Excluimos TTL (separación perfecta artefactual), \texttt{tipo\_trafico} y \texttt{attack\_cat} (fuga). M1 usa solo los puntajes (AIC 3.734,2; $R^2$ de McFadden 0,232; AUC en prueba 0,795) y M2 agrega protocolo, servicio y estado (AIC 2.876,5; $R^2$ 0,411; AUC 0,882); la razón de verosimilitud favorece a M2 ($\chi^2 = 871{,}7$; 7 gl; $p < 0{,}001$), que elegimos.
+
+\textbf{Odds ratios.} Con lo demás fijo, un desvío más de CP1 (magnitud del flujo frente a repetición) multiplica las chances de ataque por 5,01 (IC 95\,\% por verosimilitud perfilada: 4,11 a 6,15), uno más de CP3 (ritmo lento) por 2,54 (2,25 a 2,86) y uno más de CP2 (volumen de tráfico) las reduce un 41\,\% (OR 0,59; 0,53 a 0,67). Los OR de las categóricas son condicionales y la colinealidad es alta (VIF 18,4 en \texttt{udp} y 17,1 en INT; las componentes llegan a 3,64), por lo que se interpretan solo en su dirección: INT frente a FIN (OR 375,1; IC 107,0 a 1.317,7) y dns frente a ninguno (19,1; 9,0 a 42,5), más chances de ataque; CON\_otros frente a FIN (0,19; 0,08 a 0,44), menos. La inestabilidad lo confirma: al rehacer la partición el OR de INT pasó de 93 a 375 y el de udp de 0,42 a 0,14. Así, dns tiene menos ataques que servicio ninguno (32 frente a 49\,\%) pero OR ajustado 19,1. Los demás OR están en \texttt{resultados/tablas}.
+
+\textbf{Desempeño en prueba.} Con umbral 0,5, M2 logra AUC = 0,882 (IC 95\,\% de DeLong con \texttt{pROC} \citep{robin2011}: 0,864 -- 0,900), exactitud 0,818, sensibilidad 0,915, especificidad 0,713 y precisión 0,775. Domina el falso positivo: 207 normales marcados como ataque (28,7\,\%) frente a 66 ataques no detectados (8,5\,\%; Figura~\ref{fig:log-roc}), un costo aceptable al detectar intrusiones.
+
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.6\linewidth]{17_logistica_roc_confusion.png}
+  \caption[Curva ROC y matriz de confusión de M2]{Curva ROC y matriz de confusión de M2 en la prueba (umbral 0,5). La diagonal punteada corresponde al azar (AUC = 0,5). Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:log-roc}
+\end{figure}
+
+\textbf{Diagnóstico.} No hay separación (convergió sin avisos). Según la distancia de Cook, 166 flujos (4,7\,\%) superan $4/n$, pero el máximo es 0,019. La calibración por deciles es buena entre el 5 y el 9 (diferencias de hasta 2,6 puntos) e irregular en los extremos: los tres deciles bajos sobreestiman en proporción (0,02, 0,06 y 0,15 contra 0,007, 0,013 y 0,020 observadas) y el 10 sobreestima unos 12 puntos (0,96 contra 0,84).
+
+\textbf{Cierre.} H4 se confirma: el AUC en prueba es 0,882 y el límite inferior de su IC (0,864) también supera 0,80; con las componentes solas (M1, 0,795) no se cumpliría. La probabilidad es relativa a esta base (52\,\% de ataques, sin duplicados, ataques sintéticos): interpretamos odds ratios, no prevalencias.

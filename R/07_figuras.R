@@ -1,5 +1,5 @@
 # FIGURAS DEL INFORME. Una idea por figura, nombres de variables descriptivos.
-# Ejecutar después de 00 a 05. Guarda PNG a 300 ppp en resultados/figuras_informe/.
+# Ejecutar después de 00 a 06. Guarda PNG a 300 ppp en resultados/figuras_informe/.
 library(ggplot2)
 library(ggrepel)
 library(patchwork)

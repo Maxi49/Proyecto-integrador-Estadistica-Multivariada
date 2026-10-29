@@ -1,0 +1,53 @@
+\section{Datos}
+\label{sec:datos}
+
+\textbf{Origen y muestra.} Trabajamos con UNSW-NB15 \citep{moustafa2015,moustafa2016}, de uso académico citando a sus autores, con R \citep{rcore2024} y los paquetes \texttt{psych} y \texttt{ca} \citep{nenadic2007}. El tráfico normal es realista, pero los ataques son sintéticos (en las variables, \texttt{s} indica el origen y \texttt{d} el destino). Del archivo de entrenamiento (175.341 flujos) tomamos 5.000 únicos, con muestreo estratificado proporcional por \texttt{attack\_cat}: 48,2~\% normales y 51,8~\% ataques (Exploits 18,4~\%, Fuzzers 15,0~\%, Reconnaissance 7,0~\%, otros 11,5~\%). Sin duplicados (eran el 38,6~\% del original), las proporciones no son prevalencias reales.
+
+\textbf{Diccionario y variables de análisis.} La Tabla~\ref{tab:xnum} describe las 12 variables de X\_num, agrupadas en los tres bloques esperados, con su unidad y su resumen numérico; el diccionario de las 68 columnas está en la hoja \texttt{diccionario} del Excel de la muestra. X\_cat (Tabla~\ref{tab:xcat}, sección~\ref{sec:acm}) tiene siete categóricas: cuatro existentes y tres numéricas discretizadas. \texttt{tipo\_trafico}, \texttt{attack\_cat} y \texttt{label} no construyen componentes, factores ni clusters: solo colorean o se cruzan después. Como las variables son positivas, muy asimétricas y de rangos amplios, analizamos $\log(x+1)$, que conserva los ceros y baja la asimetría de \texttt{sbytes} de 33,3 a 1,0 (Figura~\ref{fig:hist}).
+
+\begin{table}[htbp]
+  \centering
+  \caption[Variables de X\_num: significado, unidad y resumen numérico]{Variables numéricas de X\_num por bloque esperado, con unidad y resumen numérico en la unidad original ($n$ = 5.000; el análisis usa $\log(x+1)$). Q1 y Q3 están en el repositorio. Fuente: elaboración propia con UNSW-NB15.}\label{tab:xnum}
+  \begin{tablacompacta}
+  \footnotesize\setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}Xlrrrrr@{}}
+  \toprule
+  Variable & Significado & Unidad & Media & Desvío & Mín. & Mediana & Máx. \\
+  \midrule
+  \multicolumn{8}{@{}l}{\emph{Volumen}} \\
+  \texttt{spkts} & Paquetes enviados por el origen & paquetes & 32,4 & 227 & 1 & 10 & 9.616 \\
+  \texttt{sbytes} & Bytes enviados por el origen & bytes & 16.918 & 296.287 & 46 & 918 & 12.965.233 \\
+  \texttt{dbytes} & Bytes enviados por el destino & bytes & 26.437 & 234.484 & 0 & 354 & 12.422.665 \\
+  \multicolumn{8}{@{}l}{\emph{Temporización}} \\
+  \texttt{dur} & Duración total del flujo & s & 1,34 & 5,52 & 0 & 0,297 & 60 \\
+  \texttt{sinpkt} & Tiempo entre paquetes del origen & ms & 484 & 4.778 & 0 & 19,9 & 60.001 \\
+  \texttt{sjit} & Jitter del origen & ms & 5.636 & 39.960 & 0 & 1.186 & 934.346 \\
+  \texttt{synack} & Tiempo SYN a SYN-ACK (0 si no es TCP) & s & 0,032 & 0,046 & 0 & 0,0006 & 0,731 \\
+  \multicolumn{8}{@{}l}{\emph{Repetición} (conexiones entre las últimas 100 con\dots)} \\
+  \texttt{ct\_srv\_src} & igual servicio y origen & conexiones & 5,09 & 6,33 & 1 & 3 & 63 \\
+  \texttt{ct\_srv\_dst} & igual servicio y destino & conexiones & 4,76 & 6,25 & 1 & 3 & 62 \\
+  \texttt{ct\_src\_ltm} & igual origen & conexiones & 3,81 & 4,81 & 1 & 2 & 50 \\
+  \texttt{ct\_src\_dport\_ltm} & igual origen y puerto destino & conexiones & 1,95 & 3,34 & 1 & 1 & 50 \\
+  \texttt{ct\_dst\_sport\_ltm} & igual destino y puerto origen & conexiones & 1,42 & 2,04 & 1 & 1 & 28 \\
+  \bottomrule
+  \end{tabularx}
+  \end{tablacompacta}
+\end{table}
+
+\textbf{Calidad.} Aplicamos 16 controles (faltantes, vacíos, duplicados por fila, identificador y perfil, valores negativos, no finitos o no enteros, TTL y ventana fuera de rango, \texttt{dur} = 0 con \texttt{spkts} > 1, \texttt{sbytes} < \texttt{spkts}, indicadores no binarios y etiqueta inconsistente). La única incidencia es un flujo con \texttt{is\_ftp\_login} = 4, que conservamos porque esa variable no se usa. No imputamos los ceros estructurales: \texttt{synack} 29,6~\%, \texttt{sjit} 25,9~\% y \texttt{dbytes} 18,9~\% (sin respuesta). Criterio de atípicos (Tukey, sobre la escala logarítmica): es atípico el valor fuera de $[Q_1-1{,}5\,\mathrm{RIC};\,Q_3+1{,}5\,\mathrm{RIC}]$, con RIC el rango intercuartílico. Según los diagramas de caja de la Figura~\ref{fig:datos}, 1.715 flujos (34,3~\%) tienen al menos una variable fuera de los límites, sobre todo \texttt{dbytes} (21,1~\%; 945 son los ceros sin respuesta), \texttt{ct\_src\_dport\_ltm} (11,6~\%) y \texttt{ct\_dst\_sport\_ltm} (9,3~\%, con RIC nulo). Los conservamos: en ciberseguridad lo extremo puede ser el fenómeno de interés.
+
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.985\linewidth]{07_datos_resumen.png}
+  \caption[Correlaciones, diagramas de caja y MSA de X\_num]{Izquierda: matriz de correlaciones de Pearson de las 12 variables de X\_num (mapa de calor; rosa positivo, azul negativo). Centro: diagramas de caja en escala $\log(x+1)$ con los límites de Tukey y, a la derecha, la cantidad de flujos atípicos. Derecha: MSA por variable (línea punteada: umbral 0,50) y KMO global. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:datos}
+\end{figure}
+
+\textbf{Descriptiva y supuestos.} La matriz de la Figura~\ref{fig:datos} muestra tres zonas: volumen (\texttt{spkts}--\texttt{sbytes} 0,86), temporización (\texttt{sinpkt}--\texttt{sjit} 0,85) y repetición (\texttt{ct\_srv\_src}--\texttt{ct\_srv\_dst} 0,85), esta última con correlaciones negativas con el resto ($-0{,}13$ a $-0{,}43$); \texttt{sjit} también se asocia con el volumen (0,46 a 0,55), así que los bloques no están aislados. Los histogramas (Figura~\ref{fig:hist}) son multimodales y con muchos ceros en volumen y temporización, y con cola derecha en repetición (los de las 12 variables están en \texttt{resultados/figuras}). Los supuestos se cumplen: determinante $6{,}3\times10^{-5}$ (mayor que $10^{-5}$), KMO global 0,748 \citep{kaiser1974}, MSA mínima 0,621 (\texttt{spkts}) y Bartlett significativo ($\chi^2$ = 48.303,5; 66 gl; p < 0,001). Con 14 candidatas el determinante era $1{,}0\times10^{-7}$ por la redundancia de \texttt{dpkts} (r = 0,95 con \texttt{dbytes}) y de \texttt{rate} (r = $-0,91$ con \texttt{sinpkt}); quitar solo \texttt{dpkts} no bastaba ($5{,}2\times10^{-6}$), así que excluimos ambas. Las frecuencias de las categóricas están en la Tabla~\ref{tab:xcat}.
+
+\begin{figure}[htbp]
+  \centering
+  \grafico[0.985\linewidth]{07b_histogramas_log.png}
+  \caption[Histogramas de variables de X\_num en escala logarítmica]{Histogramas de seis variables de X\_num (dos por bloque) en escala $\log(x+1)$; las 12 están en \texttt{resultados/figuras}. Fuente: elaboración propia con UNSW-NB15.}
+  \label{fig:hist}
+\end{figure}

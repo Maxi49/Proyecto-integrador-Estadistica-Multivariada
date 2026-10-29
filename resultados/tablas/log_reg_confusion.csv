@@ -1,0 +1,5 @@
+"real","predicho","n"
+"normal","normal",515
+"normal","ataque",207
+"ataque","normal",66
+"ataque","ataque",711
