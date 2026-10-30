@@ -10,7 +10,7 @@
 #    2) Desde una consola:        Rscript Proyecto_Integrador_UNSW-NB15.R
 #       Desde RStudio:            abrir el archivo (Reopen with Encoding > UTF-8) y apretar "Source",
 #                                 o bien  source("Proyecto_Integrador_UNSW-NB15.R", encoding = "UTF-8")
-#    Tarda entre 1 y 2 minutos. La primera vez instala los paquetes que falten (requiere internet).
+#    Tarda menos de un minuto; la primera vez puede demorar más porque instala los paquetes que falten (requiere internet).
 #
 #  QUÉ PRODUCE
 #    - En la consola: las salidas numéricas que aparecen en el informe, cada una con un encabezado del
