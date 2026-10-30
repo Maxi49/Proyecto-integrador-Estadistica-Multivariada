@@ -1,5 +1,10 @@
-# ETAPA 0. Ejecutar desde la carpeta principal del proyecto.
-# Instalar una sola vez: install.packages(c("readxl", "psych"))
+# ETAPA 0 · Exploración y preparación de los datos
+# Produce: Figura 1 (boxplots), Figura 2 (histogramas antes/después del log) y Figura 3 (correlaciones) del informe;
+#   tablas: calidad, atipicos_limites, resumen_numerico, piloto_supuestos (determinante, KMO, Bartlett), msa_por_variable,
+#   frecuencias_X_cat y los conjuntos congelados X_num / X_cat que usan las etapas siguientes.
+# Figuras: resultados/figuras_informe/fig01_boxplots.png, fig02_histogramas.png, fig03_correlaciones.png
+# Ejecutar desde la carpeta principal del proyecto.
+# Instalar una sola vez: install.packages(c("readxl", "psych", "ggplot2", "ggrepel", "patchwork", "systemfonts"))
 # Ejecutar: source("R/00_datos.R", encoding = "UTF-8")
 library(readxl)
 library(psych)
@@ -181,4 +186,64 @@ saveRDS(list(X_num = X_num, X_cat = X_cat, id = base$id, semilla = 42,
   cortes_dur = cortes_dur, cortes_bytes = cortes_bytes,
   estado_X_cat = "Congelado para los análisis de la Parte 2"), "resultados/conjuntos_congelados.rds")
 cat("Base y conjuntos guardados en resultados. Excel original conservado.\n")
-cat("Gráficos: ejecutar en Python el archivo python/graficos_etapa0.py.\n")
+
+# 8. FIGURAS DE LA ETAPA 0 (Figuras 1 a 3 del informe).
+source("R/estilo_graficos.R", encoding = "UTF-8")   # fuente, paleta, tema y guardar_fig()
+corto <- sub("^log_", "", names(X_num))
+
+# Figura 1. Boxplots de las 12 variables (log, estandarizadas para compartir eje).
+Z <- as.data.frame(scale(X_num)); names(Z) <- corto
+largo <- data.frame(variable = rep(corto, each = nrow(Z)), valor = unlist(Z, use.names = FALSE))
+largo$variable <- factor(largo$variable, levels = rev(orden), labels = rev(etiquetas[orden]))
+largo$bloque <- factor(bloque[as.character(sub(".*\\((.*)\\)$", "\\1", largo$variable))],
+  levels = c("Volumen", "Ritmo", "Repetición"))
+# Las cajas y los atípicos usan las bisagras de Tukey (fivenum), igual que la tabla de atípicos de más arriba, para que la
+# figura cuente los mismos flujos que el texto. geom_boxplot calcularía cuartiles con quantile().
+res_caja <- do.call(rbind, lapply(corto, function(v) {
+  x <- Z[[v]]; f <- fivenum(x); ric <- f[4] - f[2]
+  inf <- f[2] - 1.5 * ric; sup <- f[4] + 1.5 * ric
+  data.frame(nombre = v, minimo = min(x[x >= inf]), q1 = f[2], mediana = f[3], q3 = f[4], maximo = max(x[x <= sup]),
+    inf = inf, sup = sup)
+}))
+fuera <- do.call(rbind, lapply(corto, function(v) {
+  r <- res_caja[res_caja$nombre == v, ]; x <- Z[[v]]; o <- x[x < r$inf | x > r$sup]
+  if (length(o)) data.frame(nombre = v, valor = o)
+}))
+stopifnot(sum(rowSums(sapply(corto, function(v) {
+  r <- res_caja[res_caja$nombre == v, ]; Z[[v]] < r$inf | Z[[v]] > r$sup
+})) > 0) == 1715)
+etiquetar <- function(d) {
+  d$variable <- factor(d$nombre, levels = rev(orden), labels = rev(etiquetas[orden]))
+  d$bloque <- factor(bloque[d$nombre], levels = c("Volumen", "Ritmo", "Repetición")); d
+}
+res_caja <- etiquetar(res_caja); fuera <- etiquetar(fuera)
+f1 <- ggplot(res_caja, aes(y = variable)) +
+  geom_point(data = fuera, aes(x = valor), colour = azul, size = .4, alpha = .35) +
+  geom_boxplot(aes(xmin = minimo, xlower = q1, xmiddle = mediana, xupper = q3, xmax = maximo),
+    stat = "identity", orientation = "y", width = .55, linewidth = .35, colour = tinta_2, fill = neutro) +
+  facet_grid(bloque ~ ., scales = "free_y", space = "free_y") +
+  labs(x = "Valor estandarizado de log(x + 1)", y = NULL)
+guardar_fig(f1, "fig01_boxplots", 11)
+
+# Figura 2. Efecto de la transformación: bytes enviados antes y después del log.
+h1 <- ggplot(base, aes(sbytes)) + geom_histogram(bins = 40, fill = azul, colour = "white", linewidth = .2) +
+  scale_x_continuous(labels = function(x) paste(format(x / 1e6, decimal.mark = ","), "MB")) +
+  labs(title = "Escala original", x = "Bytes enviados por el origen (sbytes)", y = "Flujos")
+h2 <- ggplot(base, aes(log1p(sbytes))) + geom_histogram(bins = 40, fill = azul, colour = "white", linewidth = .2) +
+  labs(title = "Escala log(x + 1)", x = "log(sbytes + 1)", y = NULL)
+f2 <- h1 + h2
+guardar_fig(f2, "fig02_histogramas", 6.5)
+
+# Figura 3. Mapa de calor de correlaciones, ordenado por bloque.
+R <- cor(X_num); dimnames(R) <- list(corto, corto)
+cr <- as.data.frame(as.table(R[orden, orden]))
+cr$Var1 <- factor(cr$Var1, levels = orden, labels = etiquetas[orden])
+cr$Var2 <- factor(cr$Var2, levels = rev(orden), labels = rev(etiquetas[orden]))
+f3 <- ggplot(cr, aes(Var1, Var2, fill = Freq)) + geom_tile(colour = "white", linewidth = .6) +
+  geom_text(aes(label = formatC(Freq, format = "f", digits = 2, decimal.mark = ",")),
+    family = familia, size = 2.2, colour = tinta) +
+  scale_fill_gradient2(low = azul, mid = neutro, high = rojo, midpoint = 0, limits = c(-1, 1), name = "r") +
+  labs(x = NULL, y = NULL) + theme(axis.text.x = element_text(angle = 40, hjust = 1), panel.grid = element_blank(),
+    legend.position = "right", legend.title = element_text(colour = tinta_2))
+guardar_fig(f3, "fig03_correlaciones", 13)
+cat("Etapa 0: Figuras 1 a 3 guardadas en resultados/figuras_informe/\n")

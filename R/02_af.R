@@ -1,4 +1,9 @@
-# ETAPA 2. Análisis factorial exploratorio y revisión de soluciones impropias.
+# ETAPA 2 · Análisis Factorial (AF) exploratorio y revisión de soluciones impropias
+# Produce: Figura 6 (análisis paralelo) del informe; tablas: af_paralelo, af_cargas_completas (cargas, comunalidades,
+#   unicidades), af_varianza (% de varianza), af_ajuste (RMSR, RMSEA, TLI) y af_diagnostico_minres (caso Heywood).
+# Figura: resultados/figuras_informe/fig06_paralelo_af.png
+# Requiere haber corrido antes R/00_datos.R. Ejecutar desde la carpeta principal del proyecto.
+# (El diagnóstico comparativo de estimadores está aparte, en R/aux_diagnostico_af.R.)
 library(psych)
 set.seed(42)
 conjuntos <- readRDS("resultados/conjuntos_congelados.rds")
@@ -13,7 +18,7 @@ stopifnot(det(R) > .00001, kmo$MSA >= .6, min(kmo$MSAi) >= .5, bartlett$p.value 
 # El análisis paralelo compara los autovalores observados con datos aleatorios.
 # OJO: fa.parallel devuelve en fa.sim / pc.sim el PROMEDIO de las 100 simulaciones (el argumento quant
 # solo afecta a un objeto interno que no se exporta). Por eso la figura 6 rotula "promedio" y no "percentil 95".
-# El gráfico se arma en 07_figuras.R a partir de af_paralelo.csv.
+# El gráfico (Figura 6) se arma al final de este script a partir de af_paralelo.csv.
 options(mc.cores = 1)
 paralelo <- suppressWarnings(fa.parallel(X_num, fa = "both", fm = "minres", n.iter = 100,
   plot = FALSE))  # los avisos son de réplicas con casos Heywood en datos al azar; no afectan al resultado
@@ -64,3 +69,17 @@ guardar(data.frame(id = conjuntos$id, af$scores), "af_puntajes")
 saveRDS(list(modelo = af, n_factores = n_factores, cargas = cargas, paralelo = paralelo), "resultados/af.rds")
 print(af$loadings, cutoff = .4)
 print(af$uniquenesses)
+
+# FIGURA DE LA ETAPA 2 (Figura 6 del informe).
+source("R/estilo_graficos.R", encoding = "UTF-8")   # fuente, paleta, tema y guardar_fig()
+
+# Figura 6. Análisis paralelo de factores.
+par_af <- leer_tabla("af_paralelo")[1:8, ]
+pa <- rbind(data.frame(dimension = par_af$dimension, valor = par_af$factor_observado, serie = "Datos observados"),
+  data.frame(dimension = par_af$dimension, valor = par_af$factor_simulado, serie = "Datos al azar (promedio de 100 simulaciones)"))
+pa$serie <- factor(pa$serie, levels = c("Datos observados", "Datos al azar (promedio de 100 simulaciones)"))
+f6 <- ggplot(pa, aes(dimension, valor, colour = serie)) + geom_line(linewidth = .6) + geom_point(size = 2) +
+  scale_colour_manual(values = c("Datos observados" = azul, "Datos al azar (promedio de 100 simulaciones)" = naranja)) +
+  scale_x_continuous(breaks = 1:8) + labs(x = "Factor", y = "Autovalor")
+guardar_fig(f6, "fig06_paralelo_af", 6.5)
+cat("Etapa 2: Figura 6 guardada en resultados/figuras_informe/\n")
