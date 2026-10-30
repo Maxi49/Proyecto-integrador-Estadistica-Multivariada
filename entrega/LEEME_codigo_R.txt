@@ -1,0 +1,24 @@
+PROYECTO INTEGRADOR - ESTADISTICA MULTIVARIADA (UCC) - BASE UNSW-NB15
+Autores: Maximiliano Gimenez, Lisandro Monti, Ignacio Marinelli, Mateo Camelino
+Docente: Prof. Silvana Malpassi
+
+CONTENIDO DE ESTA CARPETA
+  Proyecto_Integrador_UNSW-NB15.R                 script unico (Etapas 0 a 4 e integracion)
+  muestra_estratificada-simulado-de-ataques.xlsx  base de datos (debe estar en la MISMA carpeta que el .R)
+  salida_de_referencia.txt                        salida de consola de una corrida limpia, para comparar
+
+COMO EJECUTARLO
+  En RStudio: abrir el .R (File > Reopen with Encoding > UTF-8 si se ven mal las tildes) y apretar "Source".
+              O bien en la consola de R:  source("Proyecto_Integrador_UNSW-NB15.R", encoding = "UTF-8")
+              (si no encuentra el Excel, fijar antes la carpeta con Session > Set Working Directory > To Source File Location).
+  Por consola: Rscript Proyecto_Integrador_UNSW-NB15.R
+  La primera vez instala los paquetes que falten (necesita internet).
+
+QUE GENERA
+  - En la consola: las salidas del informe, cada una con un encabezado "== Tabla N del informe: ... ==".
+  - salidas/figuras/figura01_etapa0_boxplots.png ... figura11_etapa4_mapa_acm.png (las 11 figuras del informe).
+  - salidas/tablas/*.csv (las tablas principales).
+  Cada seccion del script esta marcada ("ETAPA 0 ... ETAPA 6") y aparece en el menu de secciones de RStudio.
+
+TIEMPO: unos 20-60 segundos (mas la instalacion de paquetes la primera vez).
+Semilla fija (42): las cifras y las figuras son siempre las mismas.
