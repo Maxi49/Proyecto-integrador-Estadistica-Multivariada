@@ -4,9 +4,14 @@ library(ggplot2)
 library(ggrepel)
 library(patchwork)
 set.seed(42)
+# Carlito es la fuente del informe (métrica de Calibri); si no está instalada se usa la sans por defecto.
+familia <- if ("Carlito" %in% systemfonts::system_fonts()$family) "Carlito" else "sans"
 base <- readRDS("resultados/base_con_clusters.rds")
 conjuntos <- readRDS("resultados/conjuntos_congelados.rds")
 X_num <- conjuntos$X_num
+# Los nombres G1 a G4 de las figuras 9 y 11 se asignan por posición: si cambia la numeración de k-means
+# (semilla, versión de R) hay que revisarlos. Tamaños esperados: Tabla 7 del informe.
+stopifnot(identical(as.integer(table(base$cluster)), c(1220L, 2444L, 1121L, 215L)))
 acp <- readRDS("resultados/acp.rds")
 clustering <- readRDS("resultados/clustering.rds")
 tabla <- function(nombre) read.csv(paste0("resultados/tablas/", nombre, ".csv"), fileEncoding = "UTF-8")
@@ -17,7 +22,7 @@ guardar_fig <- function(grafico, nombre, alto = 9) ggsave(paste0("resultados/fig
 # Paleta: tinta en grises, azul y naranja para identidad, divergente azul-gris-rojo.
 tinta <- "#0b0b0b"; tinta_2 <- "#52514e"; grilla <- "#e4e3df"; neutro <- "#f0efec"
 azul <- "#2a78d6"; naranja <- "#eb6834"; rojo <- "#e34948"; gris_puntos <- "#c3c2b7"
-tema <- theme_minimal(base_size = 9, base_family = "Carlito") +
+tema <- theme_minimal(base_size = 9, base_family = familia) +
   theme(panel.grid.minor = element_blank(), panel.grid.major = element_line(colour = grilla, linewidth = .3),
     axis.text = element_text(colour = tinta_2), axis.title = element_text(colour = tinta_2),
     plot.title = element_text(colour = tinta, face = "bold", size = 10),
@@ -87,7 +92,7 @@ cr$Var1 <- factor(cr$Var1, levels = orden, labels = etiquetas[orden])
 cr$Var2 <- factor(cr$Var2, levels = rev(orden), labels = rev(etiquetas[orden]))
 f3 <- ggplot(cr, aes(Var1, Var2, fill = Freq)) + geom_tile(colour = "white", linewidth = .6) +
   geom_text(aes(label = formatC(Freq, format = "f", digits = 2, decimal.mark = ",")),
-    family = "Carlito", size = 2.2, colour = tinta) +
+    family = familia, size = 2.2, colour = tinta) +
   scale_fill_gradient2(low = azul, mid = neutro, high = rojo, midpoint = 0, limits = c(-1, 1), name = "r") +
   labs(x = NULL, y = NULL) + theme(axis.text.x = element_text(angle = 40, hjust = 1), panel.grid = element_blank(),
     legend.position = "right", legend.title = element_text(colour = tinta_2))
@@ -98,46 +103,63 @@ av <- tabla("acp_autovalores")
 f4 <- ggplot(av, aes(componente, autovalor)) + geom_hline(yintercept = 1, colour = tinta_2, linetype = "dashed", linewidth = .3) +
   geom_line(colour = azul, linewidth = .6) + geom_point(colour = azul, size = 2) +
   geom_point(data = av[1:3, ], colour = azul, size = 3.2) +
-  annotate("text", x = 11.8, y = 1.18, label = "Kaiser: autovalor = 1", hjust = 1, family = "Carlito", size = 2.8, colour = tinta_2) +
+  annotate("text", x = 11.8, y = 1.18, label = "Kaiser: autovalor = 1", hjust = 1, family = familia, size = 2.8, colour = tinta_2) +
   scale_x_continuous(breaks = 1:12) + labs(x = "Componente", y = "Autovalor")
 guardar_fig(f4, "fig04_codo_acp", 6.5)
 
-# Figura 5. Biplot CP1-CP2: flujos de fondo muy tenues, flechas de variables con nombre en la punta
-# y el centro de cada tipo de tráfico. Se recorta la vista a la zona central.
+# Figura 5. Biplot CP1-CP2: flujos coloreados por tipo de tráfico (todos los puntos, sin recorte),
+# flechas de variables, centro (media) de cada tipo y los tres flujos extremos del texto rotulados.
+# Las flechas son la correlación de cada variable con la componente multiplicada por `escala`
+# (los puntos están en puntajes sin reescalar); el factor se declara al pie de la figura.
 pt <- data.frame(acp$puntajes[, 1:2]); names(pt) <- c("CP1", "CP2"); pt$tipo <- base$tipo_trafico
 centros <- aggregate(cbind(CP1, CP2) ~ tipo, pt, mean)
 carg <- tabla("acp_correlaciones"); carg$etq <- sub(" \\(.*", "", etiquetas[sub("^log_", "", carg$variable)])
 escala <- 4.5
 carg$x <- escala * carg$PC1; carg$y <- escala * carg$PC2
-extremos <- pt[match(c(127446, 97189, 44648), base$id), ]
-extremos$etq <- paste("Flujo", c(127446, 97189, 44648))
+# Las etiquetas van junto a la punta, del lado hacia donde apunta la flecha, y se separan en vertical.
+carg$lado <- ifelse(carg$x < 0, "izq", "der")
+# Los tres flujos que describe el texto: el de menor CP1, el de mayor CP2 y el de menor CP2 (se buscan en
+# los puntajes en vez de escribir los id a mano; salen 127446, 97189 y 44648).
+i_ext <- c(which.min(pt$CP1), which.max(pt$CP2), which.min(pt$CP2))
+extremos <- pt[i_ext, ]
+extremos$etq <- paste("Flujo", base$id[i_ext])
 colores_tipo <- c(Normal = azul, Exploits = naranja, Fuzzers = "#3a9a5b", Reconnaissance = "#8b5cc7",
   "Otros ataques" = rojo)
+# Rango con margen para que entren todos los puntos (incluidos los extremos) y sus rótulos.
+xlim5 <- range(c(pt$CP1, carg$x)) + c(-1.2, 2.2); ylim5 <- range(c(pt$CP2, carg$y)) + c(-.5, .6)
 f5 <- ggplot(pt, aes(CP1, CP2)) + geom_hline(yintercept = 0, colour = grilla) + geom_vline(xintercept = 0, colour = grilla) +
   geom_point(aes(colour = tipo), size = .35, alpha = .25) +
   geom_segment(data = carg, aes(x = 0, y = 0, xend = x, yend = y), colour = tinta,
     linewidth = .4, arrow = arrow(length = unit(1.3, "mm"))) +
-  geom_text_repel(data = carg, aes(x, y, label = etq), family = "Carlito", size = 2.4, colour = tinta,
-    box.padding = .15, min.segment.length = 0, segment.colour = tinta_2, segment.size = .2,
-    max.overlaps = 30, seed = 42, bg.colour = "white", bg.r = .12) +
+  geom_text_repel(data = carg[carg$lado == "izq", ], aes(x, y, label = etq), family = familia, size = 2.5,
+    colour = tinta, hjust = 1, nudge_x = -.35, direction = "y", box.padding = .1, min.segment.length = Inf,
+    seed = 42, bg.colour = "white", bg.r = .12) +
+  geom_text_repel(data = carg[carg$lado == "der", ], aes(x, y, label = etq), family = familia, size = 2.5,
+    colour = tinta, hjust = 0, nudge_x = .35, direction = "y", box.padding = .1, min.segment.length = Inf,
+    seed = 42, bg.colour = "white", bg.r = .12) +
   geom_point(data = centros, aes(fill = tipo), shape = 21, colour = tinta, size = 3.4, stroke = .5) +
   geom_point(data = extremos, shape = 21, colour = tinta, fill = NA, size = 3.6, stroke = .7) +
-  geom_text_repel(data = extremos, aes(label = etq), family = "Carlito", size = 2.7, fontface = "bold",
+  geom_text_repel(data = extremos, aes(label = etq), family = familia, size = 2.7, fontface = "bold",
     colour = tinta, box.padding = .5, seed = 42) +
   scale_colour_manual(values = colores_tipo, guide = guide_legend(override.aes = list(size = 2.5, alpha = 1))) +
   scale_fill_manual(values = colores_tipo, guide = "none") +
-  coord_equal() +
+  scale_x_continuous(labels = function(x) format(x, decimal.mark = ",")) +
+  scale_y_continuous(labels = function(x) format(x, decimal.mark = ",")) +
+  coord_equal(xlim = xlim5, ylim = ylim5) +
   labs(x = "CP1 (43,3 %): conexiones repetidas ← → conversaciones largas y cargadas",
-    y = "CP2 (16,9 %): más actividad ↑")
+    y = "CP2 (16,9 %): más actividad ↑",
+    caption = paste0("Puntos: flujos (n = 5.000), sin recorte. Círculos grandes: media de cada tipo de tráfico. ",
+      "Flechas: correlación de la variable con la CP × ", format(escala, decimal.mark = ","), "."))
+f5 <- f5 + theme(plot.caption = element_text(colour = tinta_2, size = 7, hjust = 0))
 guardar_fig(f5, "fig05_biplot", 11.5)
 
 # Figura 6. Análisis paralelo de factores.
 par_af <- tabla("af_paralelo")[1:8, ]
 pa <- rbind(data.frame(dimension = par_af$dimension, valor = par_af$factor_observado, serie = "Datos observados"),
-  data.frame(dimension = par_af$dimension, valor = par_af$factor_simulado, serie = "Datos al azar (percentil 95)"))
-pa$serie <- factor(pa$serie, levels = c("Datos observados", "Datos al azar (percentil 95)"))
+  data.frame(dimension = par_af$dimension, valor = par_af$factor_simulado, serie = "Datos al azar (promedio de 100 simulaciones)"))
+pa$serie <- factor(pa$serie, levels = c("Datos observados", "Datos al azar (promedio de 100 simulaciones)"))
 f6 <- ggplot(pa, aes(dimension, valor, colour = serie)) + geom_line(linewidth = .6) + geom_point(size = 2) +
-  scale_colour_manual(values = c("Datos observados" = azul, "Datos al azar (percentil 95)" = naranja)) +
+  scale_colour_manual(values = c("Datos observados" = azul, "Datos al azar (promedio de 100 simulaciones)" = naranja)) +
   scale_x_continuous(breaks = 1:8) + labs(x = "Factor", y = "Autovalor")
 guardar_fig(f6, "fig06_paralelo_af", 6.5)
 
@@ -157,7 +179,7 @@ guardar_fig(p_wss + p_sil, "fig07_eleccion_k", 7)
 # Figura 8. Dendrograma de variables (Ward), coloreado por bloque.
 hv <- clustering$jerarquico_variables
 hv$labels <- sub(" \\(.*", "", etiquetas[sub("^log_", "", hv$labels)])
-png("resultados/figuras_informe/fig08_dendrograma_variables.png", width = 16, height = 8, units = "cm", res = 300, family = "Carlito")
+png("resultados/figuras_informe/fig08_dendrograma_variables.png", width = 16, height = 8, units = "cm", res = 300, family = familia)
 par(mar = c(1, 4.5, .5, .5), cex = .7, col.axis = tinta_2, fg = tinta_2)
 plot(hv, hang = -1, main = "", xlab = "", sub = "", ylab = "Altura (Ward)", col = tinta_2, lwd = .8)
 rect.hclust(hv, k = 3, border = c(azul, naranja, "#1baf7a"))
@@ -171,7 +193,7 @@ mh <- data.frame(grupo = rep(nombres_g, times = 12), variable = rep(sub("^log_",
 mh$variable <- factor(mh$variable, levels = orden, labels = etiquetas[orden])
 mh$grupo <- factor(mh$grupo, levels = rev(nombres_g))
 f9 <- ggplot(mh, aes(variable, grupo, fill = pmax(pmin(z, 2.5), -2.5))) + geom_tile(colour = "white", linewidth = .6) +
-  geom_text(aes(label = formatC(z, format = "f", digits = 1, decimal.mark = ",")), family = "Carlito", size = 2.4, colour = tinta) +
+  geom_text(aes(label = formatC(z, format = "f", digits = 1, decimal.mark = ",")), family = familia, size = 2.4, colour = tinta) +
   scale_fill_gradient2(low = azul, mid = neutro, high = rojo, midpoint = 0, limits = c(-2.5, 2.5),
     name = "Desvíos respecto\ndel promedio") +
   labs(x = NULL, y = NULL) + theme(axis.text.x = element_text(angle = 40, hjust = 1), panel.grid = element_blank(),
@@ -185,7 +207,7 @@ col$categoria <- c(CON_otros = "CON y otros", FIN = "FIN (cerrada)", INT = "INT 
 acs <- rbind(fil, col)
 inercia <- tabla("acs_inercia")$porcentaje
 f10 <- ggplot(acs, aes(Dim1, Dim2, colour = rol)) + geom_hline(yintercept = 0, colour = grilla) + geom_vline(xintercept = 0, colour = grilla) +
-  geom_point(aes(shape = rol), size = 2.6) + geom_text_repel(aes(label = categoria), family = "Carlito", size = 2.9,
+  geom_point(aes(shape = rol), size = 2.6) + geom_text_repel(aes(label = categoria), family = familia, size = 2.9,
     colour = tinta, box.padding = .4, show.legend = FALSE) +
   scale_colour_manual(values = c("Tipo de tráfico" = azul, "Estado de la conexión" = naranja)) +
   scale_shape_manual(values = c("Tipo de tráfico" = 16, "Estado de la conexión" = 17)) +
@@ -214,17 +236,41 @@ su$categoria[su$rol == "Grupos del clustering"] <- c("G1 Cortos", "G2 Largos y l
 su$rol[su$rol == "Grupos del clustering"] <- "Grupos del clustering (suplementaria)"
 mapa <- rbind(ca_, su)
 mapa$rol <- factor(mapa$rol, levels = c("Categorías activas", "Tipo de tráfico (suplementaria)", "Grupos del clustering (suplementaria)"))
-aut <- tabla("acm_autovalores")$porcentaje_ajustado
-f11 <- ggplot(mapa, aes(Dim.1, Dim.2, colour = rol, shape = rol)) + geom_hline(yintercept = 0, colour = grilla) +
-  geom_vline(xintercept = 0, colour = grilla) + geom_point(size = 2.2) +
-  geom_text_repel(aes(label = categoria), family = "Carlito", size = 2.6, show.legend = FALSE, max.overlaps = 30,
-    box.padding = .35, min.segment.length = .2) +
-  scale_colour_manual(values = c("Categorías activas" = tinta_2, "Tipo de tráfico (suplementaria)" = azul,
-    "Grupos del clustering (suplementaria)" = naranja)) +
-  scale_shape_manual(values = c(1, 16, 17)) +
-  coord_equal() +  # misma escala en los dos ejes: las distancias del mapa no se deforman
-  theme(legend.position = "right") + guides(colour = guide_legend(ncol = 1)) +
-  labs(x = paste0("Dim 1 (", format(round(aut[1], 1), decimal.mark = ","), " %): completa ← → a medias"),
-    y = paste0("Dim 2 (", format(round(aut[2], 1), decimal.mark = ","), " %)"))
-guardar_fig(f11, "fig11_mapa_acm", 14)
+aut <- tabla("acm_autovalores")
+# Las coordenadas son las principales del ACM estándar (matriz indicadora). Los porcentajes de los
+# ejes son la inercia ajustada de Greenacre, que es la que cita el texto; se declaran junto a la cruda
+# (34,9 % y 16,6 %) porque el plano crudo solo explica 51,6 %.
+pct <- function(x) format(round(x, 1), decimal.mark = ",")
+# Dos paneles con la misma escala en ambos ejes (coord_equal): mapa completo y ampliación de la zona
+# donde se aglomeran las categorías, para que las etiquetas no se superpongan.
+zoom <- list(x = c(-.85, .45), y = c(-.6, .8))
+en_zoom <- mapa$Dim.1 > zoom$x[1] & mapa$Dim.1 < zoom$x[2] & mapa$Dim.2 > zoom$y[1] & mapa$Dim.2 < zoom$y[2]
+base_mapa <- function(d, lim = NULL, tam = 2.5) {
+  ggplot(d, aes(Dim.1, Dim.2, colour = rol, shape = rol)) + geom_hline(yintercept = 0, colour = grilla) +
+    geom_vline(xintercept = 0, colour = grilla) + geom_point(size = 2) +
+    geom_text_repel(aes(label = categoria), family = familia, size = tam, show.legend = FALSE, max.overlaps = Inf,
+      box.padding = .6, point.padding = .3, min.segment.length = .1, segment.size = .2, force = 8, max.time = 3, seed = 42,
+      nudge_x = ifelse(d$categoria == "Otros ataques", .25, 0)) +  # único empuje a mano: el rótulo tocaba el recuadro
+    scale_colour_manual(values = c("Categorías activas" = tinta_2, "Tipo de tráfico (suplementaria)" = azul,
+      "Grupos del clustering (suplementaria)" = naranja), drop = FALSE) +
+    scale_shape_manual(values = c(1, 16, 17), drop = FALSE) +
+    scale_x_continuous(labels = function(x) format(x, decimal.mark = ",")) +
+    scale_y_continuous(labels = function(x) format(x, decimal.mark = ",")) +
+    coord_equal(xlim = lim$x, ylim = lim$y)  # misma escala en los dos ejes: las distancias no se deforman
+}
+p_total <- base_mapa(mapa[!en_zoom, ]) +
+  annotate("rect", xmin = zoom$x[1], xmax = zoom$x[2], ymin = zoom$y[1], ymax = zoom$y[2], fill = NA,
+    colour = tinta_2, linetype = "dashed", linewidth = .3) +
+  annotate("text", x = zoom$x[1], y = zoom$y[2] + .12, label = "ampliada a la derecha", hjust = 0,
+    family = familia, size = 2.3, colour = tinta_2) +
+  labs(title = "Mapa completo", x = NULL, y = paste0("Dim 2 (", pct(aut$porcentaje_ajustado[2]), " % ajustada; ",
+    pct(aut$porcentaje_crudo[2]), " % cruda)"))
+p_zoom <- base_mapa(mapa[en_zoom, ], zoom) +
+  labs(title = "Ampliación de la zona central", x = NULL, y = NULL)
+f11 <- (p_total + p_zoom) + plot_layout(guides = "collect", widths = c(1, 1.1)) &
+  theme(legend.position = "bottom", legend.text = element_text(size = 8), plot.title = element_text(size = 9))
+f11 <- f11 + plot_annotation(caption = paste0("Dim 1 (", pct(aut$porcentaje_ajustado[1]), " % de la inercia ajustada; ",
+  pct(aut$porcentaje_crudo[1]), " % de la cruda): completa ← → a medias. Porcentajes ajustados según Greenacre."),
+  theme = theme(plot.caption = element_text(colour = tinta_2, size = 8, hjust = .5)))
+guardar_fig(f11, "fig11_mapa_acm", 12)
 cat("Figuras guardadas en resultados/figuras_informe/\n")
