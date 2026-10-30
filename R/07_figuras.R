@@ -220,7 +220,7 @@ guardar_fig(f10, "fig10_mapa_acs", 8)
 # Figura 11. Mapa del ACM: categorías activas en gris, suplementarias en color.
 ca_ <- tabla("acm_categorias_coordenadas")[, c("categoria", "Dim.1", "Dim.2")]
 ca_$categoria <- c("proto_g:otros" = "protocolo otros", "proto_g:tcp" = "TCP", "proto_g:udp" = "UDP",
-  "service_g:dns" = "dns", "service_g:http" = "http", "service_g:ninguno" = "sin servicio",
+  "service_g:dns" = "dns", "service_g:http" = "http", "service_g:ninguno" = "servicio ninguno",
   "service_g:otros" = "servicio otros", "state_g:CON_otros" = "CON y otros", "state_g:FIN" = "FIN",
   "state_g:INT" = "INT", "respuesta_destino:con_respuesta" = "con respuesta",
   "respuesta_destino:sin_respuesta" = "sin respuesta", "duracion_banda:corta" = "duración corta",
