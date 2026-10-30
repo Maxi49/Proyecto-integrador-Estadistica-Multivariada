@@ -11,10 +11,12 @@ bartlett <- cortest.bartlett(R, n = nrow(X_num))
 stopifnot(det(R) > .00001, kmo$MSA >= .6, min(kmo$MSAi) >= .5, bartlett$p.value < .05)
 
 # El análisis paralelo compara los autovalores observados con datos aleatorios.
-# No se dibuja en R: los resultados se exportan para Matplotlib.
+# OJO: fa.parallel devuelve en fa.sim / pc.sim el PROMEDIO de las 100 simulaciones (el argumento quant
+# solo afecta a un objeto interno que no se exporta). Por eso la figura 6 rotula "promedio" y no "percentil 95".
+# El gráfico se arma en 07_figuras.R a partir de af_paralelo.csv.
 options(mc.cores = 1)
-paralelo <- fa.parallel(X_num, fa = "both", fm = "minres", n.iter = 100,
-  quant = .95, plot = FALSE)
+paralelo <- suppressWarnings(fa.parallel(X_num, fa = "both", fm = "minres", n.iter = 100,
+  plot = FALSE))  # los avisos son de réplicas con casos Heywood en datos al azar; no afectan al resultado
 guardar(data.frame(dimension = seq_along(paralelo$fa.values),
   factor_observado = paralelo$fa.values, factor_simulado = paralelo$fa.sim,
   componente_observado = paralelo$pc.values, componente_simulado = paralelo$pc.sim), "af_paralelo")
@@ -23,7 +25,8 @@ guardar(data.frame(dimension = seq_along(paralelo$fa.values),
 # y solo parte en dos el bloque de repetición. Kaiser y el paralelo de componentes indican 3.
 # Se retienen 3 factores por simplicidad e interpretabilidad (decisión del grupo, 27/10).
 n_factores <- 3
-minres <- fa(X_num, nfactors = n_factores, fm = "minres", rotate = "varimax", scores = "regression")
+# Solo diagnóstico: se espera una unicidad negativa (ultra-Heywood), por eso se silencian sus avisos.
+minres <- suppressWarnings(fa(X_num, nfactors = n_factores, fm = "minres", rotate = "varimax", scores = "none"))
 guardar(data.frame(metodo = "minres", n_factores = n_factores,
   comunalidad_max = max(minres$communality), unicidad_min = min(minres$uniquenesses),
   heywood = any(minres$uniquenesses < 0)), "af_diagnostico_minres")
@@ -47,7 +50,12 @@ guardar(data.frame(factor = colnames(cargas), suma_cargas2 = colSums(cargas^2),
   porcentaje_comun = 100 * colSums(cargas^2) / sum(cargas^2)), "af_varianza")
 residuos <- R - tcrossprod(cargas)
 rmsr <- sqrt(mean(residuos[lower.tri(residuos)]^2))
-guardar(data.frame(n_factores = n_factores, rmsr = rmsr,
+# RMSEA y TLI no dependen del n del mismo modo que el chi cuadrado y completan la evaluación del ajuste.
+n <- nrow(X_num); p <- ncol(X_num)
+chi2_nulo <- -(n - 1 - (2 * p + 5) / 6) * log(det(R)); gl_nulo <- p * (p - 1) / 2
+rmsea <- sqrt(max(unname(af$STATISTIC) - af$dof, 0) / (af$dof * (n - 1)))
+tli <- (chi2_nulo / gl_nulo - unname(af$STATISTIC) / af$dof) / (chi2_nulo / gl_nulo - 1)
+guardar(data.frame(n_factores = n_factores, rmsr = rmsr, rmsea = rmsea, tli = tli,
   chi2 = unname(af$STATISTIC), gl = af$dof, p_modelo = af$PVAL,
   comunalidad_min = min(1 - af$uniquenesses), unicidad_min = min(af$uniquenesses),
   unicidades_limite = sum(af$uniquenesses <= .00501),

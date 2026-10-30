@@ -8,7 +8,8 @@ X_cat <- conjuntos$X_cat
 guardar <- function(x, nombre) write.csv(x, paste0("resultados/tablas/", nombre, ".csv"),
   row.names = FALSE, fileEncoding = "UTF-8")
 
-# Las siete variables activas ya incluyen tres numéricas discretizadas en Etapa 0.
+# Seis variables activas: proto_g, service_g, state_g, respuesta_destino (dpkts = 0) y dos numéricas
+# discretizadas en terciles en la Etapa 0 (duracion_banda, bytes_origen_banda). tipo_trafico es suplementaria.
 # Sus modalidades superan 5%; no se fusionan categorías adicionales.
 frecuencias <- read.csv("resultados/tablas/frecuencias_X_cat.csv")
 stopifnot(all(frecuencias$porcentaje >= 5), all(sapply(X_cat, is.factor)))
