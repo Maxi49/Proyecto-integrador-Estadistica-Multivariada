@@ -2,9 +2,10 @@ EJECUTAR DESDE LA CARPETA PRINCIPAL DEL REPOSITORIO
 
 1. Una sola vez, en R:
 install.packages(c("readxl", "psych", "GPArotation", "cluster", "ca", "FactoMineR",
-                   "MASS", "pROC", "writexl"))
+                   "MASS", "pROC", "writexl", "ggplot2", "ggrepel", "patchwork", "systemfonts"))
+   Las figuras del informe usan la fuente Carlito (si no está instalada, R usa la fuente sans por defecto).
 
-2. Ejecutar todos los análisis en R (Etapas 0 a 4, integración y regresión logística):
+2. Ejecutar todos los análisis en R (Etapas 0 a 4, integración y regresión logística; cada etapa genera sus figuras):
 source("R/ejecutar_todo.R", encoding = "UTF-8")
    Desde una terminal: Rscript R/ejecutar_todo.R
    (en Linux/macOS, si aparece "invalid input found", ejecutar con LANG=C.UTF-8)
@@ -27,9 +28,19 @@ Notas
 - R/00_datos.R conserva el estilo del script Consultar Diccionario de Variables.R.
 - La hoja muestra y n_atipicos originales no se modifican. Los clusters se guardan
   en otra base: resultados/base_con_clusters.rds.
-- El AF usa 3 factores con GLS y varimax. Minres, pa y ML producen un caso Heywood (log_spkts);
-  se informa en resultados/tablas/af_diagnostico_minres.csv y se explica en docs/validacion_decisiones.md.
+- El AF usa 3 factores por máxima verosimilitud (factanal) con varimax y unicidad mínima 0,005.
+  Minres produce una unicidad negativa en log_spkts (caso Heywood) y ML la deja en el límite 0,005; el
+  diagnóstico de minres queda en resultados/tablas/af_diagnostico_minres.csv.
   El diagnóstico completo se corre aparte: Rscript R/aux_diagnostico_af.R
+- Las figuras que usa el informe las genera cada etapa, al final de su script, con el estilo común de
+  R/estilo_graficos.R (resultados/figuras_informe/, 16 cm de ancho, 300 ppp, coma decimal):
+  Etapa 0 (00_datos.R): Figuras 1 a 3 | Etapa 1 (01_acp.R): Figuras 4 y 5 | Etapa 2 (02_af.R): Figura 6 |
+  Etapa 3 (03_cluster.R): Figuras 7 a 9 | Etapa 4 (04_acm.R): Figuras 10 y 11.
+  Para correr una sola etapa hay que haber corrido antes las que la preceden (cada una lee los .rds de resultados/).
+  Alternativa: el archivo único Proyecto_Integrador_UNSW-NB15.R reúne todo (sin la logística) y solo necesita el Excel. Las de python/ (resultados/figuras/) son complementarias para el informe en LaTeX
+  de la carpeta informe/.
+- Decisiones finales: k-means con k = 4 (nstart = 25, semilla 42) y Ward.D2 como contraste; ACM con 6 variables
+  activas y tipo_trafico, label y cluster suplementarios; inercia ajustada de Greenacre.
 - La regresión logística usa una partición 70/30 estratificada por attack_cat (semilla 42).
   Los dos conjuntos quedan en resultados/muestra_particion_70_30.xlsx.
 - Documentación de decisiones en docs/ y contexto general en CONTEXTO_PROYECTO.md.

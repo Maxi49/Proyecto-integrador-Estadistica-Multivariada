@@ -1,0 +1,662 @@
+
+Attaching package: ‘GPArotation’
+
+The following objects are masked from ‘package:psych’:
+
+    equamax, varimin
+
+
+Attaching package: ‘ggplot2’
+
+The following objects are masked from ‘package:psych’:
+
+    %+%, alpha
+
+Proyecto Integrador UNSW-NB15 · Estadística Multivariada (UCC)
+Carpeta de trabajo: <carpeta donde está el script> 
+R4.3.3 | fuente de las figuras: Carlito
+
+== Dimensión de la base (flujos x columnas) y tipo de variable ==
+[1] 5000   68
+
+categórica   numérica 
+        21         47 
+
+== Calidad de los datos (controles; cantidad = casos que no cumplen) ==
+                                             control cantidad
+1                                         Valores NA        0
+2                                      Textos vacíos        0
+3                                   Filas duplicadas        0
+4                                       ID repetidos        0
+5              Perfiles originales duplicados sin id        0
+6                                   Celdas negativas        0
+7                           Celdas no finitas sin NA        0
+8                                 Conteos no enteros        0
+9                               TTL fuera de 0 a 255        0
+10                    Ventana TCP fuera de 0 a 65535        0
+11         dur = 0 con spkts > 1 (revisar precisión)        0
+12                                    sbytes < spkts        0
+13 Indicadores usa_http/is_sm_ips_ports fuera de 0/1        0
+14                         is_ftp_login fuera de 0/1        1
+15                      label fuera de normal/ataque        0
+16                 label y attack_cat inconsistentes        0
+
+Flujo con código FTP fuera de 0/1 (se conserva):
+     id is_ftp_login ct_ftp_cmd
+1 97597            4          4
+
+== Atípicos por variable (límites de Tukey sobre log(x + 1)) ==
+             variable q1_tukey q3_tukey limite_inferior limite_superior n_atipicos
+              log_dur  0.00164   0.6794         -1.0150           1.696        189
+            log_spkts  1.09861   3.1355         -1.9567           6.191         19
+           log_sbytes  6.22456   7.8156          3.8380          10.202        256
+           log_dbytes  5.18739   7.9987          0.9705          12.216       1056
+           log_sinpkt  0.21224   4.3170         -5.9449          10.474         33
+             log_sjit  0.00000   8.3449        -12.5174          20.862          0
+           log_synack  0.00000   0.0611         -0.0917           0.153         44
+       log_ct_srv_src  0.69315   1.9459         -1.1860           3.825         10
+       log_ct_srv_dst  0.69315   1.9459         -1.1860           3.825         10
+       log_ct_src_ltm  0.69315   1.6094         -0.6813           2.984        127
+ log_ct_src_dport_ltm  0.69315   0.8959          0.3890           1.200        581
+ log_ct_dst_sport_ltm  0.69315   0.6931          0.6931           0.693        466
+
+Flujos con al menos un atípico en las 12 variables: 1715 (34.3 % de 5000)
+
+== Tabla 1 del informe: variables numéricas del análisis (12 log_) ==
+             variable   media  desvio minimo       q1   mediana      q3  maximo ceros
+              log_dur 0.44682 0.61962 0.0000 0.001637 0.2599918 0.67935  4.1108    26
+            log_spkts 2.49336 1.14166 0.6931 1.098612 2.3978953 3.13549  9.1713     0
+           log_sbytes 6.98776 1.61734 3.8501 6.224558 6.8232861 7.81480 16.3778     0
+           log_dbytes 5.98660 3.44185 0.0000 5.187386 5.8721178 7.99867 16.3350   945
+           log_sinpkt 2.53710 2.19141 0.0000 0.212407 3.0411152 4.31634 11.0021     4
+             log_sjit 5.21309 3.68934 0.0000 0.000000 7.0789436 8.34487 13.7476  1294
+           log_synack 0.03036 0.04235 0.0000 0.000000 0.0005878 0.06112  0.5485  1482
+       log_ct_srv_src 1.49628 0.72627 0.6931 0.693147 1.3862944 1.94591  4.1589     0
+       log_ct_srv_dst 1.43323 0.72439 0.6931 0.693147 1.3862944 1.94591  4.1431     0
+       log_ct_src_ltm 1.31022 0.63899 0.6931 0.693147 1.0986123 1.60944  3.9318     0
+ log_ct_src_dport_ltm 0.89653 0.46495 0.6931 0.693147 0.6931472 0.79451  3.9318     0
+ log_ct_dst_sport_ltm 0.77970 0.33512 0.6931 0.693147 0.6931472 0.69315  3.3673     0
+
+(Ceros: dbytes, synack y sjit tienen ceros estructurales; ver columna 'ceros'.)
+
+== Composición de la muestra: tipo de tráfico y etiqueta ==
+     variable      categoria frecuencia porcentaje
+        label         ataque       2592      51.84
+        label         normal       2408      48.16
+ tipo_trafico       Exploits        921      18.42
+ tipo_trafico        Fuzzers        749      14.98
+ tipo_trafico         Normal       2408      48.16
+ tipo_trafico  Otros ataques        573      11.46
+ tipo_trafico Reconnaissance        349       6.98
+
+== Tabla 2 del informe: correlación de cada variable con ser ataque ==
+             variable       r         p
+           log_dbytes -0.3319 7.85e-129
+       log_ct_srv_dst -0.2621  2.59e-79
+       log_ct_srv_src -0.2329  1.50e-62
+       log_ct_src_ltm -0.2039  4.52e-48
+            log_spkts -0.1658  3.85e-32
+           log_sbytes -0.0660  2.99e-06
+ log_ct_src_dport_ltm  0.0811  9.44e-09
+             log_sjit  0.1846  1.50e-39
+              log_dur  0.2012  7.93e-47
+ log_ct_dst_sport_ltm  0.2215  1.29e-56
+           log_sinpkt  0.2347  1.56e-63
+           log_synack  0.3268 9.79e-125
+
+== Supuestos (texto de la Etapa 0): determinante, KMO, Bartlett ==
+Determinante de la matriz de correlaciones: 0.000063 (= 6.302e-05)
+KMO global: 0.748 | MSA mínima: 0.621 (log_spkts)
+Bartlett: chi2 = 48303.5, gl = 66, p = < 0,001
+
+== MSA por variable ==
+             log_dur            log_spkts           log_sbytes           log_dbytes           log_sinpkt             log_sjit           log_synack 
+               0.786                0.621                0.665                0.675                0.729                0.775                0.875 
+      log_ct_srv_src       log_ct_srv_dst       log_ct_src_ltm log_ct_src_dport_ltm log_ct_dst_sport_ltm 
+               0.769                0.800                0.879                0.796                0.764 
+
+== Tabla 9 del informe: variables categóricas y categorías finales ==
+           variable      categoria frecuencia porcentaje
+       tipo_trafico       Exploits        921      18.42
+       tipo_trafico        Fuzzers        749      14.98
+       tipo_trafico         Normal       2408      48.16
+       tipo_trafico  Otros ataques        573      11.46
+       tipo_trafico Reconnaissance        349       6.98
+            proto_g          otros        363       7.26
+            proto_g            tcp       3541      70.82
+            proto_g            udp       1096      21.92
+          service_g            dns        516      10.32
+          service_g           http        869      17.38
+          service_g        ninguno       3002      60.04
+          service_g          otros        613      12.26
+            state_g      CON_otros        620      12.40
+            state_g            FIN       3467      69.34
+            state_g            INT        913      18.26
+  respuesta_destino  con_respuesta       4055      81.10
+  respuesta_destino  sin_respuesta        945      18.90
+     duracion_banda          corta       1667      33.34
+     duracion_banda          media       1666      33.32
+     duracion_banda          larga       1667      33.34
+ bytes_origen_banda          bajos       1689      33.78
+ bytes_origen_banda         medios       1681      33.62
+ bytes_origen_banda          altos       1630      32.60
+
+Cortes en terciles: dur = 0.0185 y 0.7090 | sbytes = 564 y 1580
+
+Etapa 0 terminada: Figuras 1 a 3 guardadas.
+
+== Tabla 3 del informe: autovalores y varianza explicada (ACP) ==
+ componente autovalor porcentaje acumulado
+          1   5.19477    43.2897     43.29
+          2   2.02571    16.8809     60.17
+          3   1.72065    14.3387     74.51
+          4   0.75860     6.3217     80.83
+          5   0.60672     5.0560     85.89
+          6   0.52649     4.3874     90.27
+          7   0.42864     3.5720     93.85
+          8   0.26016     2.1680     96.01
+          9   0.19741     1.6451     97.66
+         10   0.14691     1.2243     98.88
+         11   0.07352     0.6126     99.50
+         12   0.06041     0.5034    100.00
+
+Sin estandarizar, la CP1 explicaría 66.4 % (con estandarizar: 43.3 %): por eso se estandariza.
+Componentes retenidas (autovalor > 1): 3 
+
+== Tabla 4 del informe: correlación de cada variable con las componentes ==
+                        PC1   PC2    PC3
+log_dur               0.639 0.267  0.403
+log_spkts             0.639 0.638 -0.350
+log_sbytes            0.597 0.564 -0.323
+log_dbytes            0.640 0.449 -0.385
+log_sinpkt            0.717 0.030  0.588
+log_sjit              0.824 0.234  0.365
+log_synack            0.544 0.004  0.581
+log_ct_srv_src       -0.682 0.507  0.079
+log_ct_srv_dst       -0.700 0.489  0.041
+log_ct_src_ltm       -0.564 0.452  0.002
+log_ct_src_dport_ltm -0.686 0.432  0.409
+log_ct_dst_sport_ltm -0.615 0.292  0.437
+
+== Contribuciones (%) de cada variable a las componentes ==
+                       PC1   PC2   PC3
+log_dur               7.87  3.52  9.44
+log_spkts             7.85 20.11  7.11
+log_sbytes            6.87 15.71  6.06
+log_dbytes            7.89  9.94  8.62
+log_sinpkt            9.89  0.04 20.12
+log_sjit             13.06  2.70  7.73
+log_synack            5.69  0.00 19.64
+log_ct_srv_src        8.96 12.71  0.37
+log_ct_srv_dst        9.44 11.79  0.10
+log_ct_src_ltm        6.13 10.07  0.00
+log_ct_src_dport_ltm  9.06  9.20  9.72
+log_ct_dst_sport_ltm  7.28  4.20 11.09
+
+== Tabla 4 del informe: cos2 (calidad de representación) ==
+                       PC1   PC2   PC3
+log_dur              0.409 0.071 0.162
+log_spkts            0.408 0.407 0.122
+log_sbytes           0.357 0.318 0.104
+log_dbytes           0.410 0.201 0.148
+log_sinpkt           0.514 0.001 0.346
+log_sjit             0.678 0.055 0.133
+log_synack           0.296 0.000 0.338
+log_ct_srv_src       0.466 0.258 0.006
+log_ct_srv_dst       0.490 0.239 0.002
+log_ct_src_ltm       0.319 0.204 0.000
+log_ct_src_dport_ltm 0.471 0.186 0.167
+log_ct_dst_sport_ltm 0.378 0.085 0.191
+
+cos2 acumulado en las componentes retenidas, por variable:
+             log_dur            log_spkts           log_sbytes           log_dbytes           log_sinpkt             log_sjit           log_synack 
+               0.642                0.938                0.779                0.760                0.861                0.866                0.634 
+      log_ct_srv_src       log_ct_srv_dst       log_ct_src_ltm log_ct_src_dport_ltm log_ct_dst_sport_ltm 
+               0.729                0.731                0.523                0.824                0.654 
+
+Etapa 1 terminada: Figuras 4 y 5 guardadas.
+Parallel analysis suggests that the number of factors =  4  and the number of components =  3 
+
+== Análisis paralelo (Figura 6 del informe): autovalores observados vs. datos al azar ==
+ dimension factor_observado factor_simulado componente_observado componente_simulado
+         1            4.606           0.288                5.195               1.080
+         2            1.398           0.066                2.026               1.061
+         3            1.106           0.051                1.721               1.046
+         4            0.127           0.036                0.759               1.030
+         5           -0.041           0.024                0.607               1.017
+         6           -0.138           0.013                0.526               1.005
+El análisis paralelo sugiere 4 factores; Kaiser y el paralelo de componentes indican 3.
+
+== Diagnóstico minres: ¿hay unicidades negativas (caso Heywood)? ==
+ metodo n_factores comunalidad_max unicidad_min heywood
+ minres          3        1.024515   -0.0245151    TRUE
+
+== Tabla 5 del informe: matriz de patrón (cargas >= 0,40), comunalidades (h2) y unicidades (u2) ==
+                       F1   F2   F3    h2    u2
+log_dur                NA 0.64   NA 0.546 0.454
+log_spkts              NA   NA 0.98 0.995 0.005
+log_sbytes             NA   NA 0.84 0.746 0.254
+log_dbytes             NA   NA 0.76 0.658 0.342
+log_sinpkt             NA 0.95   NA 0.968 0.032
+log_sjit               NA 0.81   NA 0.847 0.153
+log_synack             NA 0.61   NA 0.401 0.599
+log_ct_srv_src       0.88   NA   NA 0.820 0.180
+log_ct_srv_dst       0.87   NA   NA 0.814 0.186
+log_ct_src_ltm       0.51   NA   NA 0.322 0.678
+log_ct_src_dport_ltm 0.71   NA   NA 0.566 0.434
+log_ct_dst_sport_ltm 0.55   NA   NA 0.358 0.642
+
+== Cargas completas (sin ocultar) ==
+                         F1     F2     F3
+log_dur              -0.149  0.645  0.330
+log_spkts            -0.095  0.170  0.978
+log_sbytes           -0.136  0.130  0.843
+log_dbytes           -0.205  0.194  0.761
+log_sinpkt           -0.230  0.955  0.060
+log_sjit             -0.248  0.809  0.363
+log_synack           -0.164  0.611  0.035
+log_ct_srv_src        0.883 -0.197 -0.047
+log_ct_srv_dst        0.870 -0.235 -0.050
+log_ct_src_ltm        0.514 -0.237 -0.040
+log_ct_src_dport_ltm  0.714 -0.088 -0.219
+log_ct_dst_sport_ltm  0.546 -0.093 -0.227
+
+== Varianza explicada por cada factor (Tabla 6 del informe: comparación ACP-AF) ==
+ factor suma_cargas2 porcentaje_total porcentaje_comun
+     F1        2.841            23.68            35.32
+     F2        2.605            21.71            32.38
+     F3        2.597            21.64            32.29
+Varianza total explicada por los 3 factores (AF): 67.0 %
+Varianza acumulada de las 3 primeras componentes (ACP): 74.5 %
+
+== Ajuste del AF (texto de la Etapa 2): chi2, RMSR, RMSEA, TLI ==
+       n_factores              rmsr             rmsea               tli              chi2                gl          p_modelo   comunalidad_min 
+           3.0000            0.0593            0.2038            0.7158         6887.3644           33.0000            0.0000            0.3219 
+     unicidad_min unicidades_limite   cruces_ambiguos 
+           0.0050            1.0000            0.0000 
+
+== Diagnóstico de estimadores del AF (3 y 4 factores; minres, ml, pa, gls; varimax y oblimin) ==
+ n_factores metodo rotacion heywood comunalidad_max unicidad_min   rmsr   tli rmsea pct_var_acum sin_carga_040 cruces_dif_menor_020
+          3 minres  varimax    TRUE           1.025     -0.02452 0.0454 0.687 0.214         67.4             0                    0
+          3 minres  oblimin    TRUE           1.025     -0.02452 0.0454 0.687 0.214         67.4             0                    0
+          3     ml  varimax    TRUE           0.995      0.00497 0.0593 0.716 0.204         67.0             0                    0
+          3     ml  oblimin    TRUE           0.995      0.00497 0.0593 0.716 0.204         67.0             0                    0
+          3     pa  varimax    TRUE           1.095     -0.09509 0.0452 0.684 0.215         67.7             0                    0
+          3     pa  oblimin    TRUE           1.095     -0.09509 0.0452 0.684 0.215         67.7             0                    0
+          3    gls  varimax   FALSE           0.897      0.10325 0.0505 0.609 0.239         68.6             0                    0
+          3    gls  oblimin   FALSE           0.897      0.10325 0.0505 0.609 0.239         68.6             0                    0
+          4 minres  varimax    TRUE           1.029     -0.02938 0.0261 0.777 0.180         73.0             0                    0
+          4 minres  oblimin    TRUE           1.029     -0.02938 0.0261 0.777 0.180         73.0             0                    0
+          4     ml  varimax    TRUE           0.995      0.00497 0.0325 0.793 0.174         73.6             0                    0
+          4     ml  oblimin    TRUE           0.995      0.00497 0.0325 0.793 0.174         73.6             0                    0
+          4     pa  varimax    TRUE           1.133     -0.13254 0.0256 0.764 0.186         73.3             0                    0
+          4     pa  oblimin    TRUE           1.133     -0.13254 0.0256 0.764 0.186         73.3             0                    0
+          4    gls  varimax    TRUE           1.011     -0.01066 0.0277 0.778 0.180         73.6             0                    0
+          4    gls  oblimin    TRUE           1.011     -0.01066 0.0277 0.778 0.180         73.6             0                    0
+ bloques_H1_recuperados avisos
+                      3      2
+                      3      2
+                      3      0
+                      3      0
+                      3      2
+                      3      2
+                      3      0
+                      3      0
+                      2      2
+                      2      2
+                      2      0
+                      2      0
+                      2      2
+                      2      2
+                      2      2
+                      2      2
+
+Etapa 2 terminada: Figura 6 guardada.
+
+== Tabla C1 del informe: suma de cuadrados dentro de grupos y silhouette según k ==
+ k wss_ward wss_kmeans silhouette_ward silhouette_kmeans
+ 2    42571      41918          0.3192            0.3283
+ 3    35521      34422          0.3103            0.3018
+ 4    29735      27700          0.2730            0.3265
+ 5    26529      24654          0.3020            0.3290
+ 6    24290      22600          0.3179            0.3334
+ 7    22591      20742          0.2464            0.2772
+ 8    20934      19343          0.2566            0.2839
+
+== Tabla cruzada Ward (filas) vs k-means (columnas), k = 4 ==
+    Kmeans
+Ward    1    2    3    4
+   1 1193   17  169   62
+   2   26 2398  191    3
+   3    1   29  761    0
+   4    0    0    0  150
+
+== Tabla cruzada k-means sobre las 12 variables vs k-means sobre puntajes del ACP ==
+          Kmeans_ACP
+Kmeans_log    1    2    3    4
+         1    0    0   32 1188
+         2   16 2425    2    1
+         3 1069   15    7   30
+         4    0    0  215    0
+
+== Tabla cruzada Ward sobre las 12 variables vs Ward sobre puntajes del ACP ==
+        Ward_ACP
+Ward_log    1    2    3    4
+       1 1127   17   98  199
+       2   26 2410    0  182
+       3    0   74    0  717
+       4    0    0  150    0
+
+== Índice de Rand ajustado (ARI) ==
+ k ARI_ward_kmeans ARI_kmeans_acp ARI_ward_acp
+ 4           0.772          0.958         0.74
+
+== Tabla 7 del informe: tamaño de cada grupo y % de ataques ==
+ cluster    n porcentaje pct_ataques
+       1 1220      24.40      45.902
+       2 2444      48.88      72.913
+       3 1121      22.42       4.906
+       4  215       4.30      90.698
+
+== Tabla 7 del informe: promedios en unidades originales por grupo ==
+ cluster      dur  spkts  sbytes  dbytes   sinpkt     sjit    synack ct_srv_src ct_srv_dst ct_src_ltm ct_src_dport_ltm ct_dst_sport_ltm
+       1 0.006839  2.342   353.1   132.7 1132.188     4.12 0.0001014      5.078      4.873      3.850            1.627            1.245
+       2 2.509228 32.989 24001.3 22679.5  417.515 11200.59 0.0630836      2.681      2.283      2.410            1.181            1.033
+       3 0.500782 69.810 22677.5 68326.5    7.885   702.93 0.0040230      6.356      6.000      4.789            1.680            1.008
+       4 0.099860  2.037   366.1     0.4   33.224    53.62 0.0002445     25.884     25.893     14.288           13.912            8.856
+
+== Perfil estandarizado de los grupos (Figura 9 del informe) ==
+ cluster log_dur log_spkts log_sbytes log_dbytes log_sinpkt log_sjit log_synack log_ct_srv_src log_ct_srv_dst log_ct_src_ltm log_ct_src_dport_ltm
+       1   -0.71     -1.15      -0.96      -1.04      -0.98    -1.34      -0.71           0.17           0.19           0.13                 0.02
+       2    0.57      0.20       0.21       0.24       0.84     0.85       0.71          -0.49          -0.53          -0.45                -0.29
+       3   -0.34      1.04       0.78       0.93      -0.55    -0.12      -0.62           0.44           0.48           0.45                -0.07
+       4   -0.68     -1.21      -1.05      -1.73      -1.11    -1.38      -0.71           2.33           2.43           1.99                 3.54
+ log_ct_dst_sport_ltm
+                 0.01
+                -0.22
+                -0.25
+                 3.73
+
+== Tabla 8 del informe: composición de cada grupo según tipo de tráfico (% por fila) ==
+     Tipo
+Grupo Exploits Fuzzers Normal Otros ataques Reconnaissance
+    1      6.1    17.1   54.1          15.7            7.0
+    2     33.6    19.9   27.1           8.8           10.6
+    3      2.0     2.5   95.1           0.4            0.1
+    4      1.4    12.1    9.3          75.3            1.9
+
+== Bloques de variables (corte del dendrograma en 3 grupos) ==
+             variable bloque
+              log_dur      1
+            log_spkts      2
+           log_sbytes      2
+           log_dbytes      2
+           log_sinpkt      1
+             log_sjit      1
+           log_synack      1
+       log_ct_srv_src      3
+       log_ct_srv_dst      3
+       log_ct_src_ltm      3
+ log_ct_src_dport_ltm      3
+ log_ct_dst_sport_ltm      3
+
+Etapa 3 terminada: Figuras 7 a 9 guardadas.
+
+== Tabla de contingencia del ACS: tipo de tráfico x estado de la conexión (frecuencias) ==
+                
+                 CON_otros  FIN  INT  Sum
+  Exploits              13  833   75  921
+  Fuzzers                2  500  247  749
+  Normal               579 1686  143 2408
+  Otros ataques         22  194  357  573
+  Reconnaissance         4  254   91  349
+  Sum                  620 3467  913 5000
+
+== Tabla 10 del informe: estado de la conexión según tipo de tráfico (% por fila) ==
+                
+                 CON_otros  FIN  INT
+  Exploits             1.4 90.4  8.1
+  Fuzzers              0.3 66.8 33.0
+  Normal              24.0 70.0  5.9
+  Otros ataques        3.8 33.9 62.3
+  Reconnaissance       1.1 72.8 26.1
+
+== Asociación del ACS: chi cuadrado y V de Cramér ==
+chi2 = 1637.2, gl = 8, p < 0,001 | V de Cramér = 0.405 | frecuencia esperada mínima = 43.3
+
+== Inercia (autovalores) de cada dimensión del ACS ==
+ dimension autovalor porcentaje
+         1    0.2551    77.9181
+         2    0.0723    22.0819
+
+== Coordenadas principales del ACS (Figura 10 del informe) ==
+                 Dim1   Dim2
+Exploits        0.119 -0.451
+Fuzzers        -0.460 -0.162
+Normal          0.401  0.179
+Otros ataques  -1.095  0.322
+Reconnaissance -0.294 -0.226
+CON_otros       0.662  0.622
+FIN             0.147 -0.161
+INT            -1.009  0.188
+
+== Autovalores del ACM: crudos y ajustados (Greenacre) ==
+ dimension autovalor porcentaje_crudo acumulado_crudo autovalor_ajustado porcentaje_ajustado acumulado_ajustado
+         1    0.6986          34.9293         34.9293             0.4074             83.5368            83.5368
+         2    0.3326          16.6302         51.5595             0.0397              8.1297            91.6665
+         3    0.2244          11.2181         62.7776             0.0048              0.9828            92.6493
+         4    0.1749           8.7464         71.5240             0.0001              0.0202            92.6695
+         5    0.1428           7.1385         78.6625             0.0000              0.0000            92.6695
+         6    0.1259           6.2972         84.9597             0.0000              0.0000            92.6695
+
+Q = 6 variables activas, J = 18 categorías. Inercia total cruda = J/Q - 1 = 2.000; autovalor medio 1/Q = 0.1667
+Plano 1-2: 91.7 % de la inercia ajustada (83.5 % + 8.1 %) y 51.6 % de la cruda (34.9 % + 16.6 %)
+
+== Tabla 11 del informe: categorías con contribución mayor que la promedio (5.56 %) ==
+
+Dimensión 1 (8 categorías):
+                        categoria contribucion coordenada cos2_dimension cos2_plano
+1 respuesta_destino:sin_respuesta        12.28      1.651          0.635      0.901
+2                     state_g:INT        12.25      1.677          0.628      0.901
+3            duracion_banda:corta        11.91      1.224          0.749      0.753
+4                     proto_g:udp        10.78      1.436          0.579      0.791
+5        bytes_origen_banda:bajos         8.30      1.015          0.525      0.537
+6                     state_g:FIN         6.52     -0.628          0.891      0.901
+7                     proto_g:tcp         6.33     -0.612          0.910      0.916
+8                   service_g:dns         6.23      1.591          0.291      0.734
+
+Dimensión 2 (6 categorías):
+                        categoria contribucion coordenada cos2_dimension cos2_plano
+1               state_g:CON_otros        24.73       2.00          0.563      0.717
+2                   service_g:dns        19.89       1.96          0.443      0.734
+3                   proto_g:otros        16.90      -2.16          0.364      0.574
+4                     state_g:INT        11.19      -1.11          0.273      0.901
+5 respuesta_destino:sin_respuesta        10.81      -1.07          0.266      0.901
+6                     proto_g:udp         8.31       0.87          0.212      0.791
+
+== Contribuciones (%) de todas las categorías, Dim 1 y Dim 2 ==
+                                Dim.1 Dim.2
+proto_g:otros                    4.65 16.90
+proto_g:tcp                      6.33  0.08
+proto_g:udp                     10.78  8.31
+service_g:dns                    6.23 19.89
+service_g:http                   2.87  0.05
+service_g:ninguno                0.17  3.99
+service_g:otros                  1.39  0.00
+state_g:CON_otros                3.20 24.73
+state_g:FIN                      6.52  0.15
+state_g:INT                     12.25 11.19
+respuesta_destino:con_respuesta  2.86  2.52
+respuesta_destino:sin_respuesta 12.28 10.81
+duracion_banda:corta            11.91  0.14
+duracion_banda:media             2.97  0.02
+duracion_banda:larga             2.99  0.26
+bytes_origen_banda:bajos         8.30  0.39
+bytes_origen_banda:medios        1.70  0.01
+bytes_origen_banda:altos         2.59  0.55
+
+== cos2 de todas las categorías, Dim 1 y Dim 2 ==
+                                Dim.1 Dim.2
+proto_g:otros                   0.210 0.364
+proto_g:tcp                     0.910 0.006
+proto_g:udp                     0.579 0.212
+service_g:dns                   0.291 0.443
+service_g:http                  0.146 0.001
+service_g:ninguno               0.018 0.199
+service_g:otros                 0.066 0.000
+state_g:CON_otros               0.153 0.563
+state_g:FIN                     0.891 0.010
+state_g:INT                     0.628 0.273
+respuesta_destino:con_respuesta 0.635 0.266
+respuesta_destino:sin_respuesta 0.635 0.266
+duracion_banda:corta            0.749 0.004
+duracion_banda:media            0.187 0.001
+duracion_banda:larga            0.188 0.008
+bytes_origen_banda:bajos        0.525 0.012
+bytes_origen_banda:medios       0.107 0.000
+bytes_origen_banda:altos        0.161 0.016
+
+== eta2 de las variables activas (razón de correlación con cada dimensión) ==
+                   Dim 1 Dim 2
+proto_g            0.912 0.505
+service_g          0.447 0.478
+state_g            0.921 0.720
+respuesta_destino  0.635 0.266
+duracion_banda     0.749 0.009
+bytes_origen_banda 0.527 0.019
+
+== Variables suplementarias: coordenadas, cos2 y eta2 (Dim 1 y 2) ==
+                Dim 1  Dim 2
+Exploits       -0.564 -0.142
+Fuzzers         0.102 -0.444
+Normal         -0.050  0.371
+Otros ataques   0.911 -0.537
+Reconnaissance  0.119 -0.349
+ataque          0.047 -0.344
+normal         -0.050  0.371
+1               1.413  0.245
+2              -0.616 -0.055
+3              -0.550 -0.105
+4               1.855 -0.212
+
+cos2:
+               Dim 1 Dim 2
+Exploits       0.072 0.005
+Fuzzers        0.002 0.035
+Normal         0.002 0.128
+Otros ataques  0.107 0.037
+Reconnaissance 0.001 0.009
+ataque         0.002 0.128
+normal         0.002 0.128
+1              0.645 0.019
+2              0.363 0.003
+3              0.088 0.003
+4              0.155 0.002
+
+eta2:
+             Dim 1 Dim 2
+tipo_trafico 0.157 0.141
+label        0.002 0.128
+cluster      0.889 0.020
+
+Etapa 4 terminada: Figuras 10 y 11 guardadas.
+
+== Asociación del tipo de tráfico con protocolo, servicio y estado (chi cuadrado y V de Cramér) ==
+  variable   chi2 gl          p cramer_v
+   proto_g  909.3  8 5.465e-191   0.3016
+ service_g 1539.3 12 1.235e-322   0.3203
+   state_g 1637.2  8  0.000e+00   0.4046
+
+== Tabla 12 del informe: síntesis de las técnicas ==
+
+[ACP]
+  Estructura:     3 componentes; 74,51 % de varianza
+  Interpretación: Ejes mixtos: complejidad frente a repetición; volumen y actividad
+
+[AF]
+  Estructura:     3 factores (máxima verosimilitud, varimax); 67,0 % de varianza; unicidad de log_spkts en el límite 0,005
+  Interpretación: Repetición, ritmo y volumen: reproduce los tres bloques
+
+[Clustering]
+  Estructura:     Tres bloques de variables y 4 grupos de observaciones (k-means, Ward.D2 como contraste)
+  Interpretación: Bloques de variables iguales a los factores; % de ataques por grupo: G1 46 %; G2 73 %; G3 5 %; G4 91 %
+
+[ACS]
+  Estructura:     Tipo de tráfico por estado; V de Cramér = 0,405
+  Interpretación: Normal-CON_otros y Exploits-FIN coinciden con asociaciones del ACM
+
+[ACM]
+  Estructura:     Plano de dos dimensiones; 91,7 % de inercia ajustada (Greenacre) y 51,6 % de inercia cruda
+  Interpretación: Conversación a medias frente a completa; los ataques caen del lado incompleto salvo Exploits
+
+== Archivos generados ==
+Figuras en <carpeta donde está el script>/salidas/figuras ( 11 ):
+  figura01_etapa0_boxplots.png
+  figura02_etapa0_histogramas.png
+  figura03_etapa0_correlaciones.png
+  figura04_etapa1_codo_acp.png
+  figura05_etapa1_biplot.png
+  figura06_etapa2_paralelo_af.png
+  figura07_etapa3_eleccion_k.png
+  figura08_etapa3_dendrograma_variables.png
+  figura09_etapa3_perfiles_grupos.png
+  figura10_etapa4_mapa_acs.png
+  figura11_etapa4_mapa_acm.png
+
+Tablas CSV en <carpeta donde está el script>/salidas/tablas ( 54 ):
+  acm_autovalores.csv
+  acm_categorias_contribuciones.csv
+  acm_categorias_coordenadas.csv
+  acm_categorias_cos2.csv
+  acm_eta2.csv
+  acm_resumen.csv
+  acm_suplementarias_coordenadas.csv
+  acm_suplementarias_cos2.csv
+  acm_suplementarias_eta2.csv
+  acp_autovalores.csv
+  acp_contribuciones.csv
+  acp_correlaciones.csv
+  acp_cos2.csv
+  acp_extremos.csv
+  acs_asociacion.csv
+  acs_columnas.csv
+  acs_contingencia.csv
+  acs_filas.csv
+  acs_inercia.csv
+  acs_porcentajes_fila.csv
+  af_ajuste.csv
+  af_cargas_completas.csv
+  af_diagnostico_comparativo.csv
+  af_diagnostico_minres.csv
+  af_paralelo.csv
+  af_patron.csv
+  af_varianza.csv
+  atipicos_limites.csv
+  calidad.csv
+  cluster_asignaciones.csv
+  cluster_comparaciones.csv
+  cluster_contexto.csv
+  cluster_cruce_acp.csv
+  cluster_cruce_ward_acp.csv
+  cluster_cruce_ward_kmeans.csv
+  cluster_medias_estandarizadas.csv
+  cluster_medias_originales.csv
+  cluster_metricas.csv
+  cluster_proporcion_ataques.csv
+  cluster_silhouette.csv
+  cluster_tamanos.csv
+  cluster_variables_bloques.csv
+  correlacion_con_ataque.csv
+  correlaciones.csv
+  diccionario_variables.csv
+  faltantes.csv
+  frecuencias_categoricas.csv
+  frecuencias_X_cat.csv
+  ftp_revision.csv
+  integracion_asociaciones.csv
+  integracion_tecnicas.csv
+  msa_por_variable.csv
+  piloto_supuestos.csv
+  resumen_numerico.csv
+
+Listo: las 11 figuras y las salidas del informe se generaron sin errores.

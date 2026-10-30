@@ -1,2 +1,2 @@
-"metodo","n_factores","n_sugerido_paralelo","n_kaiser_reducida","rmsr","tli","rmsea","chi2","gl","p_modelo","comunalidad_min","unicidad_min","unicidades_limite","cruces_ambiguos"
-"gls",3,4,3,0.0505261316411203,0.609304678820362,0.238928201881746,9452.3097343036,33,0,0.356251896989651,0.103250844292701,0,0
+"n_factores","rmsr","rmsea","tli","chi2","gl","p_modelo","comunalidad_min","unicidad_min","unicidades_limite","cruces_ambiguos"
+3,0.0593407216657801,0.2038379569336,0.715807815165086,6887.36444621394,33,0,0.321853269989064,0.005,1,0

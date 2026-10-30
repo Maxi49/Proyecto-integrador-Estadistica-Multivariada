@@ -1,5 +1,2 @@
-"metodo","n_factores","comunalidad_max","unicidad_min","variable_extrema","heywood","rmsr"
-"minres",3,1.02451510063151,-0.024515100631509,"log_spkts",TRUE,0.0453953582937833
-"pa",3,1.09509139566142,-0.0950913956614206,"log_spkts",TRUE,0.0452151892169467
-"ml",3,0.995030090972927,0.00496990902707295,"log_spkts",TRUE,0.0593400781989039
-"gls",3,0.896749155707299,0.103250844292701,"log_ct_src_dport_ltm",FALSE,0.0505261316411203
+"metodo","n_factores","comunalidad_max","unicidad_min","heywood"
+"minres",3,1.02451510063151,-0.024515100631509,TRUE
