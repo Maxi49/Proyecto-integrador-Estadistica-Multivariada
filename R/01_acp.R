@@ -72,12 +72,12 @@ carg$lado <- ifelse(carg$x < 0, "izq", "der")
 i_ext <- c(which.min(pt$CP1), which.max(pt$CP2), which.min(pt$CP2))
 extremos_fig <- pt[i_ext, ]
 extremos_fig$etq <- paste("Flujo", base$id[i_ext])
-colores_tipo <- c(Normal = azul, Exploits = naranja, Fuzzers = "#3a9a5b", Reconnaissance = "#8b5cc7",
+colores_tipo <- c(Normal = azul, Exploits = naranja, Fuzzers = verde, Reconnaissance = violeta,
   "Otros ataques" = rojo)
 # Rango con margen para que entren todos los puntos (incluidos los extremos_fig) y sus rótulos.
 xlim5 <- range(c(pt$CP1, carg$x)) + c(-1.2, 2.2); ylim5 <- range(c(pt$CP2, carg$y)) + c(-.5, .6)
 f5 <- ggplot(pt, aes(CP1, CP2)) + geom_hline(yintercept = 0, colour = grilla) + geom_vline(xintercept = 0, colour = grilla) +
-  geom_point(aes(colour = tipo), size = .35, alpha = .25) +
+  geom_point(aes(colour = tipo), size = .35, alpha = .4) +
   geom_segment(data = carg, aes(x = 0, y = 0, xend = x, yend = y), colour = tinta,
     linewidth = .4, arrow = arrow(length = unit(1.3, "mm"))) +
   geom_text_repel(data = carg[carg$lado == "izq", ], aes(x, y, label = etq), family = familia, size = 2.5,

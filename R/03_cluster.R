@@ -116,7 +116,7 @@ hv$labels <- sub(" \\(.*", "", etiquetas[sub("^log_", "", hv$labels)])
 png("resultados/figuras_informe/fig08_dendrograma_variables.png", width = 16, height = 8, units = "cm", res = 300, family = familia)
 par(mar = c(1, 4.5, .5, .5), cex = .7, col.axis = tinta_2, fg = tinta_2)
 plot(hv, hang = -1, main = "", xlab = "", sub = "", ylab = "Altura (Ward)", col = tinta_2, lwd = .8)
-rect.hclust(hv, k = 3, border = c(azul, naranja, "#1baf7a"))
+rect.hclust(hv, k = 3, border = c(azul, naranja, verde))
 dev.off()
 
 # Figura 9. Medias estandarizadas por grupo (mapa de calor divergente).

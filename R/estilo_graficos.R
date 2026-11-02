@@ -16,9 +16,11 @@ guardar_fig <- function(grafico, nombre, alto = 9) ggsave(paste0("resultados/fig
 # Lee una tabla CSV que escribió alguna etapa en resultados/tablas/.
 leer_tabla <- function(nombre) read.csv(paste0("resultados/tablas/", nombre, ".csv"), fileEncoding = "UTF-8")
 
-# Paleta: tinta en grises, azul y naranja para identidad, divergente azul-gris-rojo.
+# Paleta pastel apagada (pedido de la cátedra: que los gráficos no distraigan). Tinta en grises para
+# textos y ejes; colores de baja saturación que siguen distinguiendo grupos; divergente azul-gris-rosa.
 tinta <- "#0b0b0b"; tinta_2 <- "#52514e"; grilla <- "#e4e3df"; neutro <- "#f0efec"
-azul <- "#2a78d6"; naranja <- "#eb6834"; rojo <- "#e34948"; gris_puntos <- "#c3c2b7"
+azul <- "#7da0c4"; naranja <- "#d9a07a"; rojo <- "#d08c8c"; verde <- "#8fbc9b"; violeta <- "#a99ac8"
+gris_puntos <- "#c3c2b7"
 tema <- theme_minimal(base_size = 9, base_family = familia) +
   theme(panel.grid.minor = element_blank(), panel.grid.major = element_line(colour = grilla, linewidth = .3),
     axis.text = element_text(colour = tinta_2), axis.title = element_text(colour = tinta_2),
