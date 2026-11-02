@@ -129,30 +129,33 @@ aut <- leer_tabla("acm_autovalores")
 # (34,9 % y 16,6 %) porque el plano crudo solo explica 51,6 %.
 pct <- function(x) format(round(x, 1), decimal.mark = ",")
 # Dos paneles con la misma escala en ambos ejes (coord_equal): mapa completo y ampliación de la zona
-# donde se aglomeran las categorías, para que las etiquetas no se superpongan.
-zoom <- list(x = c(-.85, .45), y = c(-.6, .8))
+# donde se aglomeran las categorías, para que las etiquetas no se superpongan. El mapa completo
+# dibuja TODOS los puntos (los de la zona ampliada sin rótulo) y el recuadro punteado marca exactamente
+# los límites del panel derecho (expand = FALSE), así el zoom muestra los mismos puntos que encierra.
+zoom <- list(x = c(-1, .35), y = c(-.6, .55))
 en_zoom <- mapa$Dim.1 > zoom$x[1] & mapa$Dim.1 < zoom$x[2] & mapa$Dim.2 > zoom$y[1] & mapa$Dim.2 < zoom$y[2]
 base_mapa <- function(d, lim = NULL, tam = 2.5) {
   ggplot(d, aes(Dim.1, Dim.2, colour = rol, shape = rol)) + geom_hline(yintercept = 0, colour = grilla) +
     geom_vline(xintercept = 0, colour = grilla) + geom_point(size = 2) +
-    geom_text_repel(aes(label = categoria), family = familia, size = tam, show.legend = FALSE, max.overlaps = Inf,
+    geom_text_repel(aes(label = rotulo), family = familia, size = tam, show.legend = FALSE, max.overlaps = Inf,
       box.padding = .6, point.padding = .3, min.segment.length = .1, segment.size = .2, force = 8, max.time = 3, seed = 42,
-      nudge_x = ifelse(d$categoria == "Otros ataques", .25, 0)) +  # único empuje a mano: el rótulo tocaba el recuadro
+      nudge_y = ifelse(d$rotulo == "duración corta", -.35, 0)) +  # único empuje a mano: el rótulo pisaba el recuadro
     scale_colour_manual(values = c("Categorías activas" = tinta_2, "Tipo de tráfico (suplementaria)" = azul,
       "Grupos del clustering (suplementaria)" = naranja), drop = FALSE) +
     scale_shape_manual(values = c(1, 16, 17), drop = FALSE) +
     scale_x_continuous(labels = function(x) format(x, decimal.mark = ",")) +
     scale_y_continuous(labels = function(x) format(x, decimal.mark = ",")) +
-    coord_equal(xlim = lim$x, ylim = lim$y)  # misma escala en los dos ejes: las distancias no se deforman
+    coord_equal(xlim = lim$x, ylim = lim$y, expand = is.null(lim))  # misma escala en los dos ejes
 }
-p_total <- base_mapa(mapa[!en_zoom, ]) +
+mapa$rotulo <- ifelse(en_zoom, "", mapa$categoria)  # en el mapa completo, la zona ampliada va sin rótulos
+p_total <- base_mapa(mapa) +
   annotate("rect", xmin = zoom$x[1], xmax = zoom$x[2], ymin = zoom$y[1], ymax = zoom$y[2], fill = NA,
     colour = tinta_2, linetype = "dashed", linewidth = .3) +
   annotate("text", x = zoom$x[1], y = zoom$y[2] + .12, label = "ampliada a la derecha", hjust = 0,
     family = familia, size = 2.3, colour = tinta_2) +
   labs(title = "Mapa completo", x = NULL, y = paste0("Dim 2 (", pct(aut$porcentaje_ajustado[2]), " % ajustada; ",
     pct(aut$porcentaje_crudo[2]), " % cruda)"))
-p_zoom <- base_mapa(mapa[en_zoom, ], zoom) +
+p_zoom <- base_mapa(transform(mapa[en_zoom, ], rotulo = categoria), zoom) +
   labs(title = "Ampliación de la zona central", x = NULL, y = NULL)
 f11 <- (p_total + p_zoom) + plot_layout(guides = "collect", widths = c(1, 1.1)) &
   theme(legend.position = "bottom", legend.text = element_text(size = 8), plot.title = element_text(size = 9))
