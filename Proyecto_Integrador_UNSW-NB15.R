@@ -96,7 +96,7 @@ guardar_fig <- function(grafico, archivo, alto = 9) ggsave(file.path(dir_figuras
 # Estilo común de las figuras. Carlito es la fuente del informe; si no está instalada se usa la sans por defecto.
 familia <- if ("Carlito" %in% systemfonts::system_fonts()$family) "Carlito" else "sans"
 tinta <- "#0b0b0b"; tinta_2 <- "#52514e"; grilla <- "#e4e3df"; neutro <- "#f0efec"
-azul <- "#2a78d6"; naranja <- "#eb6834"; rojo <- "#e34948"
+azul <- "#7da0c4"; naranja <- "#d9a07a"; rojo <- "#d08c8c"; verde <- "#8fbc9b"; violeta <- "#a99ac8"  # pastel apagada
 theme_set(theme_minimal(base_size = 9, base_family = familia) +
   theme(panel.grid.minor = element_blank(), panel.grid.major = element_line(colour = grilla, linewidth = .3),
     axis.text = element_text(colour = tinta_2), axis.title = element_text(colour = tinta_2),
@@ -403,10 +403,10 @@ carg$lado <- ifelse(carg$x < 0, "izq", "der")   # la etiqueta va del lado hacia 
 i_ext <- c(which.min(pt$CP1), which.max(pt$CP2), which.min(pt$CP2))
 extremos_fig <- pt[i_ext, ]
 extremos_fig$etq <- paste("Flujo", base$id[i_ext])
-colores_tipo <- c(Normal = azul, Exploits = naranja, Fuzzers = "#3a9a5b", Reconnaissance = "#8b5cc7", "Otros ataques" = rojo)
+colores_tipo <- c(Normal = azul, Exploits = naranja, Fuzzers = verde, Reconnaissance = violeta, "Otros ataques" = rojo)
 xlim5 <- range(c(pt$CP1, carg$x)) + c(-1.2, 2.2); ylim5 <- range(c(pt$CP2, carg$y)) + c(-.5, .6)
 f5 <- ggplot(pt, aes(CP1, CP2)) + geom_hline(yintercept = 0, colour = grilla) + geom_vline(xintercept = 0, colour = grilla) +
-  geom_point(aes(colour = tipo), size = .35, alpha = .25) +
+  geom_point(aes(colour = tipo), size = .35, alpha = .4) +
   geom_segment(data = carg, aes(x = 0, y = 0, xend = x, yend = y), colour = tinta,
     linewidth = .4, arrow = arrow(length = unit(1.3, "mm"))) +
   geom_text_repel(data = carg[carg$lado == "izq", ], aes(x, y, label = etq), family = familia, size = 2.5,
@@ -687,7 +687,7 @@ hv$labels <- sub(" \\(.*", "", etiquetas[sub("^log_", "", hv$labels)])
 png(file.path(dir_figuras, "figura08_etapa3_dendrograma_variables.png"), width = 16, height = 8, units = "cm", res = 300, family = familia)
 par(mar = c(1, 4.5, .5, .5), cex = .7, col.axis = tinta_2, fg = tinta_2)
 plot(hv, hang = -1, main = "", xlab = "", sub = "", ylab = "Altura (Ward)", col = tinta_2, lwd = .8)
-rect.hclust(hv, k = 3, border = c(azul, naranja, "#1baf7a"))
+rect.hclust(hv, k = 3, border = c(azul, naranja, verde))
 invisible(dev.off())
 
 # Figura 9. Medias estandarizadas por grupo (mapa de calor divergente).
